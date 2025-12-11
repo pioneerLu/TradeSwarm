@@ -85,7 +85,12 @@ def create_market_analyst(llm) -> dict:
 
         # invoke agent with first message (same模式)
         result = agent.invoke(
-            input=state["messages"][0],
+            # input: list
+            # input=state["messages"][0],
+            input= 
+            {
+                "messages": state["messages"]
+            }
         )
 
         # 存储最后 AI 回复

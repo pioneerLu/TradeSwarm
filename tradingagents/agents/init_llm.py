@@ -1,6 +1,7 @@
 from langchain_openai import ChatOpenAI
 import os
 from dotenv import load_dotenv
+from langchain.messages import HumanMessage, AIMessage, SystemMessage
 
 load_dotenv()
 
@@ -12,4 +13,24 @@ llm = ChatOpenAI(
     base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
     model="qwen-plus"    # 此处以qwen-plus为例，可按需更换模型名称。模型列表：https://help.aliyun.com/zh/model-studio/getting-started/models
     )
+
+system_msg = SystemMessage("You are a helpful assistant.")
+human_msg = HumanMessage("how are you")
+
+# Use with chat models
+messages = [system_msg, human_msg]
+
+# response = llm.invoke(messages)
+
+from langchain.agents import create_agent
+
+agent = create_agent(model=llm)
+response = agent.invoke(input= {
+    "messages": messages
+})
+
+print(response)
+
+
+
 
