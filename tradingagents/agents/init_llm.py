@@ -22,14 +22,15 @@ messages = [system_msg, human_msg]
 
 # response = llm.invoke(messages)
 
-from langchain.agents import create_agent
-
-agent = create_agent(model=llm)
-response = agent.invoke(input= {
-    "messages": messages
-})
-
-print(response)
+# 测试代码已注释
+# from langchain.agents import create_agent
+# 
+# agent = create_agent(model=llm)
+# response = agent.invoke(input= {
+#     "messages": messages
+# })
+# 
+# print(response)
 
 
 
