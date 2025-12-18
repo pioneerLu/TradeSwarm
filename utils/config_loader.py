@@ -29,11 +29,16 @@ def load_config() -> dict:
     if 'llm' not in config:
         config['llm'] = {}
 
+    # Ensure 'data_sources' section exists
+    if 'data_sources' not in config:
+        config['data_sources'] = {}
+
     # Mapping table (Env Key -> Config Section, Config Key)
     mapping = {
         'MODEL_NAME': ('llm', 'model_name'),
         'DASHSCOPE_API_KEY': ('llm', 'api_key'),
         'BASE_URL': ('llm', 'base_url'),
+        'TUSHARE_TOKEN': ('data_sources', 'tushare_token'),
     }
 
     # Apply overrides
