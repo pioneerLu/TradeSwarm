@@ -2,7 +2,7 @@
 import tushare as ts
 from typing import Optional, Dict
 import pandas as pd
-from .utils import normalize_stock_code, format_date, extract_stock_code_number
+from utils.data_utils import normalize_stock_code, format_date, extract_stock_code_number
 
 
 class TushareProvider:
