@@ -6,3 +6,8 @@ llm:
 
 data_sources:
   tushare_token: "YOUR_TUSHARE_TOKEN"
+
+storage:
+  sqlite_path: "data/tradeswarm.sqlite"
+  chroma_persist_directory: "data/chromadb"
+  chroma_collection: "tradeswarm"
