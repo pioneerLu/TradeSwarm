@@ -11,12 +11,19 @@ from chromadb.api import ClientAPI
 from chromadb.api.models import Collection
 
 
+
+
 class DataManager:
     """
     数据管理器，负责初始化SQLite连接与ChromaDB持久化客户端。
 
     设计遵循研究型代码规范：显式传入所有配置参数，避免使用隐式默认值，
     并在初始化阶段完成路径校验、目录创建及核心依赖的实例化。
+
+    属性:
+        sqlite_connection: SQLite 数据库连接
+        chroma_client: ChromaDB 客户端
+        chroma_collection: ChromaDB 集合
     """
 
     def __init__(self, config: Dict[str, Any]) -> None:
@@ -74,3 +81,5 @@ class DataManager:
             name=chroma_collection,
             metadata={"source": "tradeswarm", "purpose": "vector_store"},
         )
+
+        

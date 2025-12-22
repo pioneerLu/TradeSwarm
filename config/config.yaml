@@ -6,6 +6,8 @@ llm:
 
 data_sources:
   tushare_token: "YOUR_TUSHARE_TOKEN"
+  akshare_default_news_limit: 10
+  akshare_request_timeout: 30
 
 storage:
   sqlite_path: "data/tradeswarm.sqlite"

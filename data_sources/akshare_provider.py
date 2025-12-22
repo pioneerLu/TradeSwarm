@@ -1,6 +1,6 @@
 """AkShare"""
 import re
-from typing import Optional, List, Dict
+from typing import Any, Optional, List, Dict
 import pandas as pd
 import akshare as ak
 from datetime import datetime
@@ -9,9 +9,29 @@ from datetime import datetime
 class AkshareProvider:
     """AkShare 数据提供者封装 - 主要获取新闻和宏观数据，具体tick数据延迟较大"""
     
-    def __init__(self):
-        """初始化 AkShare Provider（无需 token）"""
-        pass
+    def __init__(self, config: Optional[Dict[str, Any]] = None) -> None:
+        """
+        初始化 AkShare Provider
+        
+        Args:
+            config: 配置字典，可选。用于从配置中读取 data_sources 段的参数。
+                   AkShare 本身无需 token，但为保持与其他 Provider 一致的初始化模式，
+                   统一接收 config 参数。
+        
+        关键实现细节:
+            - 第一阶段：保存配置引用（如有）
+            - 第二阶段：从配置中提取 data_sources 段的超参数（如有）
+        """
+        # 第一阶段：保存配置引用
+        self._config = config or {}
+        
+        # 第二阶段：提取 data_sources 配置段（预留扩展）
+        data_sources_config = self._config.get("data_sources", {})
+        
+        # AkShare 无需 token，但预留超参数扩展点
+        # 例如：未来可从配置读取默认的新闻数量限制、请求超时等
+        self._default_news_limit = data_sources_config.get("akshare_default_news_limit", 10)
+        self._request_timeout = data_sources_config.get("akshare_request_timeout", 30)
     
     # ==================== Public ==================
     
