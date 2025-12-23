@@ -3,46 +3,66 @@ TradeSwarm 入口模块：加载配置并初始化数据管理器与数据提供
 """
 
 from data_sources.akshare_provider import AkshareProvider
+from data_manager.data_manager import DataManager
 
 
 def main() -> None:
     """
-    主函数：测试AkShare财务报表功能。
+    主函数：测试AkShare财务报表功能并插入数据库。
+    
+    实现流程:
+        1. 初始化数据提供者和管理器
+        2. 获取三大财务报表数据
+        3. 创建数据库表
+        4. 插入财务数据到数据库
+        5. 验证插入结果
     """
+    # 初始化配置
+    config = {
+        "storage": {
+            "sqlite_path": "data/tradeswarm.db",
+            "chroma_persist_directory": "data/chroma",
+            "chroma_collection": "financial_data"
+        }
+    }
     
-    # 简化测试，直接实例化AkShare提供者
-    config = {}
+    # 初始化组件
     akshare_provider = AkshareProvider(config=config)
+    data_manager = DataManager(config)
     
-    print("AkShare 数据提供者已初始化:", type(akshare_provider).__name__)
-    print("\n1. 测试利润表获取（使用所有数据源）:")
-    profit_result = akshare_provider.get_profit_statement("600519", "annual", 1, "all")
-    print(f"利润表获取结果: {profit_result.get('actual_source', '失败')}")
-    print("\n2. 测试资产负债表获取（使用所有数据源）:")
-    balance_result = akshare_provider.get_balance_sheet("600519", "annual", 1, "all")
-    print(f"资产负债表获取结果: {balance_result.get('actual_source', '失败')}")
+    # 获取财务数据
+    symbol = "600519"  # 贵州茅台
+    profit_result = akshare_provider.get_profit_statement(symbol, "annual", 1, "all")
+    balance_result = akshare_provider.get_balance_sheet(symbol, "annual", 1, "all")
+    cashflow_result = akshare_provider.get_cash_flow_statement(symbol, "annual", 1, "all")
     
-    # 测试现金流量表获取
-    print("\n3. 测试现金流量表获取（使用所有数据源）:")
-    cashflow_result = akshare_provider.get_cash_flow_statement("600519", "annual", 1, "all")
-    print(f"现金流量表获取结果: {cashflow_result.get('actual_source', '失败')}")
+    # 创建数据库表
+    data_manager.create_tables()
     
-    # 测试东方财富数据源的一致性
-    print("\n=== 测试东方财富数据源一致性 ===")
-    em_profit = akshare_provider.get_profit_statement("600519", "annual", 1, "em")
-    print(f"东方财富利润表: {'成功' if em_profit.get('data') else '失败'}")
-    if em_profit.get('errors'):
-        print(f"东方财富利润表错误: {em_profit['errors']}")
+    # 插入财务数据
+    data_manager.insert_financial_data(profit_result, "profit_statements")
+    data_manager.insert_financial_data(balance_result, "balance_sheets")
+    data_manager.insert_financial_data(cashflow_result, "cash_flow_statements")
     
-    em_balance = akshare_provider.get_balance_sheet("600519", "annual", 1, "em")
-    print(f"东方财富资产负债表: {'成功' if em_balance.get('data') else '失败'}")
-    if em_balance.get('errors'):
-        print(f"东方财富资产负债表错误: {em_balance['errors']}")
-    
-    em_cashflow = akshare_provider.get_cash_flow_statement("600519", "annual", 1, "em")
-    print(f"东方财富现金流量表: {'成功' if em_cashflow.get('data') else '失败'}")
-    if em_cashflow.get('errors'):
-        print(f"东方财富现金流量表错误: {em_cashflow['errors']}")
+    # 验证插入结果
+    results = data_manager.query_financial_data(symbol=symbol, report_period="2024")
+    for result in results:
+        table_name = result.get('table_name')
+        symbol = result.get('symbol')
+        period = result.get('report_period')
+        data_source = result.get('data_source')
+        
+        # 根据不同表类型显示关键字段
+        if table_name == "profit_statements":
+            net_profit = result.get('net_profit')
+            total_revenue = result.get('total_revenue')
+        elif table_name == "balance_sheets":
+            total_assets = result.get('total_assets')
+            total_equity = result.get('total_equity')
+        elif table_name == "cash_flow_statements":
+            operating_cash = result.get('operating_cash_flow')
+            net_cash_increase = result.get('net_cash_increase')
+
 
 if __name__ == "__main__":
     main()
