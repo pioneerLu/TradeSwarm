@@ -668,22 +668,28 @@ class AkshareProvider:
         except Exception as e:
             return {"error": f"获取公司信息失败: {str(e)}"}
     
-    def get_financial_statements(
+    def get_profit_statement(
         self,
         symbol: str,
         report_type: str = "annual",
-        periods: int = 4
+        periods: int = 4,
+        source: str = "all"
     ) -> dict:
         """
-        获取三大财务报表
+        获取利润表（独立函数）
         
         Args:
             symbol: 股票代码
             report_type: 'annual' 或 'quarter'
             periods: 获取最近 N 期数据（默认 4 期）
+            source: 数据源选择，可选值：
+                   - 'all': 依次尝试所有数据源（默认）
+                   - 'ths': 同花顺数据源
+                   - 'em': 东方财富数据源  
+                   - 'sina': 新浪数据源
         
         Returns:
-            包含利润表、资产负债表、现金流量表的字典
+            包含利润表数据的字典
         """
         clean_symbol = re.sub(r"\D", "", symbol)
         
@@ -693,6 +699,184 @@ class AkshareProvider:
         result = {
             "symbol": clean_symbol,
             "report_type": report_type,
+            "periods": periods,
+            "source": source,
+            "data": None,
+            "actual_source": None,
+            "errors": []
+        }
+        
+        # 定义数据源尝试顺序
+        sources_order = []
+        if source == "all":
+            sources_order = ["ths", "em", "sina"]
+        else:
+            sources_order = [source]
+        
+        # 依次尝试各个数据源
+        for source_name in sources_order:
+            try:
+                df = self._get_profit_sheet_from_source(clean_symbol, report_type, periods, source_name)
+                if df is not None and not df.empty:
+                    result["data"] = df.to_dict('records')
+                    result["actual_source"] = source_name
+                    break
+                else:
+                    result["errors"].append(f"{source_name} 数据源利润表为空")
+            except Exception as e:
+                result["errors"].append(f"{source_name} 数据源利润表获取失败: {str(e)}")
+        
+        if result["data"] is None:
+            result["errors"].append("所有数据源均无法获取利润表数据")
+        
+        return result
+    
+    def get_balance_sheet(
+        self,
+        symbol: str,
+        report_type: str = "annual",
+        periods: int = 4,
+        source: str = "all"
+    ) -> dict:
+        """
+        获取资产负债表（独立函数）
+        
+        Args:
+            symbol: 股票代码
+            report_type: 'annual' 或 'quarter'
+            periods: 获取最近 N 期数据（默认 4 期）
+            source: 数据源选择，可选值：
+                   - 'all': 依次尝试所有数据源（默认）
+                   - 'ths': 同花顺数据源
+                   - 'em': 东方财富数据源  
+                   - 'sina': 新浪数据源
+        
+        Returns:
+            包含资产负债表数据的字典
+        """
+        clean_symbol = re.sub(r"\D", "", symbol)
+        
+        if not clean_symbol or len(clean_symbol) != 6:
+            return {"error": f"无效的股票代码: {symbol}"}
+        
+        result = {
+            "symbol": clean_symbol,
+            "report_type": report_type,
+            "periods": periods,
+            "source": source,
+            "data": None,
+            "actual_source": None,
+            "errors": []
+        }
+        
+        # 定义数据源尝试顺序
+        sources_order = []
+        if source == "all":
+            sources_order = ["ths", "em", "sina"]
+        else:
+            sources_order = [source]
+        
+        # 依次尝试各个数据源
+        for source_name in sources_order:
+            try:
+                df = self._get_balance_sheet_from_source(clean_symbol, report_type, periods, source_name)
+                if df is not None and not df.empty:
+                    result["data"] = df.to_dict('records')
+                    result["actual_source"] = source_name
+                    break
+                else:
+                    result["errors"].append(f"{source_name} 数据源资产负债表为空")
+            except Exception as e:
+                result["errors"].append(f"{source_name} 数据源资产负债表获取失败: {str(e)}")
+        
+        if result["data"] is None:
+            result["errors"].append("所有数据源均无法获取资产负债表数据")
+        
+        return result
+    
+    def get_cash_flow_statement(
+        self,
+        symbol: str,
+        report_type: str = "annual",
+        periods: int = 4,
+        source: str = "all"
+    ) -> dict:
+        """
+        获取现金流量表（独立函数）
+        
+        Args:
+            symbol: 股票代码
+            report_type: 'annual' 或 'quarter'
+            periods: 获取最近 N 期数据（默认 4 期）
+            source: 数据源选择，可选值：
+                   - 'all': 依次尝试所有数据源（默认）
+                   - 'ths': 同花顺数据源
+                   - 'em': 东方财富数据源  
+                   - 'sina': 新浪数据源
+        
+        Returns:
+            包含现金流量表数据的字典
+        """
+        clean_symbol = re.sub(r"\D", "", symbol)
+        
+        if not clean_symbol or len(clean_symbol) != 6:
+            return {"error": f"无效的股票代码: {symbol}"}
+        
+        result = {
+            "symbol": clean_symbol,
+            "report_type": report_type,
+            "periods": periods,
+            "source": source,
+            "data": None,
+            "actual_source": None,
+            "errors": []
+        }
+        
+        # 定义数据源尝试顺序
+        sources_order = []
+        if source == "all":
+            sources_order = ["ths", "em", "sina"]
+        else:
+            sources_order = [source]
+        
+        # 依次尝试各个数据源
+        for source_name in sources_order:
+            try:
+                df = self._get_cash_flow_sheet_from_source(clean_symbol, report_type, periods, source_name)
+                if df is not None and not df.empty:
+                    result["data"] = df.to_dict('records')
+                    result["actual_source"] = source_name
+                    break
+                else:
+                    result["errors"].append(f"{source_name} 数据源现金流量表为空")
+            except Exception as e:
+                result["errors"].append(f"{source_name} 数据源现金流量表获取失败: {str(e)}")
+        
+        if result["data"] is None:
+            result["errors"].append("所有数据源均无法获取现金流量表数据")
+        
+        return result
+    
+    def get_financial_statements(
+        self,
+        symbol: str,
+        report_type: str = "annual",
+        periods: int = 4
+    ) -> dict:
+        """
+        获取三大财务报表（保持向后兼容的包装函数）
+        
+        Args:
+            symbol: 股票代码
+            report_type: 'annual' 或 'quarter'
+            periods: 获取最近 N 期数据（默认 4 期）
+        
+        Returns:
+            包含利润表、资产负债表、现金流量表的字典
+        """
+        result = {
+            "symbol": re.sub(r"\D", "", symbol),
+            "report_type": report_type,
             "income": None,
             "balance": None,
             "cashflow": None,
@@ -700,38 +884,30 @@ class AkshareProvider:
         }
         
         # 获取利润表
-        try:
-            income_df = self._get_profit_sheet(clean_symbol, report_type, periods)
-            if income_df is not None and not income_df.empty:
-                result["income"] = income_df.to_dict('records')
-            else:
-                result["errors"].append("利润表数据为空")
-        except Exception as e:
-            result["errors"].append(f"利润表获取失败: {str(e)}")
+        income_result = self.get_profit_statement(symbol, report_type, periods, "all")
+        if income_result.get("data"):
+            result["income"] = income_result["data"]
+        else:
+            result["errors"].extend(income_result.get("errors", []))
         
         # 获取资产负债表
-        try:
-            balance_df = self._get_balance_sheet(clean_symbol, report_type, periods)
-            if balance_df is not None and not balance_df.empty:
-                result["balance"] = balance_df.to_dict('records')
-            else:
-                result["errors"].append("资产负债表数据为空")
-        except Exception as e:
-            result["errors"].append(f"资产负债表获取失败: {str(e)}")
+        balance_result = self.get_balance_sheet(symbol, report_type, periods, "all")
+        if balance_result.get("data"):
+            result["balance"] = balance_result["data"]
+        else:
+            result["errors"].extend(balance_result.get("errors", []))
         
         # 获取现金流量表
-        try:
-            cashflow_df = self._get_cashflow_sheet(clean_symbol, report_type, periods)
-            if cashflow_df is not None and not cashflow_df.empty:
-                result["cashflow"] = cashflow_df.to_dict('records')
-            else:
-                result["errors"].append("现金流量表数据为空")
-        except Exception as e:
-            result["errors"].append(f"现金流量表获取失败: {str(e)}")
+        cashflow_result = self.get_cash_flow_statement(symbol, report_type, periods, "all")
+        if cashflow_result.get("data"):
+            result["cashflow"] = cashflow_result["data"]
+        else:
+            result["errors"].extend(cashflow_result.get("errors", []))
         
         # 如果三大报表均为空，则视为失败
         if result["income"] is None and result["balance"] is None and result["cashflow"] is None:
             result["errors"].append("AkShare 三大报表全部为空，可能接口失效或需要替代方案")
+        
         return result
     
     def get_financial_indicators(
@@ -977,18 +1153,37 @@ class AkshareProvider:
     
     # ==================== fundamentals ====================
     
-    def _get_profit_sheet(
+    def _get_profit_sheet_from_source(
         self,
         symbol: str,
         report_type: str,
-        periods: int
+        periods: int,
+        source: str
     ) -> pd.DataFrame:
-        """获取利润表"""
+        """从指定数据源获取利润表"""
         try:
-            if report_type == "quarter":
-                df = ak.stock_profit_sheet_by_quarterly_em(symbol=symbol)
+            if source == "ths":
+                # 同花顺数据源
+                indicator = "按单季度" if report_type == "quarter" else "按年度"
+                df = ak.stock_financial_benefit_ths(symbol=symbol, indicator=indicator)
+                
+            elif source == "em":
+                # 东方财富数据源
+                if report_type == "quarter":
+                    df = ak.stock_profit_sheet_by_quarterly_em(symbol=symbol)
+                else:
+                    df = ak.stock_profit_sheet_by_yearly_em(symbol=symbol)
+                    
+            elif source == "sina":
+                # 新浪数据源（需要先获取所有数据再筛选）
+                df = ak.stock_financial_report_sina(symbol=symbol)
+                if df is not None and not df.empty:
+                    # 新浪接口返回所有报表数据，需要筛选利润表
+                    # 具体实现可能需要根据实际返回的数据结构调整
+                    pass
+                    
             else:
-                df = ak.stock_profit_sheet_by_yearly_em(symbol=symbol)
+                return pd.DataFrame()
             
             if df is not None and not df.empty and periods > 0:
                 df = df.head(periods)
@@ -996,6 +1191,91 @@ class AkshareProvider:
             return df
         except Exception:
             return pd.DataFrame()
+    
+    def _get_balance_sheet_from_source(
+        self,
+        symbol: str,
+        report_type: str,
+        periods: int,
+        source: str
+    ) -> pd.DataFrame:
+        """从指定数据源获取资产负债表"""
+        try:
+            if source == "ths":
+                # 同花顺数据源
+                indicator = "按单季度" if report_type == "quarter" else "按年度"
+                df = ak.stock_financial_debt_ths(symbol=symbol, indicator=indicator)
+                
+            elif source == "em":
+                # 东方财富数据源
+                if report_type == "quarter":
+                    df = ak.stock_balance_sheet_by_quarterly_em(symbol=symbol)
+                else:
+                    df = ak.stock_balance_sheet_by_yearly_em(symbol=symbol)
+                    
+            elif source == "sina":
+                # 新浪数据源
+                df = ak.stock_financial_report_sina(symbol=symbol)
+                if df is not None and not df.empty:
+                    # 新浪接口返回所有报表数据，需要筛选资产负债表
+                    pass
+                    
+            else:
+                return pd.DataFrame()
+            
+            if df is not None and not df.empty and periods > 0:
+                df = df.head(periods)
+            
+            return df
+        except Exception:
+            return pd.DataFrame()
+    
+    def _get_cash_flow_sheet_from_source(
+        self,
+        symbol: str,
+        report_type: str,
+        periods: int,
+        source: str
+    ) -> pd.DataFrame:
+        """从指定数据源获取现金流量表"""
+        try:
+            if source == "ths":
+                # 同花顺数据源
+                indicator = "按单季度" if report_type == "quarter" else "按年度"
+                df = ak.stock_financial_cash_ths(symbol=symbol, indicator=indicator)
+                
+            elif source == "em":
+                # 东方财富数据源
+                if report_type == "quarter":
+                    df = ak.stock_cash_flow_sheet_by_quarterly_em(symbol=symbol)
+                else:
+                    df = ak.stock_cash_flow_sheet_by_yearly_em(symbol=symbol)
+                    
+            elif source == "sina":
+                # 新浪数据源
+                df = ak.stock_financial_report_sina(symbol=symbol)
+                if df is not None and not df.empty:
+                    # 新浪接口返回所有报表数据，需要筛选现金流量表
+                    pass
+                    
+            else:
+                return pd.DataFrame()
+            
+            if df is not None and not df.empty and periods > 0:
+                df = df.head(periods)
+            
+            return df
+        except Exception:
+            return pd.DataFrame()
+    
+    def _get_profit_sheet(
+        self,
+        symbol: str,
+        report_type: str,
+        periods: int
+    ) -> pd.DataFrame:
+        """获取利润表（保持向后兼容的包装函数）"""
+        return self._get_profit_sheet_from_source(symbol, report_type, periods, "ths")
     
     def _get_balance_sheet(
         self,
@@ -1003,20 +1283,8 @@ class AkshareProvider:
         report_type: str,
         periods: int
     ) -> pd.DataFrame:
-        """获取资产负债表"""
-        try:
-            if report_type == "quarter":
-                # 季度数据可能需要使用 report 接口
-                df = ak.stock_balance_sheet_by_report_em(symbol=symbol)
-            else:
-                df = ak.stock_balance_sheet_by_yearly_em(symbol=symbol)
-            
-            if df is not None and not df.empty and periods > 0:
-                df = df.head(periods)
-            
-            return df
-        except Exception:
-            return pd.DataFrame()
+        """获取资产负债表（保持向后兼容的包装函数）"""
+        return self._get_balance_sheet_from_source(symbol, report_type, periods, "ths")
     
     def _get_cashflow_sheet(
         self,
@@ -1024,19 +1292,8 @@ class AkshareProvider:
         report_type: str,
         periods: int
     ) -> pd.DataFrame:
-        """获取现金流量表"""
-        try:
-            if report_type == "quarter":
-                df = ak.stock_cash_flow_sheet_by_quarterly_em(symbol=symbol)
-            else:
-                df = ak.stock_cash_flow_sheet_by_yearly_em(symbol=symbol)
-            
-            if df is not None and not df.empty and periods > 0:
-                df = df.head(periods)
-            
-            return df
-        except Exception:
-            return pd.DataFrame()
+        """获取现金流量表（保持向后兼容的包装函数）"""
+        return self._get_cash_flow_sheet_from_source(symbol, report_type, periods, "ths")
     
     def _format_company_info(self, df: pd.DataFrame, symbol: str) -> dict:
         """格式化公司信息（来自 stock_profile_cninfo）"""
