@@ -35,139 +35,298 @@ class AkshareProvider:
     
     # ==================== Public ==================
     
-    def get_stock_news(
+
+    
+    def get_macro_news(
         self,
-        symbol: str,
+        source: str = "all",
         limit: int = 10
-    ) -> str:
+    ) -> dict:
         """
-        获取股票相关新闻（来源：东方财富）
+        获取宏观经济新闻
         
-        返回 Markdown 格式的个股新闻简报，便于 LLM 理解和处理。
+        支持多个数据源：
+        - 'cctv': 央视财经数据源
+        - 'baidu': 百度财经数据源
+        - 'all': 依次尝试所有数据源（默认）
         
         Args:
-            symbol: 股票代码，支持以下格式：
-                - '000001' (6位数字)
-                - '000001.SZ' (带后缀)
-                - '600000.SH' (带后缀)
-            limit: 返回的新闻数量限制（默认 10 条）
+            source: 数据源选择
+            limit: 返回新闻数量限制
         
         Returns:
-            Markdown 格式的字符串，包含个股新闻简报
+            包含宏观新闻的字典：
+            - data: pandas.DataFrame，包含新闻数据
+            - actual_sources: list，实际成功的数据源列表
+            - errors: list，各数据源的错误信息
+            - update_time: str，数据更新时间
         """
-        try:
-            # 清洗股票代码
-            clean_symbol = re.sub(r"\D", "", symbol)
+        # 第一阶段：初始化结果结构
+        update_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        result = {
+            "data": pd.DataFrame(),
+            "actual_sources": [],
+            "errors": [],
+            "update_time": update_time
+        }
+        
+        # 第二阶段：定义数据源尝试顺序
+        sources_order = []
+        if source == "all":
+            sources_order = ["cctv", "baidu"]
+        else:
+            sources_order = [source]
+        
+        # 第三阶段：依次尝试各个数据源
+        for source_name in sources_order:
+            try:
+                news_df = self._get_macro_news_from_source(limit, source_name)
+                if news_df is not None and not news_df.empty:
+                    # 添加数据源标识列
+                    news_df = news_df.copy()
+                    news_df["data_source"] = source_name
+                    
+                    if result["data"].empty:
+                        result["data"] = news_df
+                    else:
+                        result["data"] = pd.concat([result["data"], news_df], ignore_index=True)
+                    
+                    result["actual_sources"].append(source_name)
+                    
+                    # 如果不是 all 模式且已获取数据，停止尝试其他数据源
+                    if source != "all":
+                        break
+            except Exception as e:
+                result["errors"].append(f"{source_name} 数据源宏观新闻获取失败: {str(e)}")
+        
+        # 第四阶段：处理数据去重和限制数量
+        if not result["data"].empty:
+            result["data"] = self._deduplicate_news_dataframe(result["data"])
             
-            if not clean_symbol or len(clean_symbol) != 6:
-                return self._format_stock_news_error(symbol, f"无效的股票代码: {symbol}")
-            
-            # 获取新闻数据
-            df = self._fetch_stock_news_data(clean_symbol, limit)
-            
-            if df is None or df.empty:
-                return self._format_stock_news_empty(clean_symbol)
-            
-            # 格式化为 Markdown
-            return self._format_stock_news_markdown(clean_symbol, df, limit)
-            
-        except Exception as e:
-            error_msg = str(e)
-            if "Expecting value" in error_msg or "JSON" in error_msg or "JSONDecodeError" in error_msg:
-                return self._format_stock_news_error(
-                    symbol, 
-                    "AkShare 接口返回格式异常（可能是接口变更、网络问题或数据源暂时不可用）。请稍后重试或使用 Tushare 作为备选数据源。"
-                )
-            else:
-                return self._format_stock_news_error(symbol, f"获取股票新闻失败: {error_msg}")
+            # 限制返回数量
+            if len(result["data"]) > limit:
+                result["data"] = result["data"].head(limit)
+        
+        # 如果所有数据源都失败，添加错误信息
+        if not result["actual_sources"]:
+            result["errors"].append("所有数据源均无法获取宏观新闻")
+        
+        return result
     
-    def get_global_news(self) -> str:
+    def get_northbound_money_flow(self) -> dict:
         """
-        获取宏观市场全景简报
-        
-        聚合四个维度的宏观数据：
-        1. 宏观新闻（10条）
-        2. 北向资金流向
-        3. 核心指数表现
-        4. 实时汇率信息
-        
-        返回 Markdown 格式的宏观市场全景简报，便于 LLM 理解和处理。
+        获取北向资金实时净流入情况
         
         Returns:
-            Markdown 格式的字符串，包含宏观市场全景简报
+            包含北向资金流向信息的字典：
+            - data: dict，包含北向资金流向信息
+            - errors: list，错误信息
+            - update_time: str，数据更新时间
         """
         update_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        sections = []
-        errors = []
         
-        # 1. 获取宏观新闻
-        try:
-            news_df = self._get_macro_news(limit=10)
-            if news_df is not None and not news_df.empty:
-                sections.append(self._format_macro_news_section(news_df))
-            else:
-                errors.append("宏观新闻")
-        except Exception as e:
-            errors.append(f"宏观新闻（错误: {str(e)[:50]}）")
+        result = {
+            "data": {},
+            "errors": [],
+            "update_time": update_time
+        }
         
-        # 2. 获取北向资金
         try:
             money_flow = self._get_smart_money_flow()
             if money_flow and "error" not in money_flow:
-                sections.append(self._format_money_flow_section(money_flow))
+                result["data"] = money_flow
             else:
-                errors.append("北向资金")
+                result["errors"].append("北向资金数据获取失败")
+                if money_flow and "error" in money_flow:
+                    result["errors"].append(money_flow["error"])
         except Exception as e:
-            errors.append(f"北向资金（错误: {str(e)[:50]}）")
+            result["errors"].append(f"北向资金获取失败: {str(e)}")
         
-        # 3. 获取核心指数
+        return result
+    
+    def get_global_indices_performance(self) -> dict:
+        """
+        获取关键外围指数涨跌幅表现
+        
+        Returns:
+            包含核心指数表现的字典：
+            - data: pandas.DataFrame，包含核心指数表现
+            - errors: list，错误信息
+            - update_time: str，数据更新时间
+        """
+        update_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        result = {
+            "data": pd.DataFrame(),
+            "errors": [],
+            "update_time": update_time
+        }
+        
         try:
             indices = self._get_global_indices_summary()
             if indices:
-                sections.append(self._format_indices_section(indices))
+                indices_df = pd.DataFrame(indices)
+                result["data"] = indices_df
             else:
-                errors.append("核心指数")
+                result["errors"].append("核心指数数据获取失败")
         except Exception as e:
-            errors.append(f"核心指数（错误: {str(e)[:50]}）")
+            result["errors"].append(f"核心指数获取失败: {str(e)}")
         
-        # 4. 获取汇率
+        return result
+    
+    def get_currency_exchange_rate(self) -> dict:
+        """
+        获取美元/人民币汇率信息
+        
+        Returns:
+            包含汇率信息的字典：
+            - data: dict，包含汇率信息
+            - errors: list，错误信息
+            - update_time: str，数据更新时间
+        """
+        update_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        
+        result = {
+            "data": {},
+            "errors": [],
+            "update_time": update_time
+        }
+        
         try:
             currency = self._get_currency_rate()
             if currency and currency.get("price") is not None:
-                sections.append(self._format_currency_section(currency))
+                result["data"] = currency
             else:
-                errors.append("汇率信息")
+                result["errors"].append("汇率数据获取失败")
         except Exception as e:
-            errors.append(f"汇率信息（错误: {str(e)[:50]}）")
+            result["errors"].append(f"汇率获取失败: {str(e)}")
         
-        # 组装完整的 Markdown
-        markdown = f"# 宏观市场全景简报\n\n"
-        markdown += f"**更新时间**: {update_time}\n\n"
-        markdown += "---\n\n"
-        
-        # 添加各个部分
-        for section in sections:
-            markdown += section + "\n\n---\n\n"
-        
-        if errors:
-            markdown += f"## ⚠️ 数据获取提示\n\n"
-            markdown += f"以下数据获取失败，可能影响分析完整性：\n"
-            for error in errors:
-                markdown += f"- {error}\n"
-            markdown += f"\n建议：检查网络连接或稍后重试。\n\n"
-        
-        markdown += f"*数据来源: AkShare (东方财富)*\n"
-        
-        return markdown
+        return result
     
     # ==================== Internal Methods ================
     
     def _fetch_stock_news_data(self, clean_symbol: str, limit: int) -> pd.DataFrame:
-        """获取股票新闻原始数据"""
-        df = ak.stock_news_em(symbol=clean_symbol)
-        if df is not None and not df.empty and limit > 0:
-            df = df.head(limit)
-        return df
+        """获取股票新闻原始数据（保持向后兼容）"""
+        # 注意：stock_news_em 目前不可用，返回空DataFrame
+        return pd.DataFrame()
+    
+
+    
+    def _format_news_dataframe(self, df: pd.DataFrame, source: str) -> pd.DataFrame:
+        """格式化新闻 DataFrame，统一列名"""
+        if df is None or df.empty:
+            return pd.DataFrame()
+        
+        # 复制 DataFrame 避免修改原始数据
+        formatted_df = df.copy()
+        
+        # 获取列名映射
+        column_mapping = self._get_news_column_mapping(df.columns)
+        
+        # 标准化列名
+        standardized_columns = {}
+        for key, original_col in column_mapping.items():
+            if original_col in df.columns:
+                standardized_columns[key] = original_col
+        
+        # 创建标准化 DataFrame
+        result_df = pd.DataFrame()
+        
+        # 基础列
+        if "title" in standardized_columns:
+            result_df["title"] = df[standardized_columns["title"]]
+        else:
+            result_df["title"] = "无标题"
+        
+        if "content" in standardized_columns:
+            result_df["content"] = df[standardized_columns["content"]]
+        else:
+            result_df["content"] = ""
+        
+        if "time" in standardized_columns:
+            result_df["publish_time"] = df[standardized_columns["time"]]
+        else:
+            result_df["publish_time"] = pd.NaT
+        
+        if "url" in standardized_columns:
+            result_df["url"] = df[standardized_columns["url"]]
+        else:
+            result_df["url"] = ""
+        
+        if "source" in standardized_columns:
+            result_df["original_source"] = df[standardized_columns["source"]]
+        else:
+            result_df["original_source"] = source
+        
+        # 保留其他可能的有用列
+        for col in df.columns:
+            if col not in standardized_columns.values():
+                result_df[f"extra_{col}"] = df[col]
+        
+        return result_df
+    
+    def _get_news_column_mapping(self, columns) -> Dict[str, str]:
+        """获取新闻数据列名映射"""
+        mapping = {}
+        
+        for col in columns:
+            col_str = str(col).lower()
+            
+            if "标题" in str(col) or "title" in col_str or "公告标题" in str(col):
+                mapping["title"] = col
+            elif "内容" in str(col) or "content" in col_str or "摘要" in str(col) or "正文" in str(col):
+                mapping["content"] = col
+            elif "时间" in str(col) or "time" in col_str or "日期" in str(col) or "发布时间" in str(col) or "公告日期" in str(col):
+                mapping["time"] = col
+            elif "链接" in str(col) or "url" in col_str or "网址" in str(col):
+                mapping["url"] = col
+            elif "来源" in str(col) or "source" in col_str:
+                mapping["source"] = col
+            elif "名称" in str(col) or "name" in col_str:
+                mapping["name"] = col
+            elif "类型" in str(col) or "公告类型" in str(col):
+                mapping["type"] = col
+        
+        return mapping
+    
+    def _deduplicate_news_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
+        """新闻 DataFrame 去重（基于标题）"""
+        if df is None or df.empty:
+            return pd.DataFrame()
+        
+        # 按标题去重
+        deduplicated_df = df.drop_duplicates(subset=["title"], keep="first", ignore_index=True)
+        
+        return deduplicated_df
+    
+    def _get_macro_news_from_source(self, limit: int, source: str) -> pd.DataFrame:
+        """从指定数据源获取宏观新闻"""
+        try:
+            if source == "cctv":
+                # 央视财经数据源 - 宏观新闻
+                df = ak.news_cctv()
+                
+            elif source == "baidu":
+                # 百度财经数据源 - 宏观新闻
+                df = ak.news_economic_baidu()
+                
+            else:
+                return pd.DataFrame()
+            
+            if df is not None and not df.empty:
+                # 统一列名格式
+                df = self._format_news_dataframe(df, source)
+                
+                # 限制数量
+                if limit > 0 and len(df) > limit:
+                    df = df.head(limit)
+                
+                return df
+            
+            return pd.DataFrame()
+            
+        except Exception:
+            return pd.DataFrame()
     
     def _get_macro_news(self, limit: int = 10) -> pd.DataFrame:
         """

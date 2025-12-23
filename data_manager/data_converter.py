@@ -195,9 +195,144 @@ def prepare_cash_flow_statement_data(
     return result
 
 
+def prepare_macro_news_data(
+    akshare_result: Dict[str, Any]
+) -> Optional[Dict[str, Any]]:
+    """
+    准备宏观新闻数据用于插入数据库
+    
+    Args:
+        akshare_result: AkShare返回的宏观新闻结果
+    
+    Returns:
+        准备好的数据库记录列表（多条记录），如果数据无效则返回None
+    """
+    data = akshare_result.get('data')
+    if data is None:
+        return None
+    
+    # 宏观新闻返回DataFrame，需要转换为记录列表
+    if hasattr(data, 'empty') and data.empty:
+        return None
+    
+    records = []
+    
+    for _, row in data.iterrows():
+        record = {
+            'title': str(row.get('title', '')) if row.get('title') is not None else '',
+            'content': str(row.get('content', '')) if row.get('content') is not None and row.get('content') != '' else None,
+            'publish_time': str(row.get('publish_time', '')) if row.get('publish_time') is not None and row.get('publish_time') != '' else None,
+            'url': str(row.get('url', '')) if row.get('url') is not None and row.get('url') != '' else None,
+            'original_source': str(row.get('original_source', '')) if row.get('original_source') is not None and row.get('original_source') != '' else None,
+            'data_source': str(row.get('data_source', '')) if row.get('data_source') is not None and row.get('data_source') != '' else 'unknown',
+        }
+        records.append(record)
+    
+    return records
+
+
+def prepare_northbound_money_flow_data(
+    akshare_result: Dict[str, Any]
+) -> Optional[Dict[str, Any]]:
+    """
+    准备北向资金流向数据用于插入数据库
+    
+    Args:
+        akshare_result: AkShare返回的北向资金流向结果
+    
+    Returns:
+        准备好的数据库记录（单条记录），如果数据无效则返回None
+    """
+    data = akshare_result.get('data')
+    if data is None:
+        return None
+    
+    money_flow = data
+    
+    record = {
+        'title': str(money_flow.get('title', '北向资金')) if money_flow.get('title') is not None else '北向资金',
+        'value': str(money_flow.get('value', '')) if money_flow.get('value') is not None else '',
+        'flow_status': str(money_flow.get('flow_status', '')) if money_flow.get('flow_status') is not None and money_flow.get('flow_status') != '' else None,
+        'amount_yi': float(money_flow.get('amount_yi', 0)) if money_flow.get('amount_yi') is not None else None,
+        'date': str(money_flow.get('date', '')) if money_flow.get('date') is not None and money_flow.get('date') != '' else None,
+        'source': str(money_flow.get('source', '')) if money_flow.get('source') is not None and money_flow.get('source') != '' else None,
+    }
+    
+    return record
+
+
+def prepare_global_indices_data(
+    akshare_result: Dict[str, Any]
+) -> Optional[Dict[str, Any]]:
+    """
+    准备核心指数表现数据用于插入数据库
+    
+    Args:
+        akshare_result: AkShare返回的核心指数表现结果
+    
+    Returns:
+        准备好的数据库记录列表（多条记录），如果数据无效则返回None
+    """
+    data = akshare_result.get('data')
+    if data is None:
+        return None
+    
+    # 核心指数返回DataFrame，需要转换为记录列表
+    if hasattr(data, 'empty') and data.empty:
+        return None
+    
+    records = []
+    
+    for _, row in data.iterrows():
+        record = {
+            'asset': str(row.get('asset', '')) if row.get('asset') is not None else '',
+            'code': str(row.get('code', '')) if row.get('code') is not None else '',
+            'price': float(row.get('price', 0)) if row.get('price') is not None else None,
+            'change': str(row.get('change', '')) if row.get('change') is not None else '',
+            'change_pct': float(row.get('change_pct', 0)) if row.get('change_pct') is not None else None,
+        }
+        records.append(record)
+    
+    return records
+
+
+def prepare_currency_exchange_rate_data(
+    akshare_result: Dict[str, Any]
+) -> Optional[Dict[str, Any]]:
+    """
+    准备汇率信息数据用于插入数据库
+    
+    Args:
+        akshare_result: AkShare返回的汇率信息结果
+    
+    Returns:
+        准备好的数据库记录（单条记录），如果数据无效则返回None
+    """
+    data = akshare_result.get('data')
+    if data is None:
+        return None
+    
+    currency = data
+    
+    record = {
+        'currency_pair': str(currency.get('currency_pair', '')) if currency.get('currency_pair') is not None else '',
+        'price': float(currency.get('price', 0)) if currency.get('price') is not None else None,
+        'change': str(currency.get('change', '')) if currency.get('change') is not None and currency.get('change') != '' else None,
+        'change_pct': float(currency.get('change_pct', 0)) if currency.get('change_pct') is not None else None,
+        'description': str(currency.get('description', '')) if currency.get('description') is not None and currency.get('description') != '' else None,
+        'date': str(currency.get('date', '')) if currency.get('date') is not None and currency.get('date') != '' else None,
+    }
+    
+    return record
+
+
 # 数据准备函数映射
 DATA_PREPARERS = {
     "profit_statements": prepare_profit_statement_data,
     "balance_sheets": prepare_balance_sheet_data,
     "cash_flow_statements": prepare_cash_flow_statement_data,
+    "macro_news": prepare_macro_news_data,
+    "northbound_money_flow": prepare_northbound_money_flow_data,
+    "global_indices": prepare_global_indices_data,
+    "currency_exchange_rates": prepare_currency_exchange_rate_data,
 }

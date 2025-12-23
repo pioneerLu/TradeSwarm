@@ -136,12 +136,77 @@ CREATE TABLE IF NOT EXISTS cash_flow_statements (
 );
 """
 
+# 宏观新闻表
+MACRO_NEWS_TABLE = """
+CREATE TABLE IF NOT EXISTS macro_news (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    content TEXT,
+    publish_time TEXT,
+    url TEXT,
+    original_source TEXT,
+    data_source TEXT NOT NULL,     -- "cctv", "baidu" 等
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(title, data_source, publish_time)
+);
+"""
+
+# 北向资金流向表（每次查询保存一条整体记录）
+NORTHBOUND_MONEY_FLOW_TABLE = """
+CREATE TABLE IF NOT EXISTS northbound_money_flow (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    value TEXT NOT NULL,           -- 如"净流入 15.23 亿元"
+    flow_status TEXT,              -- "净流入" 或 "净流出"
+    amount_yi REAL,                -- 金额（亿元）
+    date TEXT,
+    source TEXT,
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+"""
+
+# 核心指数表现表
+GLOBAL_INDICES_TABLE = """
+CREATE TABLE IF NOT EXISTS global_indices (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    asset TEXT NOT NULL,           -- 指数名称
+    code TEXT NOT NULL,            -- 指数代码
+    price REAL NOT NULL,           -- 最新价
+    change TEXT NOT NULL,          -- 涨跌幅字符串
+    change_pct REAL,               -- 涨跌幅数值
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(code, created_at)
+);
+"""
+
+# 汇率信息表（每次查询保存一条整体记录）
+CURRENCY_EXCHANGE_RATE_TABLE = """
+CREATE TABLE IF NOT EXISTS currency_exchange_rates (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    currency_pair TEXT NOT NULL,   -- 如"USD/CNY"
+    price REAL,                    -- 汇率数值
+    change TEXT,                   -- 涨跌幅字符串
+    change_pct REAL,               -- 涨跌幅数值
+    description TEXT,              -- 完整描述
+    date TEXT,
+    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+"""
+
 # 表名映射
 TABLE_SCHEMAS = {
     "stocks": STOCKS_TABLE,
     "profit_statements": PROFIT_STATEMENTS_TABLE,
     "balance_sheets": BALANCE_SHEETS_TABLE,
     "cash_flow_statements": CASH_FLOW_STATEMENTS_TABLE,
+    "macro_news": MACRO_NEWS_TABLE,
+    "northbound_money_flow": NORTHBOUND_MONEY_FLOW_TABLE,
+    "global_indices": GLOBAL_INDICES_TABLE,
+    "currency_exchange_rates": CURRENCY_EXCHANGE_RATE_TABLE,
 }
 
 # 字段映射关系（原始字段名 -> 数据库字段名）

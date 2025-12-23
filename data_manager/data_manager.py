@@ -109,41 +109,64 @@ class DataManager:
 
     def insert_financial_data(self, akshare_result: Dict[str, Any], table_name: str) -> bool:
         """
-        插入财务数据到指定表
+        插入数据到指定表（支持财务数据和宏观市场数据）
         
         Args:
-            akshare_result: AkShare返回的财务报表结果
+            akshare_result: AkShare返回的结果数据
             table_name: 目标表名，可选值：
+                        财务数据：
                         - "profit_statements": 利润表
                         - "balance_sheets": 资产负债表
                         - "cash_flow_statements": 现金流量表
+                        宏观数据：
+                        - "macro_news": 宏观新闻
+                        - "northbound_money_flow": 北向资金流向
+                        - "global_indices": 核心指数表现
+                        - "currency_exchange_rates": 汇率信息
         
         Returns:
             插入是否成功
         
         关键实现细节:
             - 第一阶段：验证表名和结果数据
-            - 第二阶段：确保股票信息存在（满足外键约束）
+            - 第二阶段：区分财务数据和宏观数据处理逻辑
             - 第三阶段：使用对应的数据准备函数转换数据
             - 第四阶段：插入数据到数据库并处理异常
         """
         # 第一阶段：验证表名和结果数据
-        if table_name not in ["profit_statements", "balance_sheets", "cash_flow_statements"]:
+        supported_tables = [
+            "profit_statements", "balance_sheets", "cash_flow_statements",
+            "macro_news", "northbound_money_flow", "global_indices", "currency_exchange_rates"
+        ]
+        
+        if table_name not in supported_tables:
             print(f"错误：不支持的表名 {table_name}")
             return False
         
-        if not isinstance(akshare_result, dict) or not akshare_result.get('data'):
-            print(f"错误：插入的数据无效或为空")
+        if not isinstance(akshare_result, dict):
+            print(f"错误：插入的数据无效")
+            return False
+        
+        data = akshare_result.get('data')
+        if data is None:
+            print(f"错误：插入的数据为空")
+            return False
+        
+        # 检查DataFrame是否为空
+        import pandas as pd
+        if isinstance(data, pd.DataFrame) and data.empty:
+            print(f"错误：DataFrame数据为空")
             return False
         
         try:
-            # 第二阶段：确保股票信息存在
-            symbol = akshare_result.get('symbol')
-            if not symbol:
-                print(f"错误：股票代码缺失")
-                return False
-            
-            self._ensure_stock_exists(symbol)
+            # 第二阶段：区分处理逻辑
+            # 财务数据需要确保股票存在，宏观数据不需要
+            if table_name in ["profit_statements", "balance_sheets", "cash_flow_statements"]:
+                symbol = akshare_result.get('symbol')
+                if not symbol:
+                    print(f"错误：股票代码缺失")
+                    return False
+                self._ensure_stock_exists(symbol)
             
             # 第三阶段：数据转换
             from .data_converter import DATA_PREPARERS
@@ -158,8 +181,14 @@ class DataManager:
                 print(f"错误：数据转换失败")
                 return False
             
-            # 第四阶段：插入数据库
-            return self._insert_record(table_name, db_data)
+            # 第四阶段：根据数据类型选择插入方法
+            # 宏观数据中的新闻和指数返回列表（多条记录），其他返回单条记录
+            multi_record_tables = ["macro_news", "global_indices"]
+            
+            if table_name in multi_record_tables:
+                return self._insert_multiple_records(table_name, db_data)
+            else:
+                return self._insert_record(table_name, db_data)
             
         except Exception as e:
             print(f"插入数据时发生异常: {e}")
@@ -231,7 +260,12 @@ class DataManager:
             cursor.execute(sql, values)
             self.sqlite_connection.commit()
             
-            print(f"成功插入数据到 {table_name}: {data.get('symbol', 'N/A')} - {data.get('report_period', 'N/A')}")
+            # 根据表类型显示不同的成功信息
+            if table_name in ["profit_statements", "balance_sheets", "cash_flow_statements"]:
+                print(f"成功插入数据到 {table_name}: {data.get('symbol', 'N/A')} - {data.get('report_period', 'N/A')}")
+            else:
+                print(f"成功插入数据到 {table_name}")
+            
             cursor.close()
             return True
             
@@ -242,19 +276,80 @@ class DataManager:
             print(f"插入记录时发生异常: {e}")
             return False
 
+    def _insert_multiple_records(self, table_name: str, data_list: list) -> bool:
+        """
+        内部方法：插入多条记录到数据库
+        
+        Args:
+            table_name: 表名
+            data_list: 要插入的数据字典列表
+        
+        Returns:
+            插入是否成功
+        """
+        if not data_list or not isinstance(data_list, list):
+            print(f"错误：数据列表无效或为空")
+            return False
+        
+        try:
+            cursor = self.sqlite_connection.cursor()
+            success_count = 0
+            error_count = 0
+            
+            for data in data_list:
+                if not isinstance(data, dict):
+                    error_count += 1
+                    continue
+                
+                # 获取所有非None的字段
+                valid_fields = {k: v for k, v in data.items() if v is not None}
+                
+                if not valid_fields:
+                    error_count += 1
+                    continue
+                
+                # 构建INSERT语句
+                columns = list(valid_fields.keys())
+                placeholders = ['?' for _ in columns]
+                values = list(valid_fields.values())
+                
+                sql = f"INSERT OR REPLACE INTO {table_name} ({', '.join(columns)}) VALUES ({', '.join(placeholders)})"
+                
+                try:
+                    cursor.execute(sql, values)
+                    success_count += 1
+                except sqlite3.Error as e:
+                    print(f"插入单条记录失败: {e}")
+                    error_count += 1
+            
+            # 提交所有成功的插入
+            if success_count > 0:
+                self.sqlite_connection.commit()
+            
+            cursor.close()
+            
+            print(f"成功插入 {success_count} 条记录到 {table_name}，失败 {error_count} 条")
+            return success_count > 0
+            
+        except Exception as e:
+            print(f"批量插入记录时发生异常: {e}")
+            return False
+
     def query_financial_data(
         self,
         symbol: Optional[str] = None,
         table_name: Optional[str] = None,
-        report_period: Optional[str] = None
+        report_period: Optional[str] = None,
+        limit: Optional[int] = None
     ) -> list:
         """
-        查询财务数据
+        查询数据（支持财务数据和宏观市场数据）
         
         Args:
-            symbol: 股票代码，为空则查询所有
-            table_name: 表名，为空则查询所有财务表
-            report_period: 报告期，为空则查询所有期数
+            symbol: 股票代码，为空则查询所有（仅对财务数据有效）
+            table_name: 表名，为空则查询所有表
+            report_period: 报告期，为空则查询所有期数（仅对财务数据有效）
+            limit: 限制返回记录数量，为空则返回所有记录
         
         Returns:
             查询结果列表
@@ -266,7 +361,10 @@ class DataManager:
             if table_name:
                 tables = [table_name]
             else:
-                tables = ["profit_statements", "balance_sheets", "cash_flow_statements"]
+                tables = [
+                    "profit_statements", "balance_sheets", "cash_flow_statements",
+                    "macro_news", "northbound_money_flow", "global_indices", "currency_exchange_rates"
+                ]
             
             results = []
             
@@ -275,18 +373,34 @@ class DataManager:
                 conditions = []
                 params = []
                 
-                if symbol:
-                    conditions.append("symbol = ?")
-                    params.append(symbol)
-                
-                if report_period:
-                    conditions.append("report_period = ?")
-                    params.append(report_period)
+                # 财务数据特有的查询条件
+                if table in ["profit_statements", "balance_sheets", "cash_flow_statements"]:
+                    if symbol:
+                        conditions.append("symbol = ?")
+                        params.append(symbol)
+                    
+                    if report_period:
+                        conditions.append("report_period = ?")
+                        params.append(report_period)
                 
                 where_clause = " WHERE " + " AND ".join(conditions) if conditions else ""
                 
+                # 构建排序和限制条件
+                order_by = ""
+                if table in ["northbound_money_flow", "currency_exchange_rates"]:
+                    # 单条记录类型的表按创建时间倒序
+                    order_by = " ORDER BY created_at DESC"
+                elif table in ["macro_news", "global_indices"]:
+                    # 多条记录类型的表也按创建时间倒序
+                    order_by = " ORDER BY created_at DESC"
+                else:
+                    # 财务数据表按报告期倒序
+                    order_by = " ORDER BY report_period DESC, created_at DESC"
+                
+                limit_clause = f" LIMIT {limit}" if limit else ""
+                
                 # 执行查询
-                sql = f"SELECT *, '{table}' as table_name FROM {table}{where_clause} ORDER BY report_period DESC"
+                sql = f"SELECT *, '{table}' as table_name FROM {table}{where_clause}{order_by}{limit_clause}"
                 cursor.execute(sql, params)
                 
                 # 获取列名
