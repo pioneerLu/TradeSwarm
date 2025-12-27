@@ -1069,80 +1069,6 @@ class AkshareProvider:
         
         return result
     
-    def get_financial_indicators(
-        self,
-        symbol: str,
-        report_type: str = "annual",
-        periods: int = 4
-    ) -> dict:
-        """
-        获取财务指标（ROE、ROA、毛利率、净利率等）
-        
-        Args:
-            symbol: 股票代码
-            report_type: 'annual' 或 'quarter'
-            periods: 最近 N 期（默认 4 期）
-        
-        Returns:
-            包含财务指标的字典
-        """
-        clean_symbol = re.sub(r"\D", "", symbol)
-        
-        if not clean_symbol or len(clean_symbol) != 6:
-            return {"error": f"无效的股票代码: {symbol}"}
-        
-        try:
-            df = ak.stock_financial_analysis_indicator_em(symbol=clean_symbol)
-            
-            if df is None:
-                return {"error": "财务指标接口返回 None"}
-            
-            if df.empty:
-                return {"error": "财务指标数据为空"}
-            
-            # 确保 df 有 columns 属性
-            if not hasattr(df, 'columns'):
-                return {"error": "返回数据格式不正确，缺少 columns 属性"}
-            
-            # 检查是否有 '报告期' 列
-            date_col = None
-            if '报告期' in df.columns:
-                date_col = '报告期'
-            else:
-                # 尝试其他可能的列名
-                for col in df.columns:
-                    if '期' in str(col) or 'date' in str(col).lower() or 'period' in str(col).lower():
-                        date_col = col
-                        break
-            
-            # 根据 report_type 过滤数据（如果有日期列）
-            if date_col:
-                try:
-                    if report_type == "quarter":
-                        df = df[df[date_col].astype(str).str.contains('Q', na=False)]
-                    else:
-                        df = df[~df[date_col].astype(str).str.contains('Q', na=False)]
-                except Exception as filter_error:
-                    # 如果过滤失败，继续使用全部数据
-                    pass
-            
-            # 取最近 N 期
-            if periods > 0 and not df.empty:
-                df = df.head(periods)
-            
-            if df.empty:
-                return {"error": f"未找到 {report_type} 类型的财务指标数据"}
-            
-            return {
-                "symbol": clean_symbol,
-                "report_type": report_type,
-                "data": df.to_dict('records')
-            }
-            
-        except Exception as e:
-            import traceback
-            error_detail = traceback.format_exc()
-            return {"error": f"获取财务指标失败: {str(e)}", "detail": error_detail[:200]}
     
     def get_valuation_indicators(
         self,
@@ -1172,28 +1098,21 @@ class AkshareProvider:
             "errors": []
         }
         
-        # 获取 PE/PB
-        # 注意：stock_a_ttm_lyr 不接受 symbol 参数，返回所有股票数据
-        # 我们需要从返回的数据中筛选目标股票
+        # 获取 PE/PB (使用实时行情接口 stock_zh_a_spot_em)
         try:
-            pe_pb_df = ak.stock_a_ttm_lyr()
-            if pe_pb_df is not None and not pe_pb_df.empty:
-                # 筛选目标股票（通过代码列）
-                code_col = None
-                for col in pe_pb_df.columns:
-                    if '代码' in str(col) or 'code' in str(col).lower() or 'symbol' in str(col).lower():
-                        code_col = col
-                        break
+            # stock_zh_a_spot_em 返回所有股票的实时数据，包含市盈率和市净率
+            spot_df = ak.stock_zh_a_spot_em()
+            
+            if spot_df is not None and not spot_df.empty:
+                # 筛选目标股票
+                target_row = spot_df[spot_df['代码'] == clean_symbol]
                 
-                if code_col:
-                    filtered_df = pe_pb_df[pe_pb_df[code_col].astype(str).str.contains(clean_symbol, na=False)]
-                    if not filtered_df.empty:
-                        result["pe_pb"] = filtered_df.to_dict('records')
-                    else:
-                        result["errors"].append(f"未找到股票 {clean_symbol} 的 PE/PB 数据")
+                if not target_row.empty:
+                    result["pe_pb"] = target_row.to_dict('records')
                 else:
-                    # 如果没有代码列，返回前几条作为示例（不推荐）
-                    result["errors"].append("PE/PB 数据中未找到代码列，无法筛选目标股票")
+                    result["errors"].append(f"未找到股票 {clean_symbol} 的实时估值数据")
+            else:
+                 result["errors"].append("实时行情数据为空")
         except Exception as e:
             result["errors"].append(f"PE/PB获取失败: {str(e)}")
         
@@ -1243,44 +1162,27 @@ class AkshareProvider:
         }
         
         # 获取业绩预告
-        # 注意：这些接口可能不接受 symbol 参数，需要先获取所有数据再筛选
         try:
-            # 尝试使用 stock_profit_forecast_em（可能需要不同的参数）
-            try:
-                forecast_df = ak.stock_profit_forecast_em()
-                if forecast_df is not None and not forecast_df.empty:
-                    # 筛选目标股票
-                    code_col = None
-                    for col in forecast_df.columns:
-                        if '代码' in str(col) or 'code' in str(col).lower() or 'symbol' in str(col).lower():
-                            code_col = col
-                            break
+            forecast_df = ak.stock_profit_forecast_em()
+            if forecast_df is not None and not forecast_df.empty:
+                # 筛选目标股票 (列名通常为 "代码")
+                code_cols = [col for col in forecast_df.columns if '代码' in str(col) or 'code' in str(col).lower()]
+                
+                if code_cols:
+                    code_col = code_cols[0]
+                    # 确保代码列是字符串类型
+                    forecast_df[code_col] = forecast_df[code_col].astype(str)
+                    filtered_df = forecast_df[forecast_df[code_col] == clean_symbol]
                     
-                    if code_col:
-                        filtered_df = forecast_df[forecast_df[code_col].astype(str).str.contains(clean_symbol, na=False)]
-                        if not filtered_df.empty:
-                            if limit > 0:
-                                filtered_df = filtered_df.head(limit)
-                            result["forecast"] = filtered_df.to_dict('records')
-            except Exception:
-                # 尝试其他接口
-                try:
-                    forecast_df = ak.stock_yjyg_em()
-                    if forecast_df is not None and not forecast_df.empty:
-                        code_col = None
-                        for col in forecast_df.columns:
-                            if '代码' in str(col) or 'code' in str(col).lower():
-                                code_col = col
-                                break
-                        
-                        if code_col:
-                            filtered_df = forecast_df[forecast_df[code_col].astype(str).str.contains(clean_symbol, na=False)]
-                            if not filtered_df.empty:
-                                if limit > 0:
-                                    filtered_df = filtered_df.head(limit)
-                                result["forecast"] = filtered_df.to_dict('records')
-                except Exception as e:
-                    result["errors"].append(f"业绩预告获取失败: {str(e)}")
+                    if not filtered_df.empty:
+                        if limit > 0:
+                            filtered_df = filtered_df.head(limit)
+                        result["forecast"] = filtered_df.to_dict('records')
+                    else:
+                        # 只是未找到数据，不报错
+                        pass
+                else:
+                    result["errors"].append("业绩预告数据中未找到代码列")
         except Exception as e:
             result["errors"].append(f"业绩预告获取失败: {str(e)}")
         
@@ -1288,23 +1190,24 @@ class AkshareProvider:
         try:
             express_df = ak.stock_yjkb_em()
             if express_df is not None and not express_df.empty:
-                # 筛选目标股票
-                code_col = None
-                for col in express_df.columns:
-                    if '代码' in str(col) or 'code' in str(col).lower() or 'symbol' in str(col).lower():
-                        code_col = col
-                        break
+                # 筛选目标股票 (列名通常为 "股票代码")
+                code_cols = [col for col in express_df.columns if '代码' in str(col) or 'code' in str(col).lower()]
                 
-                if code_col:
-                    filtered_df = express_df[express_df[code_col].astype(str).str.contains(clean_symbol, na=False)]
+                if code_cols:
+                    code_col = code_cols[0]
+                    # 确保代码列是字符串类型
+                    express_df[code_col] = express_df[code_col].astype(str)
+                    filtered_df = express_df[express_df[code_col] == clean_symbol]
+                    
                     if not filtered_df.empty:
                         if limit > 0:
                             filtered_df = filtered_df.head(limit)
                         result["express"] = filtered_df.to_dict('records')
                     else:
-                        result["errors"].append(f"未找到股票 {clean_symbol} 的业绩快报数据")
+                         # 只是未找到数据，不报错
+                        pass
                 else:
-                    result["errors"].append("业绩快报数据中未找到代码列，无法筛选目标股票")
+                    result["errors"].append("业绩快报数据中未找到代码列")
         except Exception as e:
             result["errors"].append(f"业绩快报获取失败: {str(e)}")
         
