@@ -206,6 +206,45 @@ class AkshareProvider:
         
         return result
     
+    def get_stock_news(
+        self,
+        symbol: str,
+        limit: int = 10
+    ) -> str:
+        """
+        获取股票相关新闻（来源：东方财富）
+        
+        返回 Markdown 格式的个股新闻简报，便于 LLM 理解和处理。
+        
+        Args:
+            symbol: 股票代码，支持以下格式：
+                - '000001' (6位数字)
+                - '000001.SZ' (带后缀)
+                - '600000.SH' (带后缀)
+            limit: 返回的新闻数量限制（默认 10 条）
+        
+        Returns:
+            Markdown 格式的字符串，包含个股新闻简报
+        """
+        try:
+            # 清洗股票代码
+            clean_symbol = re.sub(r"\D", "", symbol)
+            
+            if not clean_symbol or len(clean_symbol) != 6:
+                return self._format_stock_news_error(symbol, f"无效的股票代码: {symbol}")
+            
+            # 获取新闻数据
+            df = self._fetch_stock_news_data(clean_symbol, limit)
+            
+            if df is None or df.empty:
+                return self._format_stock_news_empty(clean_symbol)
+            
+            # 格式化并返回 Markdown
+            return self._format_stock_news_markdown(clean_symbol, df, limit)
+            
+        except Exception as e:
+            return self._format_stock_news_error(symbol, str(e))
+    
     # ==================== Internal Methods ================
     
     def _fetch_stock_news_data(self, clean_symbol: str, limit: int) -> pd.DataFrame:
@@ -623,7 +662,6 @@ class AkshareProvider:
                             except (ValueError, TypeError, IndexError):
                                 pass
                     else:
-                        # 如果不是 item-value 格式，尝试其他解析方式
                         for col in df.columns:
                             if 'value' in str(col).lower() or 'rate' in str(col).lower() or 'result' in str(col).lower():
                                 rate_value = df[col].iloc[0] if len(df) > 0 else None
