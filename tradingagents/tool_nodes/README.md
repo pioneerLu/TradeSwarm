@@ -95,7 +95,8 @@ get_stock_data, get_company_info, get_financial_statements, ...
 ## Todo
 
 - [ ] 对工具的具体输出进行清洗和格式化
-  - 统一返回格式
   - 优化数据结构，将清洗流程固化，不要让模型干这个事情
   - 对各种简报数据、爬虫数据做清洗模板
+  - cx添加utils中technical的指标计算方式
+  - 疑问：是否需要将tool_node中的某些指标固化到state中传递，防止llm忽略
   - 参考 [工具输出样例文档](./tool_outputs.md) 了解当前输出格式
