@@ -1,6 +1,6 @@
 """Tushare"""
 import tushare as ts
-from typing import Optional, Dict
+from typing import Any, Optional, Dict
 import pandas as pd
 from utils.data_utils import normalize_stock_code, format_date, extract_stock_code_number
 
@@ -8,25 +8,40 @@ from utils.data_utils import normalize_stock_code, format_date, extract_stock_co
 class TushareProvider:
     """Tushare 数据提供者封装类"""
     
-    def __init__(self, token: Optional[str] = None, config: Optional[Dict] = None):
+    def __init__(self, config: Dict[str, Any]) -> None:
         """
-        初始化 Tushare Provider
+        初始化 Tushare Provider，基于完整配置构建 API 客户端。
 
         Args:
-            token: Tushare token，可选
-            config: 配置字典，必需，用于从配置中读取token
+            config: 总体配置字典，需包含 data_sources 段及 tushare_token 字段。
 
+        关键实现细节:
+            - 第一阶段：验证传入配置结构并提取 data_sources 段
+            - 第二阶段：从配置中提取并验证 tushare_token
+            - 第三阶段：初始化 Tushare Pro API 客户端
         """
-        if token is None:
-            if config and 'data_sources' in config and 'tushare_token' in config['data_sources']:
-                token = config['data_sources']['tushare_token']
-                if token:
-                    # 去除可能的引号
-                    token = token.strip().strip("'").strip('"')
-
+        # 第一阶段：配置校验与提取
+        if not isinstance(config, dict):
+            raise ValueError("config 必须为字典类型")
+        
+        self._config = config
+        data_sources_config = config.get("data_sources")
+        if not isinstance(data_sources_config, dict):
+            raise ValueError("data_sources 配置缺失或格式错误")
+        
+        # 第二阶段：提取 tushare_token
+        token = data_sources_config.get("tushare_token")
+        if token:
+            # 去除可能的引号
+            token = str(token).strip().strip("'").strip('"')
+        
         if not token:
-            raise ValueError("Tushare Token 未设置，请在 config/config.yaml 中设置 data_sources.tushare_token")
-
+            raise ValueError(
+                "Tushare Token 未设置，请在 config/config.yaml 中设置 data_sources.tushare_token，"
+                "或通过环境变量 TUSHARE_TOKEN 配置"
+            )
+        
+        # 第三阶段：初始化 Tushare Pro API
         ts.set_token(token)
         self.pro = ts.pro_api()
     
