@@ -32,6 +32,9 @@ class AkshareProvider:
         # 例如：未来可从配置读取默认的新闻数量限制、请求超时等
         self._default_news_limit = data_sources_config.get("akshare_default_news_limit", 10)
         self._request_timeout = data_sources_config.get("akshare_request_timeout", 30)
+        
+        # 汇率 API Key（用于 fallback 接口 currency_convert）
+        self._currency_api_key = data_sources_config.get("currency_api_key")
     
     # ==================== Public ==================
     
@@ -202,6 +205,45 @@ class AkshareProvider:
             result["errors"].append(f"汇率获取失败: {str(e)}")
         
         return result
+    
+    def get_stock_news(
+        self,
+        symbol: str,
+        limit: int = 10
+    ) -> str:
+        """
+        获取股票相关新闻（来源：东方财富）
+        
+        返回 Markdown 格式的个股新闻简报，便于 LLM 理解和处理。
+        
+        Args:
+            symbol: 股票代码，支持以下格式：
+                - '000001' (6位数字)
+                - '000001.SZ' (带后缀)
+                - '600000.SH' (带后缀)
+            limit: 返回的新闻数量限制（默认 10 条）
+        
+        Returns:
+            Markdown 格式的字符串，包含个股新闻简报
+        """
+        try:
+            # 清洗股票代码
+            clean_symbol = re.sub(r"\D", "", symbol)
+            
+            if not clean_symbol or len(clean_symbol) != 6:
+                return self._format_stock_news_error(symbol, f"无效的股票代码: {symbol}")
+            
+            # 获取新闻数据
+            df = self._fetch_stock_news_data(clean_symbol, limit)
+            
+            if df is None or df.empty:
+                return self._format_stock_news_empty(clean_symbol)
+            
+            # 格式化并返回 Markdown
+            return self._format_stock_news_markdown(clean_symbol, df, limit)
+            
+        except Exception as e:
+            return self._format_stock_news_error(symbol, str(e))
     
     # ==================== Internal Methods ================
     
@@ -533,57 +575,137 @@ class AkshareProvider:
         return summary
     
     def _get_currency_rate(self) -> Dict:
-        """获取美元/人民币汇率"""
+        """
+        获取美元/人民币汇率
+        
+        策略：
+        1. 优先使用 currency_boc_safe（国家外汇管理局，默认方法）
+        2. 如果失败，fallback 到 currency_convert（CurrencyScoop API，需要 API Key）
+        """
+        # 策略1: 优先使用 currency_boc_safe（默认方法）
         try:
-            try:
-                df = ak.currency_boc_safe()
+            df = ak.currency_boc_safe()
+            
+            if df is not None and not df.empty:
+                latest = df.iloc[-1]
+                date_str = str(latest.iloc[0])
+                usd_100 = latest.get('美元', None)
                 
-                if df is not None and not df.empty:
-                    latest = df.iloc[-1]
-                    date_str = str(latest.iloc[0])
-                    usd_100 = latest.get('美元', None)
+                if pd.notna(usd_100) and usd_100 > 0:
+                    price = float(usd_100) / 100.0
                     
-                    if pd.notna(usd_100) and usd_100 > 0:
-                        price = float(usd_100) / 100.0
+                    change_pct = 0.0
+                    if len(df) > 1:
+                        prev_usd_100 = df.iloc[-2].get('美元', None)
+                        if pd.notna(prev_usd_100) and prev_usd_100 > 0:
+                            prev_price = float(prev_usd_100) / 100.0
+                            change_pct = ((price - prev_price) / prev_price) * 100
+                    
+                    description = f"USD/CNY: {price:.4f} ({change_pct:+.2f}%)"
+                    
+                    return {
+                        "currency_pair": "USD/CNY",
+                        "price": price,
+                        "change": f"{change_pct:+.2f}%",
+                        "change_pct": change_pct,
+                        "description": description,
+                        "date": date_str,
+                        "source": "currency_boc_safe"
+                    }
+        except Exception:
+            # 默认方法失败，继续尝试 fallback
+            pass
+        
+        # 策略2: Fallback 到 currency_convert（CurrencyScoop API）
+        if self._currency_api_key:
+            try:
+                # 转换 1 USD 到 CNY，获取汇率
+                df = ak.currency_convert(
+                    base="USD",
+                    to="CNY",
+                    amount="1",
+                    api_key=self._currency_api_key
+                )
+                
+                if df is not None and isinstance(df, pd.DataFrame) and not df.empty:
+                    # 解析返回的数据结构
+                    # currency_convert 返回格式为：
+                    #   item                value
+                    # 0  timestamp  2025-12-30 06:48:29
+                    # 1  date           2025-12-30
+                    # 2  from                  USD
+                    # 3  to                  CNY
+                    # 4  amount                1
+                    # 5  value           6.99113944
+                    
+                    price = None
+                    date_str = datetime.now().strftime("%Y-%m-%d")
+                    
+                    # 检查是否是 item-value 格式
+                    if 'item' in df.columns and 'value' in df.columns:
+                        # 提取 amount 和 value
+                        amount_row = df[df['item'] == 'amount']
+                        value_row = df[df['item'] == 'value']
+                        date_row = df[df['item'] == 'date']
                         
-                        change_pct = 0.0
-                        if len(df) > 1:
-                            prev_usd_100 = df.iloc[-2].get('美元', None)
-                            if pd.notna(prev_usd_100) and prev_usd_100 > 0:
-                                prev_price = float(prev_usd_100) / 100.0
-                                change_pct = ((price - prev_price) / prev_price) * 100
+                        if not amount_row.empty and not value_row.empty:
+                            try:
+                                amount = float(amount_row.iloc[0]['value'])
+                                converted_value = float(value_row.iloc[0]['value'])
+                                
+                                # 计算汇率：转换后金额 / 原始金额
+                                price = converted_value / amount if amount > 0 else None
+                                
+                                # 提取日期
+                                if not date_row.empty:
+                                    date_str = str(date_row.iloc[0]['value'])
+                            except (ValueError, TypeError, IndexError):
+                                pass
+                    else:
+                        for col in df.columns:
+                            if 'value' in str(col).lower() or 'rate' in str(col).lower() or 'result' in str(col).lower():
+                                rate_value = df[col].iloc[0] if len(df) > 0 else None
+                                if pd.notna(rate_value):
+                                    try:
+                                        price = float(rate_value)
+                                        break
+                                    except (ValueError, TypeError):
+                                        pass
                         
-                        description = f"USD/CNY: {price:.4f} ({change_pct:+.2f}%)"
+                        # 如果找不到明确的汇率字段，尝试使用第一行第一列的值
+                        if price is None and len(df) > 0 and len(df.columns) > 0:
+                            try:
+                                first_value = df.iloc[0, 0]
+                                if pd.notna(first_value):
+                                    price = float(first_value)
+                            except (ValueError, TypeError, IndexError):
+                                pass
+                    
+                    if price is not None and price > 0:
+                        description = f"USD/CNY: {price:.4f}"
                         
                         return {
                             "currency_pair": "USD/CNY",
                             "price": price,
-                            "change": f"{change_pct:+.2f}%",
-                            "change_pct": change_pct,
+                            "change": "N/A",
+                            "change_pct": 0.0,
                             "description": description,
-                            "date": date_str
+                            "date": date_str,
+                            "source": "currency_convert"
                         }
             except Exception:
+                # Fallback 方法也失败，继续返回错误
                 pass
-            
-            return {
-                "currency_pair": "USD/CNY",
-                "price": None,
-                "change": "N/A",
-                "change_pct": 0.0,
-                "description": "USD/CNY: 数据获取失败（接口可能已变更）",
-                "date": None
-            }
-            
-        except Exception as e:
-            return {
-                "currency_pair": "USD/CNY",
-                "price": None,
-                "change": "N/A",
-                "change_pct": 0.0,
-                "description": f"汇率获取失败: {str(e)}",
-                "date": None
-            }
+        
+        # 所有方法都失败
+        return {
+            "currency_pair": "USD/CNY",
+            "price": None,
+            "change": "N/A",
+            "change_pct": 0.0,
+            "description": "USD/CNY: 数据获取失败（所有接口均不可用）",
+            "date": None
+        }
     
     # ==================== Markdown 格式化方法 ====================
     
