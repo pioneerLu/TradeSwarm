@@ -48,6 +48,9 @@ class RiskDebateState(TypedDict):
 
 
 class AgentState(MessagesState):
+    # modified state: add curr_situation
+    curr_situation: Annotated[str, "Current situation of the whole report"]
+
     company_of_interest: Annotated[str, "Company that we are interested in trading"]
     trade_date: Annotated[str, "What date we are trading at"]
 
