@@ -7,12 +7,13 @@
 - Manager State（Researcher 和 Risk Manager 内部使用）
 - Debate State（辩论状态）
 """
-from typing import Annotated, Sequence, TypedDict, Optional, Dict, Any, List
+from typing import Annotated, Sequence, TypedDict, Optional, Dict, Any, List, Literal
 from datetime import date, timedelta, datetime
 from langchain_core.messages import AnyMessage
 from langgraph.graph import MessagesState
 from langchain_core.messages import BaseMessage
 from langgraph.graph import add_messages
+from tradingagents.agents.fusion.execution_schemas import ExecutionPlan, ExecutionLog
 
 # ==================== Analyst 私有 State ====================
 # 这些 State 仅用于 Analyst 节点内部执行，不进入全局 State
@@ -174,4 +175,10 @@ class FusionState(MessagesState):
 
     # ========== 执行记录 ==========
     execution_record: Annotated[Optional[Dict[str, Any]], "下单执行日志与结果"]
+
+    # ========== 混合架构新字段 (Hybrid Architecture) ==========
+    market_phase: Annotated[Literal["pre_market", "intraday", "post_market", "sleep"], "当前市场阶段"]
+    execution_plan: Annotated[Optional[ExecutionPlan], "盘前生成的结构化执行计划"]
+    execution_log: Annotated[Optional[ExecutionLog], "盘中执行后的结果日志"]
+    strategy_review: Annotated[Optional[str], "盘后复盘结论"]
 
