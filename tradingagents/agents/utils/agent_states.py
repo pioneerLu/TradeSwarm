@@ -85,8 +85,8 @@ class AnalystMemorySummary(TypedDict):
     - memory_summary_post_close: 当日所有快照的聚合摘要
     """
     today_report: Annotated[str, "今日生成的报告"]
-    memory_summary_pre_open: Annotated[str, "开盘前长期记忆摘要"]
-    memory_summary_post_close: Annotated[str, "收盘后长期记忆摘要"]
+    history_report: Annotated[str, "开盘前长期记忆摘要"]
+
 
 
 
@@ -124,7 +124,7 @@ class RiskDebateState(TypedDict):
 
 
 
-class FusionState(MessagesState):
+class AgentState(MessagesState):
     """
     贯穿全图的全局 State，继承 MessagesState 以保留对话上下文。
     Fusion 节点从四个 Analyst Memory Controller 拉取 AnalystMemorySummary 填充基础字段；
