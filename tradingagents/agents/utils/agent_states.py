@@ -76,17 +76,11 @@ class AnalystMemorySummary(TypedDict):
     
     由 Memory Controller 提供，包含：
     - today_report: 今日生成的报告
-    - memory_summary_pre_open: 开盘前长期记忆摘要
-    - memory_summary_post_close: 收盘后长期记忆摘要
-    
-    对于 Market Analyst（频繁更新）：
-    - today_report: 最新的市场快照报告
-    - memory_summary_pre_open: 开盘前的历史市场趋势摘要
-    - memory_summary_post_close: 当日所有快照的聚合摘要
+    - history_report: 历史记忆摘要
+
     """
     today_report: Annotated[str, "今日生成的报告"]
-    memory_summary_pre_open: Annotated[str, "开盘前长期记忆摘要"]
-    memory_summary_post_close: Annotated[str, "收盘后长期记忆摘要"]
+    history_report: Annotated[str, "历史记忆摘要"]
 
 
 
@@ -124,7 +118,7 @@ class RiskDebateState(TypedDict):
 
 
 
-class FusionState(MessagesState):
+class AgentState(MessagesState):
     """
     贯穿全图的全局 State，继承 MessagesState 以保留对话上下文。
     Fusion 节点从四个 Analyst Memory Controller 拉取 AnalystMemorySummary 填充基础字段；
@@ -154,31 +148,4 @@ class FusionState(MessagesState):
     investment_plan: Annotated[Optional[str], "投资计划文本摘要"]
     trader_investment_plan: Annotated[Optional[str], "Trader 生成的最终执行计划"]
     final_trade_decision: Annotated[Optional[str], "最终交易决策"]
-
-    # ========== 账户与持仓数据（这个地方我还在想） ==========
-    account_cash: Annotated[float, "账户可用现金（元）"]
-    account_total_value: Annotated[float, "账户总权益（现金 + 持仓市值）"]
-    current_price: Annotated[float, "当前股票价格"]
-    previous_close: Annotated[Optional[float], "前一日收盘价"]
-    portfolio_positions: Annotated[Dict[str, Dict[str, Any]], """持仓结构，示例：
-        {
-            "000001": {
-                "quantity": 100,
-                "cost_price": 15.5,
-                "market_price": 16.2,
-                "market_value": 1620.0
-            },
-            "000002": {...}
-        }
-    """]
-    max_drawdown: Annotated[Optional[float], "账户最大回撤百分比"]
-
-    # ========== 执行记录 ==========
-    execution_record: Annotated[Optional[Dict[str, Any]], "下单执行日志与结果"]
-
-    # ========== 混合架构新字段 (Hybrid Architecture) ==========
-    market_phase: Annotated[Literal["pre_market", "intraday", "post_market", "sleep"], "当前市场阶段"]
-    execution_plan: Annotated[Optional[ExecutionPlan], "盘前生成的结构化执行计划"]
-    execution_log: Annotated[Optional[ExecutionLog], "盘中执行后的结果日志"]
-    strategy_review: Annotated[Optional[str], "盘后复盘结论"]
 
