@@ -54,6 +54,8 @@ def load_config() -> Dict[str, Any]:
         "DASHSCOPE_API_KEY": ("llm", "api_key"),
         "BASE_URL": ("llm", "base_url"),
         "TUSHARE_TOKEN": ("data_sources", "tushare_token"),
+        "CURRENCY_API_KEY": ("data_sources", "currency_api_key"),
+        "CURRENCYSCOOP_API_KEY": ("data_sources", "currency_api_key"),  # 别名支持
         "SQLITE_PATH": ("storage", "sqlite_path"),
         "CHROMA_PERSIST_DIRECTORY": ("storage", "chroma_persist_directory"),
         "CHROMA_COLLECTION": ("storage", "chroma_collection"),
