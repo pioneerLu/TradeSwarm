@@ -108,6 +108,219 @@ def _calculate_obv(close: pd.Series, volume: pd.Series) -> pd.Series:
     return obv
 
 
+def _calculate_atr(
+    high: pd.Series,
+    low: pd.Series,
+    close: pd.Series,
+    period: int = 14
+) -> pd.Series:
+    """Calculate ATR."""
+    prev_close = close.shift(1)
+    tr = pd.concat(
+        [(high - low).abs(), (high - prev_close).abs(), (low - prev_close).abs()],
+        axis=1
+    ).max(axis=1)
+    atr = tr.rolling(window=period).mean()
+    return atr
+
+
+def _calculate_adx(
+    high: pd.Series,
+    low: pd.Series,
+    close: pd.Series,
+    period: int = 14
+) -> Dict[str, pd.Series]:
+    """Calculate ADX/DI."""
+    up_move = high.diff()
+    down_move = -low.diff()
+    plus_dm = np.where((up_move > down_move) & (up_move > 0), up_move, 0.0)
+    minus_dm = np.where((down_move > up_move) & (down_move > 0), down_move, 0.0)
+
+    prev_close = close.shift(1)
+    tr = pd.concat(
+        [(high - low).abs(), (high - prev_close).abs(), (low - prev_close).abs()],
+        axis=1
+    ).max(axis=1)
+    atr = tr.rolling(window=period).mean()
+
+    plus_di = 100 * pd.Series(plus_dm, index=high.index).rolling(window=period).sum() / atr
+    minus_di = 100 * pd.Series(minus_dm, index=high.index).rolling(window=period).sum() / atr
+    dx = (100 * (plus_di - minus_di).abs() / (plus_di + minus_di)).replace([np.inf, -np.inf], np.nan)
+    adx = dx.rolling(window=period).mean()
+
+    return {
+        'adx': adx,
+        'plus_di': plus_di,
+        'minus_di': minus_di
+    }
+
+
+def _calculate_roc(data: pd.Series, period: int = 12) -> pd.Series:
+    """Calculate ROC."""
+    prev = data.shift(period)
+    roc = (data - prev) / prev * 100
+    return roc
+
+
+def _calculate_cci(
+    high: pd.Series,
+    low: pd.Series,
+    close: pd.Series,
+    period: int = 20
+) -> pd.Series:
+    """Calculate CCI."""
+    tp = (high + low + close) / 3
+    sma = tp.rolling(window=period).mean()
+    mad = (tp - sma).abs().rolling(window=period).mean()
+    cci = (tp - sma) / (0.015 * mad)
+    return cci
+
+
+def _calculate_mfi(
+    high: pd.Series,
+    low: pd.Series,
+    close: pd.Series,
+    volume: pd.Series,
+    period: int = 14
+) -> pd.Series:
+    """Calculate MFI."""
+    tp = (high + low + close) / 3
+    money_flow = tp * volume
+    direction = tp.diff()
+    positive_flow = money_flow.where(direction > 0, 0.0)
+    negative_flow = money_flow.where(direction < 0, 0.0).abs()
+    pos_sum = positive_flow.rolling(window=period).sum()
+    neg_sum = negative_flow.rolling(window=period).sum()
+    mfi = 100 - (100 / (1 + (pos_sum / neg_sum)))
+    return mfi
+
+
+def _calculate_vwap(close: pd.Series, volume: pd.Series) -> pd.Series:
+    """Calculate VWAP."""
+    vol_sum = volume.cumsum()
+    vwap = (close * volume).cumsum() / vol_sum.replace(0, np.nan)
+    return vwap
+
+
+def _calculate_cmf(
+    high: pd.Series,
+    low: pd.Series,
+    close: pd.Series,
+    volume: pd.Series,
+    period: int = 20
+) -> pd.Series:
+    """Calculate CMF."""
+    hl_range = (high - low).replace(0, np.nan)
+    multiplier = ((close - low) - (high - close)) / hl_range
+    multiplier = multiplier.replace([np.inf, -np.inf], np.nan).fillna(0.0)
+    money_flow_volume = multiplier * volume
+    cmf = money_flow_volume.rolling(window=period).sum() / volume.rolling(window=period).sum()
+    return cmf
+
+
+def _calculate_donchian(
+    high: pd.Series,
+    low: pd.Series,
+    period: int = 20
+) -> Dict[str, pd.Series]:
+    """Calculate Donchian Channel."""
+    upper = high.rolling(window=period).max()
+    lower = low.rolling(window=period).min()
+    middle = (upper + lower) / 2
+    return {
+        'upper': upper,
+        'middle': middle,
+        'lower': lower
+    }
+
+
+def _calculate_stoch_rsi(
+    close: pd.Series,
+    rsi_period: int = 14,
+    stoch_period: int = 14,
+    smooth_k: int = 3,
+    smooth_d: int = 3
+) -> Dict[str, pd.Series]:
+    """Calculate StochRSI."""
+    rsi = _calculate_rsi(close, rsi_period)
+    min_rsi = rsi.rolling(window=stoch_period).min()
+    max_rsi = rsi.rolling(window=stoch_period).max()
+    stoch = (rsi - min_rsi) / (max_rsi - min_rsi) * 100
+    k = stoch.rolling(window=smooth_k).mean()
+    d = k.rolling(window=smooth_d).mean()
+    return {
+        'stochrsi': stoch,
+        'k': k,
+        'd': d
+    }
+
+
+def _calculate_supertrend(
+    high: pd.Series,
+    low: pd.Series,
+    close: pd.Series,
+    period: int = 10,
+    multiplier: float = 3.0
+) -> Dict[str, pd.Series]:
+    """Calculate Supertrend."""
+    atr = _calculate_atr(high, low, close, period)
+    hl2 = (high + low) / 2
+    upper_basic = hl2 + multiplier * atr
+    lower_basic = hl2 - multiplier * atr
+
+    upper_final = pd.Series(index=close.index, dtype='float64')
+    lower_final = pd.Series(index=close.index, dtype='float64')
+    trend = pd.Series(index=close.index, dtype='float64')
+    direction = pd.Series(index=close.index, dtype='float64')
+
+    for i in range(len(close)):
+        if i == 0:
+            upper_final.iloc[i] = upper_basic.iloc[i]
+            lower_final.iloc[i] = lower_basic.iloc[i]
+            trend.iloc[i] = upper_basic.iloc[i]
+            direction.iloc[i] = -1.0
+            continue
+
+        prev = i - 1
+        upper_final.iloc[i] = (
+            upper_basic.iloc[i]
+            if (upper_basic.iloc[i] < upper_final.iloc[prev]) or (close.iloc[prev] > upper_final.iloc[prev])
+            else upper_final.iloc[prev]
+        )
+        lower_final.iloc[i] = (
+            lower_basic.iloc[i]
+            if (lower_basic.iloc[i] > lower_final.iloc[prev]) or (close.iloc[prev] < lower_final.iloc[prev])
+            else lower_final.iloc[prev]
+        )
+
+        if close.iloc[i] <= upper_final.iloc[i]:
+            trend.iloc[i] = upper_final.iloc[i]
+            direction.iloc[i] = -1.0
+        else:
+            trend.iloc[i] = lower_final.iloc[i]
+            direction.iloc[i] = 1.0
+
+    return {
+        'supertrend': trend,
+        'direction': direction
+    }
+
+
+def _calculate_adl(
+    high: pd.Series,
+    low: pd.Series,
+    close: pd.Series,
+    volume: pd.Series
+) -> pd.Series:
+    """Calculate A/D Line."""
+    hl_range = (high - low).replace(0, np.nan)
+    mfm = ((close - low) - (high - close)) / hl_range
+    mfm = mfm.replace([np.inf, -np.inf], np.nan).fillna(0.0)
+    mfv = mfm * volume
+    adl = mfv.cumsum()
+    return adl
+
+
 def _calculate_indicators(
     df: pd.DataFrame,
     indicators: List[str],
@@ -126,6 +339,18 @@ def _calculate_indicators(
             - 'BOLL': 布林带（需要 period, num_std 参数，默认 20, 2.0）
             - 'KDJ': KDJ 指标（需要 period 参数，默认 9）
             - 'OBV': 能量潮指标
+
+            - 'ATR': Average True Range (atr_period, default 14)
+            - 'ADX': ADX/DI (adx_period, default 14)
+            - 'ROC': Rate of Change (roc_period, default 12)
+            - 'CCI': CCI (cci_period, default 20)
+            - 'MFI': Money Flow Index (mfi_period, default 14)
+            - 'VWAP': VWAP (no params)
+            - 'CMF': Chaikin Money Flow (cmf_period, default 20)
+            - 'DONCHIAN': Donchian Channel (donchian_period, default 20)
+            - 'STOCHRSI': StochRSI (stochrsi_rsi_period, stochrsi_period, stochrsi_k, stochrsi_d)
+            - 'SUPERTREND': Supertrend (supertrend_period, supertrend_multiplier)
+            - 'ADL': Accumulation/Distribution Line (no params)
         **kwargs: 指标参数
     
     Returns:
@@ -191,6 +416,64 @@ def _calculate_indicators(
         elif indicator == 'OBV':
             # 能量潮指标
             result_df['OBV'] = _calculate_obv(close, volume)
+
+
+        elif indicator == 'ATR':
+            period = kwargs.get('atr_period', 14)
+            result_df['ATR'] = _calculate_atr(high, low, close, int(period))
+
+        elif indicator == 'ADX':
+            period = kwargs.get('adx_period', 14)
+            adx_data = _calculate_adx(high, low, close, int(period))
+            result_df['ADX'] = adx_data['adx']
+            result_df['DI_Plus'] = adx_data['plus_di']
+            result_df['DI_Minus'] = adx_data['minus_di']
+
+        elif indicator == 'ROC':
+            period = kwargs.get('roc_period', 12)
+            result_df['ROC'] = _calculate_roc(close, int(period))
+
+        elif indicator == 'CCI':
+            period = kwargs.get('cci_period', 20)
+            result_df['CCI'] = _calculate_cci(high, low, close, int(period))
+
+        elif indicator == 'MFI':
+            period = kwargs.get('mfi_period', 14)
+            result_df['MFI'] = _calculate_mfi(high, low, close, volume, int(period))
+
+        elif indicator == 'VWAP':
+            result_df['VWAP'] = _calculate_vwap(close, volume)
+
+        elif indicator == 'CMF':
+            period = kwargs.get('cmf_period', 20)
+            result_df['CMF'] = _calculate_cmf(high, low, close, volume, int(period))
+
+        elif indicator == 'DONCHIAN':
+            period = kwargs.get('donchian_period', 20)
+            donchian_data = _calculate_donchian(high, low, int(period))
+            result_df['DONCHIAN_Upper'] = donchian_data['upper']
+            result_df['DONCHIAN_Middle'] = donchian_data['middle']
+            result_df['DONCHIAN_Lower'] = donchian_data['lower']
+
+        elif indicator == 'STOCHRSI':
+            rsi_period = kwargs.get('stochrsi_rsi_period', 14)
+            stoch_period = kwargs.get('stochrsi_period', 14)
+            smooth_k = kwargs.get('stochrsi_k', 3)
+            smooth_d = kwargs.get('stochrsi_d', 3)
+            stoch_data = _calculate_stoch_rsi(close, int(rsi_period), int(stoch_period), int(smooth_k), int(smooth_d))
+            result_df['StochRSI'] = stoch_data['stochrsi']
+            result_df['StochRSI_K'] = stoch_data['k']
+            result_df['StochRSI_D'] = stoch_data['d']
+
+        elif indicator == 'SUPERTREND':
+            period = kwargs.get('supertrend_period', 10)
+            multiplier = kwargs.get('supertrend_multiplier', 3.0)
+            st_data = _calculate_supertrend(high, low, close, int(period), float(multiplier))
+            result_df['Supertrend'] = st_data['supertrend']
+            result_df['Supertrend_Direction'] = st_data['direction']
+
+        elif indicator == 'ADL':
+            result_df['ADL'] = _calculate_adl(high, low, close, volume)
     
     return result_df
 
@@ -223,6 +506,18 @@ def get_indicators(
             - 'BOLL': 布林带（默认周期 20，标准差 2.0）
             - 'KDJ': KDJ 指标（默认周期 9）
             - 'OBV': 能量潮指标
+
+            - 'ATR': Average True Range (atr_period, default 14)
+            - 'ADX': ADX/DI (adx_period, default 14)
+            - 'ROC': Rate of Change (roc_period, default 12)
+            - 'CCI': CCI (cci_period, default 20)
+            - 'MFI': Money Flow Index (mfi_period, default 14)
+            - 'VWAP': VWAP (no params)
+            - 'CMF': Chaikin Money Flow (cmf_period, default 20)
+            - 'DONCHIAN': Donchian Channel (donchian_period, default 20)
+            - 'STOCHRSI': StochRSI (stochrsi_rsi_period, stochrsi_period, stochrsi_k, stochrsi_d)
+            - 'SUPERTREND': Supertrend (supertrend_period, supertrend_multiplier)
+            - 'ADL': Accumulation/Distribution Line (no params)
             示例：'MA,RSI,MACD' 或 'RSI,BOLL'
         start_date: 可选，开始日期，格式为 'YYYYMMDD' 或 'YYYY-MM-DD'
             如果不提供，默认使用最近 120 个交易日的数据
