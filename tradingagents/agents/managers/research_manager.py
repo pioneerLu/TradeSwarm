@@ -1,64 +1,69 @@
-import time
-import json
-from langchain.agents import create_agent
-from tradingagents.agents.utils.agent_states import AgentState
+from __future__ import annotations
 
-# define state
-# agentstate def
-agentstate = AgentState(
-    company_of_interest="AAPL",
-    trade_date="2025-12-07",
-    sender="social_media_analyst",
-    market_report="Market is showing positive trends with tech stocks performing well.",
-    sentiment_report="Social media sentiment is largely positive for Apple with recent product launches.",
-    news_report="Recent news indicates strong holiday sales expectations for Apple products.",
-    fundamentals_report="Apple's financial fundamentals remain strong with consistent revenue growth.",
-    investment_debate_state={
-        "bull_history": "Bullish sentiment based on strong brand loyalty and ecosystem integration.",
-        "bear_history": "Concerns about market saturation in mature markets.",
-        "history": "Initial analysis shows balanced perspectives with slight bullish tilt.",
-        "current_response": "Overall sentiment is positive with strong consumer demand.",
-        "judge_decision": "Pending final evaluation.",
-        "count": 1
-    },
-    investment_plan="Analyze social media trends and correlate with sales data.",
-    trader_investment_plan="Monitor sentiment changes and adjust positions accordingly.",
-    risk_debate_state={
-        "risky_history": "High-risk tolerance due to strong market position.",
-        "safe_history": "Conservative approach considering market volatility.",
-        "neutral_history": "Balanced perspective weighing risks and opportunities.",
-        "history": "Risk assessment in progress with multiple viewpoints.",
-        "latest_speaker": "risk_analyst",
-        "current_risky_response": "Potential for high returns with calculated risks.",
-        "current_safe_response": "Recommend cautious approach with diversified portfolio.",
-        "current_neutral_response": "Moderate risk strategy with regular monitoring.",
-        "judge_decision": "Awaiting final risk assessment.",
-        "count": 1
-    },
-    final_trade_decision="PENDING",
+from typing import Any, Dict
 
-    # list[AnyMessage]
-    messages=[{"role": "user", "content": "Start a detailed social media sentiment and news analysis for Apple Inc. (AAPL)."}]
+from tradingagents.agents.utils.agent_states import (
+    AgentState,
+    AnalystMemorySummary,
+    InvestDebateState,
+    ResearchSummary,
 )
 
-def create_research_manager(llm, memory):
-    def research_manager_node(state) -> dict:
-        # history is a dict
-        history = state["investment_debate_state"].get("history", "")
 
-        market_research_report = state["market_report"]
-        sentiment_report = state["sentiment_report"]
-        news_report = state["news_report"]
-        fundamentals_report = state["fundamentals_report"]
+def _build_curr_situation_from_summaries(state: AgentState) -> str:
+    """从四个 Analyst 的 MemorySummary 中构造当前情境描述。"""
+    market_summary: AnalystMemorySummary = state["market_analyst_summary"]
+    news_summary: AnalystMemorySummary = state["news_analyst_summary"]
+    sentiment_summary: AnalystMemorySummary = state["sentiment_analyst_summary"]
+    fundamentals_summary: AnalystMemorySummary = state["fundamentals_analyst_summary"]
 
-        investment_debate_state = state["investment_debate_state"]
+    market_report = market_summary["today_report"]
+    news_report = news_summary["today_report"]
+    sentiment_report = sentiment_summary["today_report"]
+    fundamentals_report = fundamentals_summary["today_report"]
 
-        curr_situation = f"{market_research_report}\n\n{sentiment_report}\n\n{news_report}\n\n{fundamentals_report}"
+    return (
+        f"{market_report}\n\n"
+        f"{sentiment_report}\n\n"
+        f"{news_report}\n\n"
+        f"{fundamentals_report}"
+    )
+
+
+def create_research_manager(llm: Any, memory: Any):
+    """创建 Research Manager LangGraph 节点工厂。
+
+    - 输入：全局 AgentState（包含四个 analyst_summary）
+    - 内部：从 research_summary 中读取/维护 investment_debate_state
+    - 输出：更新 research_summary 和顶层 investment_plan 字段
+    """
+
+    def research_manager_node(state: AgentState) -> Dict[str, Any]:
+        """Research Manager 节点，实现最终投资结论与计划生成。"""
+        # 1. 读取上一轮辩论状态（封装在 research_summary 内）
+        prev_summary: ResearchSummary | None = state.get("research_summary")  # type: ignore[assignment]
+        prev_debate: InvestDebateState = (
+            prev_summary.get("investment_debate_state")  # type: ignore[union-attr]
+            if prev_summary is not None
+            else {
+                "bull_history": "",
+                "bear_history": "",
+                "history": "",
+                "current_response": "",
+                "judge_decision": "",
+                "count": 0,
+            }
+        )
+
+        history = prev_debate.get("history", "")
+
+        # 2. 从四个 Analyst 的 MemorySummary 中构造当前情境
+        curr_situation = _build_curr_situation_from_summaries(state)
         past_memories = memory.get_memories(curr_situation, n_matches=2)
 
         past_memory_str = ""
-        for i, rec in enumerate(past_memories, 1):
-            past_memory_str += rec["recommendation"] + "\n\n"
+        for rec in past_memories:
+            past_memory_str += rec.get("recommendation", "") + "\n\n"
 
         prompt = f"""As the portfolio manager and debate facilitator, your role is to critically evaluate this round of debate and make a definitive decision: align with the bear analyst, the bull analyst, or choose Hold only if it is strongly justified based on the arguments presented.
 
@@ -78,90 +83,107 @@ Here is the debate:
 Debate History:
 {history}"""
         
-        # get agent and invoke
-        # 沿用 Chatmodel 的方法
         response = llm.invoke(prompt)
+        content: str = getattr(response, "content", str(response))
 
-        new_investment_debate_state = {
-            # agent: append strategy -> response["messages"][-1].content
-            "judge_decision": response.content,
+        new_investment_debate_state: InvestDebateState = {
+            "judge_decision": content,
+            "history": prev_debate.get("history", ""),
+            "bear_history": prev_debate.get("bear_history", ""),
+            "bull_history": prev_debate.get("bull_history", ""),
+            "current_response": content,
+            "count": prev_debate.get("count", 0) + 1,
+        }
 
-            "history": investment_debate_state.get("history", ""),
-            "bear_history": investment_debate_state.get("bear_history", ""),
-            "bull_history": investment_debate_state.get("bull_history", ""),
-
-            "current_response": response.content,
-
-            "count": investment_debate_state["count"],
+        new_summary: ResearchSummary = {
+            "investment_debate_state": new_investment_debate_state,
+            "investment_plan": content,
+            "raw_response": content,
         }
 
         return {
-            "investment_debate_state": new_investment_debate_state,
-            "investment_plan": response.content,
+            "research_summary": new_summary,
+            "investment_plan": content,
         }
 
     return research_manager_node
 
+
 if __name__ == "__main__":
+    # 保留原有的测试逻辑，但适配新的 AgentState 结构，便于后续回归验证。
     import os
-    from openai import OpenAI
+
     from dotenv import load_dotenv
     from langchain_openai import ChatOpenAI
+    from openai import OpenAI
+
     from tradingagents.agents.utils.memory import FinancialSituationMemory
     
-    # 加载环境变量
     load_dotenv()
     
-    # 创建 client（与你的 memory.py 代码风格一致）
     client = OpenAI(
         api_key=os.getenv("DASHSCOPE_API_KEY"),
-        base_url="https://dashscope.aliyuncs.com/compatible-mode/v1"
+        base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
     )
     
     print("=" * 80)
     print("开始测试 research_manager_node")
     print("=" * 80)
     
-    # 1. 初始化 Memory
     print("\n[1/4] 初始化 Memory...")
     config = {
         "backend_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
-        "embedding_model": "text-embedding-v4"
+        "embedding_model": "text-embedding-v4",
     }
     memory = FinancialSituationMemory(name="test_research_manager", config=config)
     
-    # 添加测试用的历史记忆
     test_memories = [
         (
-            "Tech sector showing positive trends with strong fundamentals and positive sentiment",
-            "Previous mistake: Overly optimistic about tech stocks without considering market volatility. Should have been more cautious and diversified portfolio."
+            "银行板块呈现上涨趋势，基本面强劲，市场情绪积极",
+            "Previous mistake: 对银行股过于乐观，未充分考虑市场波动性。应该更加谨慎并分散投资组合。",
         ),
         (
-            "Market showing mixed signals with positive news but concerns about fundamentals",
-            "Previous mistake: Defaulted to Hold position when clear bullish signals were present. Should have taken decisive action based on strong fundamentals."
+            "市场信号混杂，新闻面积极但基本面存在担忧",
+            "Previous mistake: 当明确的看涨信号出现时，默认选择持有。应该基于强劲的基本面采取果断行动。",
         ),
     ]
     memory.add_situations(test_memories)
     print("✓ Memory 初始化完成，已添加测试记忆")
     
-    # 2. 初始化 LLM
     print("\n[2/4] 初始化 LLM...")
     llm = ChatOpenAI(
-        model="qwen-plus",  # 或使用其他阿里云百炼支持的模型
+        model="qwen-plus",
         base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
-        api_key=os.getenv("DASHSCOPE_API_KEY")
+        api_key=os.getenv("DASHSCOPE_API_KEY"),
     )
     print("✓ LLM 初始化完成")
     
-    # 3. 创建 research_manager_node
     print("\n[3/4] 创建 research_manager_node...")
     research_manager_node = create_research_manager(llm, memory)
     print("✓ research_manager_node 创建完成")
     
-    # 4. 准备测试用的 state
-    print("\n[4/4] 准备测试用的 state 并调用...")
+    print("\n[4/4] 准备测试用的 AgentState 并调用...")
+    demo_summary: AnalystMemorySummary = {
+        "today_report": "Demo today report.",
+        "history_report": "Demo history report.",
+    }
 
-    # 5. 调用 research_manager_node
+    agentstate: AgentState = {
+        "company_of_interest": "000001",
+        "trade_date": "2024-12-07",
+        "trade_timestamp": "2024-12-07 10:00:00",
+        "market_analyst_summary": demo_summary,
+        "news_analyst_summary": demo_summary,
+        "sentiment_analyst_summary": demo_summary,
+        "fundamentals_analyst_summary": demo_summary,
+        "research_summary": None,  # type: ignore[assignment]
+        "risk_summary": None,  # type: ignore[assignment]
+        "investment_plan": None,
+        "trader_investment_plan": None,
+        "final_trade_decision": None,
+        "messages": [],
+    }
+
     print("-" * 80)
     try:
         result = research_manager_node(agentstate)
@@ -170,16 +192,17 @@ if __name__ == "__main__":
         print("测试结果:")
         print("=" * 80)
         
-        # 打印 investment_plan
         print("\n【Investment Plan】")
         print("-" * 80)
         print(result.get("investment_plan", "N/A"))
         
-        # 打印 investment_debate_state
-        print("\n【Investment Debate State】")
+        print("\n【Research Summary】")
         print("-" * 80)
-        debate_state = result.get("investment_debate_state", {})
-        print(f"Judge Decision: {debate_state.get('judge_decision', 'N/A')[:300]}...")  # 显示前300字符
+        summary: ResearchSummary = result.get("research_summary", {})  # type: ignore[assignment]
+        debate_state = summary.get("investment_debate_state", {})
+        print(
+            f"Judge Decision: {debate_state.get('judge_decision', 'N/A')[:300]}..."
+        )
         print(f"\nCount: {debate_state.get('count', 'N/A')}")
         print(f"\nHistory: {debate_state.get('history', 'N/A')[:200]}...")
         
@@ -187,7 +210,8 @@ if __name__ == "__main__":
         print("✓ 测试完成！")
         print("=" * 80)
         
-    except Exception as e:
+    except Exception as e:  # pragma: no cover - 手工调试用
         print(f"\n❌ 测试失败: {str(e)}")
         import traceback
+
         traceback.print_exc()

@@ -13,7 +13,6 @@ from langchain_core.messages import AnyMessage
 from langgraph.graph import MessagesState
 from langchain_core.messages import BaseMessage
 from langgraph.graph import add_messages
-from tradingagents.agents.fusion.execution_schemas import ExecutionPlan, ExecutionLog
 
 # ==================== Analyst 私有 State ====================
 # 这些 State 仅用于 Analyst 节点内部执行，不进入全局 State
@@ -116,6 +115,35 @@ class RiskDebateState(TypedDict):
     judge_decision: Annotated[str, "裁决结果"]
     count: Annotated[int, "当前对话轮次"]
 
+
+# ==================== Manager Summary 结构 ====================
+
+class ResearchSummary(TypedDict, total=False):
+    """Research Manager 对外暴露的封装结果。
+
+    为了保持全局 AgentState 的简洁，我们只在顶层暴露一个
+    `research_summary: Dict[str, Any]` 字段，具体内部结构在此 TypedDict 中约束。
+
+    当前版本中，我们直接沿用旧版实现中的字段结构，通过多一层封装
+    （investment_debate_state 嵌入到 research_summary 内部）来兼容之前的逻辑。
+    """
+    investment_debate_state: InvestDebateState
+    investment_plan: str
+    raw_response: str
+
+
+class RiskSummary(TypedDict, total=False):
+    """Risk Manager 对外暴露的封装结果。
+
+    为了保持全局 AgentState 的简洁，我们只在顶层暴露一个
+    `risk_summary: Dict[str, Any]` 字段，具体内部结构在此 TypedDict 中约束。
+
+    当前版本中，我们直接沿用旧版实现中的字段结构，通过多一层封装
+    （risk_debate_state 嵌入到 risk_summary 内部）来兼容之前的逻辑。
+    """
+    risk_debate_state: RiskDebateState
+    final_trade_decision: str
+    raw_response: str
 
 
 class AgentState(MessagesState):
