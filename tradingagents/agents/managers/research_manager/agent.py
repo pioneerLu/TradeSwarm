@@ -89,7 +89,7 @@ def create_research_manager(llm: BaseChatModel, memory: Any) -> Callable[[AgentS
         for rec in past_memories:
             past_memory_str += rec.get("recommendation", "") + "\n\n"
 
-        # 3. 加载并渲染 prompt 模板（如果存在）
+        # 3. 加载并渲染 prompt 模板
         prompt_path = Path(__file__).parent / "prompt.j2"
         if prompt_path.exists():
             with open(prompt_path, "r", encoding="utf-8") as f:
