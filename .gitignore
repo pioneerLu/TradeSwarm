@@ -173,6 +173,9 @@ tmp/
 test_output/
 *.tmp
 
+# Test directory
+test/
+
 # Research output and reports
 research_output/
 reports/
