@@ -119,31 +119,31 @@ class RiskDebateState(TypedDict):
 # ==================== Manager Summary 结构 ====================
 
 class ResearchSummary(TypedDict, total=False):
-    """Research Manager 对外暴露的封装结果。
-
-    为了保持全局 AgentState 的简洁，我们只在顶层暴露一个
-    `research_summary: Dict[str, Any]` 字段，具体内部结构在此 TypedDict 中约束。
-
-    当前版本中，我们直接沿用旧版实现中的字段结构，通过多一层封装
-    （investment_debate_state 嵌入到 research_summary 内部）来兼容之前的逻辑。
     """
-    investment_debate_state: InvestDebateState
-    investment_plan: str
-    raw_response: str
+    Research Manager 的封装结果。
+    
+    包含：
+    - 辩论过程状态（investment_debate_state）：用于子图内部多轮辩论
+    - 最终决策（investment_plan）：Manager 生成的最终投资计划
+    - 原始响应（raw_response）：LLM 的原始输出
+    """
+    investment_debate_state: Annotated[InvestDebateState, "Research 子图辩论过程状态（包含辩论历史、轮次等）"]
+    investment_plan: Annotated[str, "Research Manager 生成的最终投资计划"]
+    raw_response: Annotated[str, "LLM 的原始响应文本"]
 
 
 class RiskSummary(TypedDict, total=False):
-    """Risk Manager 对外暴露的封装结果。
-
-    为了保持全局 AgentState 的简洁，我们只在顶层暴露一个
-    `risk_summary: Dict[str, Any]` 字段，具体内部结构在此 TypedDict 中约束。
-
-    当前版本中，我们直接沿用旧版实现中的字段结构，通过多一层封装
-    （risk_debate_state 嵌入到 risk_summary 内部）来兼容之前的逻辑。
     """
-    risk_debate_state: RiskDebateState
-    final_trade_decision: str
-    raw_response: str
+    Risk Manager 的封装结果。
+    
+    包含：
+    - 辩论过程状态（risk_debate_state）：用于子图内部多轮辩论
+    - 最终决策（final_trade_decision）：Manager 生成的最终交易决策
+    - 原始响应（raw_response）：LLM 的原始输出
+    """
+    risk_debate_state: Annotated[RiskDebateState, "Risk 子图辩论过程状态（包含辩论历史、轮次等）"]
+    final_trade_decision: Annotated[str, "Risk Manager 生成的最终交易决策"]
+    raw_response: Annotated[str, "LLM 的原始响应文本"]
 
 
 class AgentState(MessagesState):
@@ -170,10 +170,14 @@ class AgentState(MessagesState):
     sentiment_analyst_summary: Annotated[AnalystMemorySummary, "Social Media Analyst 的 Memory Summary"]
     fundamentals_analyst_summary: Annotated[AnalystMemorySummary, "Fundamentals Analyst 的 Memory Summary"]
 
-    # ========== 最终决策输出 ==========
-    research_summary: Annotated[Optional[Dict[str, Any]], "Research Manager 的最终投资决策（action、理由、置信度）"]
-    risk_summary: Annotated[Optional[Dict[str, Any]], "Risk Manager 的风险评估结论（可接纳性、约束条件）"]
-    investment_plan: Annotated[Optional[str], "投资计划文本摘要"]
+    # ========== Research 流程结果 ==========
+    research_summary: Annotated[Optional[ResearchSummary], "Research Manager 的完整结果（包含辩论状态和最终投资计划）"]
+    investment_plan: Annotated[Optional[str], "投资计划文本摘要（从 research_summary.investment_plan 提取）"]
+    
+    # ========== Risk 流程结果 ==========
+    risk_summary: Annotated[Optional[RiskSummary], "Risk Manager 的完整结果（包含辩论状态和最终交易决策）"]
+    final_trade_decision: Annotated[Optional[str], "最终交易决策（从 risk_summary.final_trade_decision 提取）"]
+    
+    # ========== Trader 执行计划 ==========
     trader_investment_plan: Annotated[Optional[str], "Trader 生成的最终执行计划"]
-    final_trade_decision: Annotated[Optional[str], "最终交易决策"]
 
