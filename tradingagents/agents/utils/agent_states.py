@@ -13,7 +13,6 @@ from langchain_core.messages import AnyMessage
 from langgraph.graph import MessagesState
 from langchain_core.messages import BaseMessage
 from langgraph.graph import add_messages
-from tradingagents.agents.fusion.execution_schemas import ExecutionPlan, ExecutionLog
 
 # ==================== Analyst 私有 State ====================
 # 这些 State 仅用于 Analyst 节点内部执行，不进入全局 State
@@ -76,17 +75,11 @@ class AnalystMemorySummary(TypedDict):
     
     由 Memory Controller 提供，包含：
     - today_report: 今日生成的报告
-    - memory_summary_pre_open: 开盘前长期记忆摘要
-    - memory_summary_post_close: 收盘后长期记忆摘要
-    
-    对于 Market Analyst（频繁更新）：
-    - today_report: 最新的市场快照报告
-    - memory_summary_pre_open: 开盘前的历史市场趋势摘要
-    - memory_summary_post_close: 当日所有快照的聚合摘要
+    - history_report: 历史记忆摘要
+
     """
     today_report: Annotated[str, "今日生成的报告"]
-    history_report: Annotated[str, "开盘前长期记忆摘要"]
-
+    history_report: Annotated[str, "历史记忆摘要"]
 
 
 
@@ -123,6 +116,35 @@ class RiskDebateState(TypedDict):
     count: Annotated[int, "当前对话轮次"]
 
 
+# ==================== Manager Summary 结构 ====================
+
+class ResearchSummary(TypedDict, total=False):
+    """Research Manager 对外暴露的封装结果。
+
+    为了保持全局 AgentState 的简洁，我们只在顶层暴露一个
+    `research_summary: Dict[str, Any]` 字段，具体内部结构在此 TypedDict 中约束。
+
+    当前版本中，我们直接沿用旧版实现中的字段结构，通过多一层封装
+    （investment_debate_state 嵌入到 research_summary 内部）来兼容之前的逻辑。
+    """
+    investment_debate_state: InvestDebateState
+    investment_plan: str
+    raw_response: str
+
+
+class RiskSummary(TypedDict, total=False):
+    """Risk Manager 对外暴露的封装结果。
+
+    为了保持全局 AgentState 的简洁，我们只在顶层暴露一个
+    `risk_summary: Dict[str, Any]` 字段，具体内部结构在此 TypedDict 中约束。
+
+    当前版本中，我们直接沿用旧版实现中的字段结构，通过多一层封装
+    （risk_debate_state 嵌入到 risk_summary 内部）来兼容之前的逻辑。
+    """
+    risk_debate_state: RiskDebateState
+    final_trade_decision: str
+    raw_response: str
+
 
 class AgentState(MessagesState):
     """
@@ -154,31 +176,4 @@ class AgentState(MessagesState):
     investment_plan: Annotated[Optional[str], "投资计划文本摘要"]
     trader_investment_plan: Annotated[Optional[str], "Trader 生成的最终执行计划"]
     final_trade_decision: Annotated[Optional[str], "最终交易决策"]
-
-    # ========== 账户与持仓数据（这个地方我还在想） ==========
-    account_cash: Annotated[float, "账户可用现金（元）"]
-    account_total_value: Annotated[float, "账户总权益（现金 + 持仓市值）"]
-    current_price: Annotated[float, "当前股票价格"]
-    previous_close: Annotated[Optional[float], "前一日收盘价"]
-    portfolio_positions: Annotated[Dict[str, Dict[str, Any]], """持仓结构，示例：
-        {
-            "000001": {
-                "quantity": 100,
-                "cost_price": 15.5,
-                "market_price": 16.2,
-                "market_value": 1620.0
-            },
-            "000002": {...}
-        }
-    """]
-    max_drawdown: Annotated[Optional[float], "账户最大回撤百分比"]
-
-    # ========== 执行记录 ==========
-    execution_record: Annotated[Optional[Dict[str, Any]], "下单执行日志与结果"]
-
-    # ========== 混合架构新字段 (Hybrid Architecture) ==========
-    market_phase: Annotated[Literal["pre_market", "intraday", "post_market", "sleep"], "当前市场阶段"]
-    execution_plan: Annotated[Optional[ExecutionPlan], "盘前生成的结构化执行计划"]
-    execution_log: Annotated[Optional[ExecutionLog], "盘中执行后的结果日志"]
-    strategy_review: Annotated[Optional[str], "盘后复盘结论"]
 

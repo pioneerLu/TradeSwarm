@@ -11,9 +11,7 @@ Risk Manager Agent 模块
 """
 
 from .agent import create_risk_manager
-from .state import RiskManagerState
 
 __all__ = [
     "create_risk_manager",
-    "RiskManagerState",
 ]
