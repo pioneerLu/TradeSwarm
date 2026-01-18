@@ -14,7 +14,7 @@ from langgraph.graph import StateGraph, END
 from langchain_core.language_models import BaseChatModel
 
 if TYPE_CHECKING:
-    from langgraph.graph.graph import CompiledGraph
+    from langgraph.pregel import Pregel as CompiledGraph
 else:
     CompiledGraph = Any
 
@@ -39,7 +39,7 @@ def create_trading_graph(
     Args:
         llm: LangChain BaseChatModel 实例
         memory: Memory 实例（MockMemory 或 FinancialSituationMemory）
-        data_manager: 数据管理器实例（可选，传入 None 时使用写死的文本）
+        data_manager: conn 数据库连接
         
     Returns:
         编译好的 StateGraph
