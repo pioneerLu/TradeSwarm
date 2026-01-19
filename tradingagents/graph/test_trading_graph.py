@@ -4,17 +4,19 @@
 运行完整的交易决策流程，验证所有节点和子图是否正常工作。
 """
 
+from re import A
 from typing import Any, Dict
 from datetime import datetime
 
 from tradingagents.agents.utils.agent_states import AgentState, AnalystMemorySummary
 from tradingagents.graph.utils import MockMemory, load_llm_from_config
 from tradingagents.graph.trading_graph import create_trading_graph
+from tradingagents.agents.init_db import conn
 
 
 def create_initial_state(
     company_code: str = "000001",
-    trade_date: str = "2024-01-15",
+    trade_date: str = "2026-01-18",
 ) -> Dict[str, Any]:
     """
     创建初始 AgentState。
@@ -32,7 +34,7 @@ def create_initial_state(
         "history_report": "",
     }
     
-    initial_state: Dict[str, Any] = {
+    initial_state: AgentState = {
         "company_of_interest": company_code,
         "trade_date": trade_date,
         "trade_timestamp": datetime.now().isoformat(),
@@ -74,10 +76,11 @@ def main():
     # 3. 创建交易图
     print("\n[3/5] 创建交易图...")
     try:
+
         graph = create_trading_graph(
             llm=llm,
             memory=memory,
-            data_manager=None,  # 使用写死的文本
+            data_manager=conn, 
         )
         print("✓ 交易图创建成功")
     except Exception as e:
@@ -90,7 +93,7 @@ def main():
     print("\n[4/5] 创建初始状态...")
     initial_state = create_initial_state(
         company_code="000001",
-        trade_date="2024-01-15",
+        trade_date="2026-01-18",
     )
     print(f"✓ 初始状态创建成功: 股票代码={initial_state['company_of_interest']}, 日期={initial_state['trade_date']}")
     
