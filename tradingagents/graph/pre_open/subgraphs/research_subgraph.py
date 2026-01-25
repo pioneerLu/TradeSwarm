@@ -11,9 +11,9 @@ from langgraph.graph import StateGraph, END
 from langchain_core.language_models import BaseChatModel
 
 from tradingagents.agents.utils.agent_states import AgentState
-from tradingagents.agents.researchers.bull_researcher import create_bull_researcher
-from tradingagents.agents.researchers.bear_researcher import create_bear_researcher
-from tradingagents.agents.managers.research_manager.agent import create_research_manager
+from tradingagents.agents.pre_open.researchers.bull_researcher import create_bull_researcher
+from tradingagents.agents.pre_open.researchers.bear_researcher import create_bear_researcher
+from tradingagents.agents.pre_open.managers.research_manager.agent import create_research_manager
 
 if TYPE_CHECKING:
     from langgraph.graph.graph import CompiledGraph

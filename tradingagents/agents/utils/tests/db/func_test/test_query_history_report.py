@@ -5,7 +5,7 @@
 """
 
 import sqlite3
-from tradingagents.agents.summary.fundamentals_summary.node import _query_history_report
+from tradingagents.agents.pre_open.summary.fundamentals_summary.node import _query_history_report
 
 # 连接数据库
 conn = sqlite3.connect("memory.db")

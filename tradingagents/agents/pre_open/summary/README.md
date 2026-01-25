@@ -47,7 +47,7 @@ summary/
 ```python
 from langgraph.graph import StateGraph
 from tradingagents.agents.utils.agent_states import AgentState
-from tradingagents.agents.summary import (
+from tradingagents.agents.pre_open.summary import (
     create_market_summary_node,
     create_news_summary_node,
     create_sentiment_summary_node,
@@ -90,7 +90,7 @@ graph.add_edge(
 
 ```python
 from tradingagents.agents.utils.agent_states import AgentState
-from tradingagents.agents.summary import create_market_summary_node
+from tradingagents.agents.pre_open.summary import create_market_summary_node
 
 # 创建节点（使用工厂函数）
 market_summary = create_market_summary_node(data_manager)
