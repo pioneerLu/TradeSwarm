@@ -18,7 +18,7 @@ if TYPE_CHECKING:
 else:
     CompiledGraph = Any
 
-from tradingagents.agents.utils.agent_states import AgentState
+from tradingagents.agents.utils.agentstate.agent_states import AgentState
 from tradingagents.agents.pre_open.summary.market_summary.node import create_market_summary_node
 from tradingagents.agents.pre_open.summary.news_summary.node import create_news_summary_node
 from tradingagents.agents.pre_open.summary.sentiment_summary.node import create_sentiment_summary_node
