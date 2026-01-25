@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 else:
     CompiledGraph = Any
 
-from tradingagents.agents.utils.agent_states import AgentState
+from tradingagents.agents.utils.agentstate.agent_states import AgentState
 from tradingagents.agents.pre_open.risk_mgmt.aggresive_debator import create_risky_debator
 from tradingagents.agents.pre_open.risk_mgmt.neutral_debator import create_neutral_debator
 from tradingagents.agents.pre_open.risk_mgmt.conservative_debator import create_safe_debator

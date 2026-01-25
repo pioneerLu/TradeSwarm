@@ -6,7 +6,7 @@ from langchain_core.language_models import BaseChatModel
 import time
 import json
 
-from tradingagents.agents.utils.agent_states import (
+from tradingagents.agents.utils.agentstate.agent_states import (
     AgentState,
     AnalystMemorySummary,
     InvestDebateState,

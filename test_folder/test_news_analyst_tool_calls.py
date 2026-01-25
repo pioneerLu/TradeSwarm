@@ -5,7 +5,7 @@ import json
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from tradingagents.agents.utils.agent_states import AgentState
+from tradingagents.agents.utils.agentstate.agent_states import AgentState
 from tradingagents.agents.init_llm import llm
 from langchain.agents import create_agent
 from tradingagents.tool_nodes.utils.news_tools import get_news, get_global_news

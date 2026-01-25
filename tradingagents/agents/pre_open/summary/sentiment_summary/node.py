@@ -5,7 +5,7 @@ Sentiment Summary Node
 """
 
 from typing import Callable, Any, Dict
-from tradingagents.agents.utils.agent_states import AgentState, AnalystMemorySummary
+from tradingagents.agents.utils.agentstate.agent_states import AgentState, AnalystMemorySummary
 
 
 def create_sentiment_summary_node(conn: Any) -> Callable[[AgentState], Dict[str, Any]]:

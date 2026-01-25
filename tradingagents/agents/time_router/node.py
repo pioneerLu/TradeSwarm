@@ -12,7 +12,7 @@ Time Router Node
 
 from typing import Callable, Dict, Any, Literal
 from datetime import datetime, time
-from tradingagents.agents.utils.agent_states import AgentState
+from tradingagents.agents.utils.agentstate.agent_states import AgentState
 
 
 def create_time_router_node() -> Callable[[AgentState], Dict[str, Any]]:
