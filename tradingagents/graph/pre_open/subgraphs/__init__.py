@@ -8,10 +8,10 @@
     - create_risk_subgraph_simple: 创建 Risk 子图（固定 2 轮辩论）
 """
 
-from tradingagents.graph.subgraphs.research_subgraph import (
+from tradingagents.graph.pre_open.subgraphs.research_subgraph import (
     create_research_subgraph_simple,
 )
-from tradingagents.graph.subgraphs.risk_subgraph import (
+from tradingagents.graph.pre_open.subgraphs.risk_subgraph import (
     create_risk_subgraph_simple,
 )
 

@@ -24,8 +24,8 @@ from tradingagents.agents.summary.news_summary.node import create_news_summary_n
 from tradingagents.agents.summary.sentiment_summary.node import create_sentiment_summary_node
 from tradingagents.agents.summary.fundamentals_summary.node import create_fundamentals_summary_node
 from tradingagents.agents.trader.trader import create_trader
-from tradingagents.graph.subgraphs.research_subgraph import create_research_subgraph_simple
-from tradingagents.graph.subgraphs.risk_subgraph import create_risk_subgraph_simple
+from tradingagents.graph.pre_open.subgraphs.research_subgraph import create_research_subgraph_simple
+from tradingagents.graph.pre_open.subgraphs.risk_subgraph import create_risk_subgraph_simple
 
 
 def create_trading_graph(

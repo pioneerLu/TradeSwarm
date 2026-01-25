@@ -14,6 +14,36 @@ from langgraph.graph import MessagesState
 from langchain_core.messages import BaseMessage
 from langgraph.graph import add_messages
 
+
+# trading strategy
+class TradingParameters(TypedDict):
+  trigger_condition: str
+  buy_limit_price: float
+  stop_loss_price: float
+  take_profit_price: float
+  position_size_pct: float
+  max_holding_time_mins: int
+
+class ValidityFactor(TypedDict):
+  factor: Annotated[str, "因子"]
+  condition: Annotated[str, "条件"]
+
+class ExecutionLog(TypedDict):
+  timestamp: Annotated[str, "时间戳"]
+  action: Literal["buy", "sell", "hold"]
+  price: Annotated[float, "价格"]
+  volume: Annotated[int, "成交量"]
+  reason: Annotated[str, "原因"]
+
+class TradingStrategy(TypedDict):
+  target_symbol: Annotated[str, "目标股票代码"]
+  direction: Annotated[Literal["long", "short", "hold"], "交易方向"]
+  strategy_id: Annotated[str, "策略ID"]
+  parameters: Annotated[TradingParameters, "交易参数"]
+  validity_factors: Annotated[List[ValidityFactor], "有效因子"]
+  expiration: Annotated[str, "策略有效期"]
+
+
 # ==================== Analyst 私有 State ====================
 # 这些 State 仅用于 Analyst 节点内部执行，不进入全局 State
 
@@ -180,4 +210,10 @@ class AgentState(MessagesState):
     
     # ========== Trader 执行计划 ==========
     trader_investment_plan: Annotated[Optional[str], "Trader 生成的最终执行计划"]
+
+    # trading params
+    trading_session: Annotated[Literal["pre_open","market_open", "intraday","post_close"], "交易会话阶段"]
+    trading_strategy: Annotated[Optional[TradingStrategy], "交易策略"]
+    trading_strategy_status: Annotated[Literal["active", "inactive", "expired"], "交易策略状态"]
+    execution_log: Annotated[Optional[List[ExecutionLog]], "执行日志"]
 

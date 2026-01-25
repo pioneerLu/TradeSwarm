@@ -4,13 +4,12 @@
 运行完整的交易决策流程，验证所有节点和子图是否正常工作。
 """
 
-from re import A
 from typing import Any, Dict
 from datetime import datetime
 
 from tradingagents.agents.utils.agent_states import AgentState, AnalystMemorySummary
-from tradingagents.graph.utils import MockMemory, load_llm_from_config
-from tradingagents.graph.trading_graph import create_trading_graph
+from tradingagents.graph.pre_open.utils import MockMemory, load_llm_from_config
+from tradingagents.graph.pre_open.trading_graph import create_trading_graph
 from tradingagents.agents.init_db import conn
 
 
