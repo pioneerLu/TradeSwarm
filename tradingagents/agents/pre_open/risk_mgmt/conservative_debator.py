@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any, Dict
 
-from tradingagents.agents.utils.agent_states import (
+from tradingagents.agents.utils.agentstate.agent_states import (
     AgentState,
     AnalystMemorySummary,
     RiskDebateState,
