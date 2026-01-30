@@ -1,0 +1,453 @@
+========== SENTIMENTS ==========
+
+=== sentiments.company ===
+
+{
+  "success": true,
+  "message": "成功获取情绪数据",
+  "data": {
+    "items": "8",
+    "sentiment_score_definition": "x <= -0.35: Bearish; -0.35 < x <= -0.15: Somewhat-Bearish; -0.15 < x < 0.15: Neutral; 0.15 <= x < 0.35: Somewhat_Bullish; x >= 0.35: Bullish",
+    "relevance_score_definition": "0 < x <= 1, with a higher score indicating higher relevance.",
+    "feed": [
+      {
+        "title": "BlackRock, Inc. Reduces Stake in iShares MSCI Poland ETF",
+        "url": "https://www.gurufocus.com/news/2626572/blackrock-inc-reduces-stake-in-ishares-msci-poland-etf",
+        "time_published": "20241206T180900",
+        "authors": [],
+        "summary": "BlackRock, Inc. reduced its stake in the iShares MSCI Poland ETF (EPOL) by selling 880,171 shares on November 30, 2024, at $22.09 per share, leaving them with 133,296 shares. This move reflects a strategic adjustment by BlackRock, a leading investment firm with $4.761.03 trillion in equity and top holdings like Apple and Amazon. The iShares MSCI Poland ETF, with a market capitalization of $222.704 million, has shown a 4.48% price gain since the transaction and a 5.24% year-to-date appreciation, boasting a GF Score of 82/100 despite BlackRock's reduced position.",
+        "banner_image": null,
+        "source": "GuruFocus",
+        "category_within_source": "General",
+        "source_domain": "GuruFocus",
+        "topics": [
+          {
+            "topic": "finance",
+            "relevance_score": "0.922022"
+          },
+          {
+            "topic": "financial_markets",
+            "relevance_score": "0.826630"
+          }
+        ],
+        "overall_sentiment_score": 0.022178,
+        "overall_sentiment_label": "Neutral",
+        "ticker_sentiment": [
+          {
+            "ticker": "EPOL",
+            "relevance_score": "0.325321",
+            "ticker_sentiment_score": "0.007259",
+            "ticker_sentiment_label": "Neutral"
+          },
+          {
+            "ticker": "BLK",
+            "relevance_score": "0.949313",
+            "ticker_sentiment_score": "0.014457",
+            "ticker_sentiment_label": "Neutral"
+          },
+          {
+            "ticker": "AAPL",
+            "relevance_score": "0.620586",
+            "ticker_sentiment_score": "0.005189",
+            "ticker_sentiment_label": "Neutral"
+          },
+          {
+            "ticker": "AMZN",
+            "relevance_score": "0.627957",
+            "ticker_sentiment_score": "0.005529",
+            "ticker_sentiment_label": "Neutral"
+          },
+          {
+            "ticker": "MSFT",
+            "relevance_score": "0.603267",
+            "ticker_sentiment_score": "0.038755",
+            "ticker_sentiment_label": "Neutral"
+          }
+        ]
+      },
+      {
+        "title": "Apple plans three-year modem rollout to compete with Qualcomm, Bloomberg News reports",
+        "url": "https://www.reuters.com/technology/apple-plans-three-year-modem-rollout-compete-with-qualcomm-bloomberg-news-2024-12-06/",
+        "time_published": "20241206T175200",
+        "authors": [
+          "Reuters"
+        ],
+        "summary": "Apple is preparing to launch its own series of cellular modem chips starting next year, aiming to replace components from Qualcomm by 2027. This move intensifies competition with Qualcomm, which currently supplies modems to Apple, and could impact other Apple suppliers like Skyworks Solutions and Qorvo. Apple has been developing its own modem technology since acquiring Intel's modem unit in 2019 and recently signed a deal with Broadcom for 5G radio frequency components.",
+        "banner_image": "https://www.reuters.com/resizer/v2/https%3A%2F%2Fcloudfront-us-east-2.images.arcpublishing.com%2Freuters%2FVJ6C47C76BNK3DOKC52C2D62LY.jpg?auth=763260cc41c09772ee78e0ad19a86b9776d635c9116e01a1154b513470ff4190&width=1200&height=628&smart=true",
+        "source": "Reuters",
+        "category_within_source": "General",
+        "source_domain": "Reuters",
+        "topics": [
+          {
+            "topic": "technology",
+            "relevance_score": "1.000000"
+          },
+          {
+            "topic": "manufacturing",
+            "relevance_score": "0.845327"
+          },
+          {
+            "topic": "financial_markets",
+            "relevance_score": "0.630715"
+          }
+        ],
+        "overall_sentiment_score": -0.050774,
+        "overall_sentiment_label": "Neutral",
+        "ticker_sentiment": [
+          {
+            "ticker": "SWKS",
+            "relevance_score": "0.832900",
+            "ticker_sentiment_score": "-0.335380",
+            "ticker_sentiment_label": "Somewhat-Bearish"
+          },
+          {
+            "ticker": "AAPL",
+            "relevance_score": "0.934836",
+            "ticker_sentiment_score": "0.338512",
+            "ticker_sentiment_label": "Somewhat-Bullish"
+          },
+          {
+            "ticker": "QCOM",
+            "relevance_score": "0.904212",
+            "ticker_sentiment_score": "-0.349102",
+            "ticker_sentiment_label": "Somewhat-Bearish"
+          },
+          {
+            "ticker": "AVGO",
+            "relevance_score": "0.749931",
+            "ticker_sentiment_score": "0.223939",
+            "ticker_sentiment_label": "Somewhat-Bullish"
+          }
+        ]
+      },
+      {
+        "title": "The Inside Story of Apple Intelligence",
+        "url": "https://www.wired.com/story/plaintext-the-inside-story-of-apple-intelligence/",
+        "time_published": "20241206T130000",
+        "authors": [
+          "Steven Levy"
+        ],
+        "summary": "This article delves into Apple's strategy for generative AI, dubbed Apple Intelligence, highlighting the company's \"best, not first\" approach. Key executives, including John Giannandrea and Craig Federighi, explain that Apple has been preparing for this moment for years and focused on integrating AI at a systems level with a strong emphasis on privacy. The piece also contrasts Apple's approach with competitors and discusses the future trajectory of AI at Apple.",
+        "banner_image": "https://media.wired.com/photos/668383e29cf9a3e6396e95b0/master/w_1600,c_limit/AP24162629471360-copy.jpg",
+        "source": "WIRED",
+        "category_within_source": "General",
+        "source_domain": "WIRED",
+        "topics": [
+          {
+            "topic": "technology",
+            "relevance_score": "1.000000"
+          }
+        ],
+        "overall_sentiment_score": 0.067257,
+        "overall_sentiment_label": "Neutral",
+        "ticker_sentiment": [
+          {
+            "ticker": "AAPL",
+            "relevance_score": "1.000000",
+            "ticker_sentiment_score": "0.298031",
+            "ticker_sentiment_label": "Somewhat-Bullish"
+          },
+          {
+            "ticker": "GOOGL",
+            "relevance_score": "0.743723",
+            "ticker_sentiment_score": "0.089459",
+            "ticker_sentiment_label": "Neutral"
+          },
+          {
+            "ticker": "META",
+            "relevance_score": "0.628224",
+            "ticker_sentiment_score": "0.075601",
+            "ticker_sentiment_label": "Neutral"
+          },
+          {
+            "ticker": "MSFT",
+            "relevance_score": "0.687115",
+            "ticker_sentiment_score": "0.081235",
+            "ticker_sentiment_label": "Neutral"
+          },
+          {
+            "ticker": "INTC",
+            "relevance_score": "0.849010",
+            "ticker_sentiment_score": "-0.296048",
+            "ticker_sentiment_label": "Somewhat-Bearish"
+          }
+        ]
+      },
+      {
+        "title": "Contact - The Lethbridge Herald - News and Sports from around Lethbridge",
+        "url": "https://markets.financialcontent.com/lethbridgeherald/article/bizwire-2024-12-5-new-fund-name-for-simplify-stable-income-etf-buck",
+        "time_published": "20241205T161500",
+        "authors": [
+          "Simplify Asset Management Inc."
+        ],
+        "summary": "Simplify Asset Management Inc. announced that its Simplify Stable Income ETF (NYSE Arca: BUCK) has been renamed the Simplify Treasury Option Income ETF. This change became effective on October 29, 2024. Simplify Asset Management, founded in 2020, specializes in options-based strategies to address portfolio challenges.",
+        "banner_image": "NULL",
+        "source": "FinancialContent",
+        "category_within_source": "General",
+        "source_domain": "FinancialContent",
+        "topics": [
+          {
+            "topic": "finance",
+            "relevance_score": "0.906292"
+          },
+          {
+            "topic": "financial_markets",
+            "relevance_score": "0.841586"
+          },
+          {
+            "topic": "ipo",
+            "relevance_score": "0.737126"
+          },
+          {
+            "topic": "life_sciences",
+            "relevance_score": "0.643250"
+          },
+          {
+            "topic": "technology",
+            "relevance_score": "0.619927"
+          }
+        ],
+        "overall_sentiment_score": 0.013977,
+        "overall_sentiment_label": "Neutral",
+        "ticker_sentiment": [
+          {
+            "ticker": "BUCK",
+            "relevance_score": "1.000000",
+            "ticker_sentiment_score": "0.028999",
+            "ticker_sentiment_label": "Neutral"
+          },
+          {
+            "ticker": "AMZN",
+            "relevance_score": "0.649893",
+            "ticker_sentiment_score": "0.119155",
+            "ticker_sentiment_label": "Neutral"
+          },
+          {
+            "ticker": "AAPL",
+            "relevance_score": "0.637609",
+            "ticker_sentiment_score": "-0.106073",
+            "ticker_sentiment_label": "Neutral"
+          }
+        ]
+      },
+      {
+        "title": "Tech giant with 30,000 employees has no return-to-office policy",
+        "url": "https://www.batimes.com.ar/news/economy/tech-giant-with-30000-employees-has-no-return-to-office-policy.phtml",
+        "time_published": "20241204T141700",
+        "authors": [
+          "Patrick Gillespie"
+        ],
+        "summary": "Globant SA, a software company with nearly 30,000 employees across 33 countries, has opted against a mandatory return-to-office policy, differentiating itself from other tech giants. CEO Martin Migoya emphasizes making offices attractive and flexible connection points rather than forcing attendance. The company is redesigning its office spaces to encourage collaboration and is planning to hire another 20,000 employees as part of a US$1-billion investment.",
+        "banner_image": null,
+        "source": "Buenos Aires Times",
+        "category_within_source": "General",
+        "source_domain": "Buenos Aires Times",
+        "topics": [
+          {
+            "topic": "technology",
+            "relevance_score": "0.904032"
+          },
+          {
+            "topic": "economy_macro",
+            "relevance_score": "0.717714"
+          }
+        ],
+        "overall_sentiment_score": -0.145472,
+        "overall_sentiment_label": "Neutral",
+        "ticker_sentiment": [
+          {
+            "ticker": "GLOB",
+            "relevance_score": "1.000000",
+            "ticker_sentiment_score": "0.313948",
+            "ticker_sentiment_label": "Somewhat-Bullish"
+          },
+          {
+            "ticker": "AAPL",
+            "relevance_score": "0.737310",
+            "ticker_sentiment_score": "-0.217733",
+            "ticker_sentiment_label": "Somewhat-Bearish"
+          },
+          {
+            "ticker": "GOOGL",
+            "relevance_score": "0.717186",
+            "ticker_sentiment_score": "-0.249863",
+            "ticker_sentiment_label": "Somewhat-Bearish"
+          },
+          {
+            "ticker": "MSFT",
+            "relevance_score": "0.720714",
+            "ticker_sentiment_score": "-0.230609",
+            "ticker_sentiment_label": "Somewhat-Bearish"
+          },
+          {
+            "ticker": "META",
+            "relevance_score": "0.714944",
+            "ticker_sentiment_score": "-0.222561",
+            "ticker_sentiment_label": "Somewhat-Bearish"
+          }
+        ]
+      },
+      {
+        "title": "Tech stocks hit first all-time high since July",
+        "url": "https://www.cnbc.com/2024/12/04/tech-stocks-hit-first-all-time-high-since-july.html",
+        "time_published": "20241204T113100",
+        "authors": [
+          "Samantha Subin",
+          "Nick Wells"
+        ],
+        "summary": "Technology stocks reached new all-time highs on Wednesday, driven by strong performances from key software players like Salesforce, Adobe, and ServiceNow, as well as megacap companies such as Apple, Nvidia, and Amazon. The Nasdaq Composite rallied 1%, and the Technology Select Sector SPDR Fund (XLK) advanced 1.8%, marking its first new high since July. Marvell Technology also saw significant gains, surging 23% after a strong quarter.",
+        "banner_image": null,
+        "source": "CNBC",
+        "category_within_source": "General",
+        "source_domain": "CNBC",
+        "topics": [
+          {
+            "topic": "earnings",
+            "relevance_score": "0.813343"
+          },
+          {
+            "topic": "financial_markets",
+            "relevance_score": "0.940964"
+          },
+          {
+            "topic": "technology",
+            "relevance_score": "1.000000"
+          }
+        ],
+        "overall_sentiment_score": 0.377924,
+        "overall_sentiment_label": "Bullish",
+        "ticker_sentiment": [
+          {
+            "ticker": "IGV",
+            "relevance_score": "1.000000",
+            "ticker_sentiment_score": "0.498132",
+            "ticker_sentiment_label": "Bullish"
+          },
+          {
+            "ticker": "CRM",
+            "relevance_score": "0.892753",
+            "ticker_sentiment_score": "0.423189",
+            "ticker_sentiment_label": "Bullish"
+          },
+          {
+            "ticker": "AAPL",
+            "relevance_score": "0.761293",
+            "ticker_sentiment_score": "0.307370",
+            "ticker_sentiment_label": "Somewhat-Bullish"
+          },
+          {
+            "ticker": "AMZN",
+            "relevance_score": "0.734842",
+            "ticker_sentiment_score": "0.348158",
+            "ticker_sentiment_label": "Somewhat-Bullish"
+          }
+        ]
+      },
+      {
+        "title": "Arista Networks announces a four-for-one stock split",
+        "url": "https://www.investing.com/news/sec-filings/arista-networks-announces-a-fourforone-stock-split-93CH-3753009",
+        "time_published": "20241204T024800",
+        "authors": [
+          "Investing.com"
+        ],
+        "summary": "Arista Networks (NYSE: ANET) has announced a four-for-one stock split, effective December 3, 2024, by increasing its authorized common stock from 1 billion to 4 billion shares. This move aims to make the stock more accessible to a broader investor base and enhance liquidity without altering the company's fundamental value or market capitalization. The decision follows a strong financial performance, with 20% year-over-year revenue growth in Q3 and significant new product introductions.",
+        "banner_image": null,
+        "source": "Investing.com",
+        "category_within_source": "General",
+        "source_domain": "Investing.com",
+        "topics": [
+          {
+            "topic": "financial_markets",
+            "relevance_score": "0.943611"
+          },
+          {
+            "topic": "earnings",
+            "relevance_score": "0.831693"
+          },
+          {
+            "topic": "technology",
+            "relevance_score": "0.715380"
+          },
+          {
+            "topic": "finance",
+            "relevance_score": "0.605050"
+          }
+        ],
+        "overall_sentiment_score": 0.225633,
+        "overall_sentiment_label": "Somewhat-Bullish",
+        "ticker_sentiment": [
+          {
+            "ticker": "ANET",
+            "relevance_score": "1.000000",
+            "ticker_sentiment_score": "0.233128",
+            "ticker_sentiment_label": "Somewhat-Bullish"
+          },
+          {
+            "ticker": "AAPL",
+            "relevance_score": "0.741656",
+            "ticker_sentiment_score": "0.199780",
+            "ticker_sentiment_label": "Somewhat-Bullish"
+          }
+        ]
+      },
+      {
+        "title": "Should iShares S&P 500 Growth ETF (IVW) Be on Your Investing Radar?",
+        "url": "https://www.tradingview.com/news/zacks:734d2f3f1094b:0-should-ishares-s-p-500-growth-etf-ivw-be-on-your-investing-radar/",
+        "time_published": "20241202T080937",
+        "authors": [
+          "NULL"
+        ],
+        "summary": "The iShares S&P 500 Growth ETF (IVW) offers broad exposure to the Large Cap Growth segment of the US equity market, with significant holdings in Information Technology, and top positions in Nvidia, Apple, and Microsoft. With an expense ratio of 0.18% and a \"Buy\" rating from Zacks, it presents a compelling option for investors seeking growth, despite the inherent volatility of growth stocks. The fund has shown strong performance, up about 34.84% year-to-date and 40% over the last year.",
+        "banner_image": "NULL",
+        "source": "TradingView — Track All Markets",
+        "category_within_source": "General",
+        "source_domain": "TradingView — Track All Markets",
+        "topics": [
+          {
+            "topic": "financial_markets",
+            "relevance_score": "0.928559"
+          },
+          {
+            "topic": "technology",
+            "relevance_score": "0.818244"
+          }
+        ],
+        "overall_sentiment_score": 0.380452,
+        "overall_sentiment_label": "Bullish",
+        "ticker_sentiment": [
+          {
+            "ticker": "IVW",
+            "relevance_score": "1.000000",
+            "ticker_sentiment_score": "0.469890",
+            "ticker_sentiment_label": "Bullish"
+          },
+          {
+            "ticker": "NVDA",
+            "relevance_score": "0.602495",
+            "ticker_sentiment_score": "0.308792",
+            "ticker_sentiment_label": "Somewhat-Bullish"
+          },
+          {
+            "ticker": "AAPL",
+            "relevance_score": "0.612648",
+            "ticker_sentiment_score": "0.320635",
+            "ticker_sentiment_label": "Somewhat-Bullish"
+          },
+          {
+            "ticker": "MSFT",
+            "relevance_score": "0.625347",
+            "ticker_sentiment_score": "0.336498",
+            "ticker_sentiment_label": "Somewhat-Bullish"
+          }
+        ]
+      }
+    ]
+  },
+  "summary": {
+    "data_source": "alpha_vantage",
+    "date_range": {
+      "start": "2024-12-01",
+      "end": "2024-12-06"
+    }
+  }
+}

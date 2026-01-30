@@ -1,0 +1,437 @@
+========== FUNDAMENTALS ==========
+
+=== fundamentals.company_info ===
+
+{
+  "success": true,
+  "message": "成功获取公司信息",
+  "data": {
+    "ts_code": "AAPL",
+    "name": "Apple Inc",
+    "area": "USA",
+    "industry": "CONSUMER ELECTRONICS",
+    "market": "NASDAQ",
+    "list_date": "2025-09-30",
+    "total_share": "14697926000",
+    "float_share": "14697926000"
+  },
+  "summary": {
+    "data_source": "alpha_vantage",
+    "update_time": "2024-12-06"
+  }
+}
+
+=== fundamentals.financial_statements ===
+
+{
+  "success": true,
+  "message": "成功获取财务报表",
+  "data": {
+    "income_statement": {
+      "preview": [],
+      "meta": {
+        "total_rows": 0,
+        "preview_rows": 0,
+        "columns": []
+      }
+    },
+    "balance_sheet": {
+      "preview": [
+        {
+          "fiscalDateEnding": "2025-09-30",
+          "reportedCurrency": "USD",
+          "totalAssets": "359241000000",
+          "totalCurrentAssets": "147957000000",
+          "cashAndCashEquivalentsAtCarryingValue": "33539000000",
+          "cashAndShortTermInvestments": "33539000000",
+          "inventory": "5718000000",
+          "currentNetReceivables": "72957000000",
+          "totalNonCurrentAssets": "211284000000",
+          "propertyPlantEquipment": "61039000000",
+          "accumulatedDepreciationAmortizationPPE": "None",
+          "intangibleAssets": "None",
+          "intangibleAssetsExcludingGoodwill": "None",
+          "goodwill": "None",
+          "investments": "None",
+          "longTermInvestments": "77723000000",
+          "shortTermInvestments": "21158000000",
+          "otherCurrentAssets": "14585000000",
+          "otherNonCurrentAssets": "None",
+          "totalLiabilities": "285508000000",
+          "totalCurrentLiabilities": "165631000000",
+          "currentAccountsPayable": "69860000000",
+          "deferredRevenue": "None",
+          "currentDebt": "None",
+          "shortTermDebt": "22446000000",
+          "totalNonCurrentLiabilities": "119877000000",
+          "capitalLeaseObligations": "None",
+          "longTermDebt": "78328000000",
+          "currentLongTermDebt": "20329000000",
+          "longTermDebtNoncurrent": "None",
+          "shortLongTermDebtTotal": "112377000000",
+          "otherCurrentLiabilities": "64270000000",
+          "otherNonCurrentLiabilities": "41549000000",
+          "totalShareholderEquity": "73733000000",
+          "treasuryStock": "None",
+          "retainedEarnings": "-14264000000",
+          "commonStock": "93568000000",
+          "commonStockSharesOutstanding": "15004697000"
+        },
+        {
+          "fiscalDateEnding": "2024-09-30",
+          "reportedCurrency": "USD",
+          "totalAssets": "364980000000",
+          "totalCurrentAssets": "152987000000",
+          "cashAndCashEquivalentsAtCarryingValue": "29943000000",
+          "cashAndShortTermInvestments": "29943000000",
+          "inventory": "7286000000",
+          "currentNetReceivables": "66243000000",
+          "totalNonCurrentAssets": "211993000000",
+          "propertyPlantEquipment": "55914000000",
+          "accumulatedDepreciationAmortizationPPE": "None",
+          "intangibleAssets": "None",
+          "intangibleAssetsExcludingGoodwill": "None",
+          "goodwill": "None",
+          "investments": "None",
+          "longTermInvestments": "91479000000",
+          "shortTermInvestments": "35228000000",
+          "otherCurrentAssets": "14287000000",
+          "otherNonCurrentAssets": "None",
+          "totalLiabilities": "308030000000",
+          "totalCurrentLiabilities": "176392000000",
+          "currentAccountsPayable": "68960000000",
+          "deferredRevenue": "None",
+          "currentDebt": "None",
+          "shortTermDebt": "22511000000",
+          "totalNonCurrentLiabilities": "131638000000",
+          "capitalLeaseObligations": "None",
+          "longTermDebt": "85750000000",
+          "currentLongTermDebt": "20879000000",
+          "longTermDebtNoncurrent": "None",
+          "shortLongTermDebtTotal": "119059000000",
+          "otherCurrentLiabilities": "50071000000",
+          "otherNonCurrentLiabilities": "36634000000",
+          "totalShareholderEquity": "56950000000",
+          "treasuryStock": "None",
+          "retainedEarnings": "-19154000000",
+          "commonStock": "83276000000",
+          "commonStockSharesOutstanding": "15408095000"
+        }
+      ],
+      "meta": {
+        "total_rows": 2,
+        "preview_rows": 2,
+        "columns": [
+          "fiscalDateEnding",
+          "reportedCurrency",
+          "totalAssets",
+          "totalCurrentAssets",
+          "cashAndCashEquivalentsAtCarryingValue",
+          "cashAndShortTermInvestments",
+          "inventory",
+          "currentNetReceivables",
+          "totalNonCurrentAssets",
+          "propertyPlantEquipment",
+          "accumulatedDepreciationAmortizationPPE",
+          "intangibleAssets",
+          "intangibleAssetsExcludingGoodwill",
+          "goodwill",
+          "investments",
+          "longTermInvestments",
+          "shortTermInvestments",
+          "otherCurrentAssets",
+          "otherNonCurrentAssets",
+          "totalLiabilities",
+          "totalCurrentLiabilities",
+          "currentAccountsPayable",
+          "deferredRevenue",
+          "currentDebt",
+          "shortTermDebt",
+          "totalNonCurrentLiabilities",
+          "capitalLeaseObligations",
+          "longTermDebt",
+          "currentLongTermDebt",
+          "longTermDebtNoncurrent",
+          "shortLongTermDebtTotal",
+          "otherCurrentLiabilities",
+          "otherNonCurrentLiabilities",
+          "totalShareholderEquity",
+          "treasuryStock",
+          "retainedEarnings",
+          "commonStock",
+          "commonStockSharesOutstanding"
+        ]
+      }
+    },
+    "cash_flow": {
+      "preview": [
+        {
+          "fiscalDateEnding": "2025-09-30",
+          "reportedCurrency": "USD",
+          "operatingCashflow": "111482000000",
+          "paymentsForOperatingActivities": "None",
+          "proceedsFromOperatingActivities": "None",
+          "changeInOperatingLiabilities": "None",
+          "changeInOperatingAssets": "None",
+          "depreciationDepletionAndAmortization": "11698000000",
+          "capitalExpenditures": "12715000000",
+          "changeInReceivables": "None",
+          "changeInInventory": "1400000000",
+          "profitLoss": "None",
+          "cashflowFromInvestment": "15195000000",
+          "cashflowFromFinancing": "-120686000000",
+          "proceedsFromRepaymentsOfShortTermDebt": "None",
+          "paymentsForRepurchaseOfCommonStock": "None",
+          "paymentsForRepurchaseOfEquity": "None",
+          "paymentsForRepurchaseOfPreferredStock": "None",
+          "dividendPayout": "15421000000",
+          "dividendPayoutCommonStock": "15421000000",
+          "dividendPayoutPreferredStock": "None",
+          "proceedsFromIssuanceOfCommonStock": "None",
+          "proceedsFromIssuanceOfLongTermDebtAndCapitalSecuritiesNet": "None",
+          "proceedsFromIssuanceOfPreferredStock": "None",
+          "proceedsFromRepurchaseOfEquity": "-90711000000",
+          "proceedsFromSaleOfTreasuryStock": "None",
+          "changeInCashAndCashEquivalents": "None",
+          "changeInExchangeRate": "None",
+          "netIncome": "112010000000"
+        },
+        {
+          "fiscalDateEnding": "2024-09-30",
+          "reportedCurrency": "USD",
+          "operatingCashflow": "118254000000",
+          "paymentsForOperatingActivities": "None",
+          "proceedsFromOperatingActivities": "None",
+          "changeInOperatingLiabilities": "None",
+          "changeInOperatingAssets": "None",
+          "depreciationDepletionAndAmortization": "11445000000",
+          "capitalExpenditures": "9447000000",
+          "changeInReceivables": "None",
+          "changeInInventory": "-1046000000",
+          "profitLoss": "None",
+          "cashflowFromInvestment": "2935000000",
+          "cashflowFromFinancing": "-121983000000",
+          "proceedsFromRepaymentsOfShortTermDebt": "None",
+          "paymentsForRepurchaseOfCommonStock": "None",
+          "paymentsForRepurchaseOfEquity": "None",
+          "paymentsForRepurchaseOfPreferredStock": "None",
+          "dividendPayout": "15234000000",
+          "dividendPayoutCommonStock": "15234000000",
+          "dividendPayoutPreferredStock": "None",
+          "proceedsFromIssuanceOfCommonStock": "None",
+          "proceedsFromIssuanceOfLongTermDebtAndCapitalSecuritiesNet": "None",
+          "proceedsFromIssuanceOfPreferredStock": "None",
+          "proceedsFromRepurchaseOfEquity": "-94949000000",
+          "proceedsFromSaleOfTreasuryStock": "None",
+          "changeInCashAndCashEquivalents": "None",
+          "changeInExchangeRate": "None",
+          "netIncome": "93736000000"
+        }
+      ],
+      "meta": {
+        "total_rows": 2,
+        "preview_rows": 2,
+        "columns": [
+          "fiscalDateEnding",
+          "reportedCurrency",
+          "operatingCashflow",
+          "paymentsForOperatingActivities",
+          "proceedsFromOperatingActivities",
+          "changeInOperatingLiabilities",
+          "changeInOperatingAssets",
+          "depreciationDepletionAndAmortization",
+          "capitalExpenditures",
+          "changeInReceivables",
+          "changeInInventory",
+          "profitLoss",
+          "cashflowFromInvestment",
+          "cashflowFromFinancing",
+          "proceedsFromRepaymentsOfShortTermDebt",
+          "paymentsForRepurchaseOfCommonStock",
+          "paymentsForRepurchaseOfEquity",
+          "paymentsForRepurchaseOfPreferredStock",
+          "dividendPayout",
+          "dividendPayoutCommonStock",
+          "dividendPayoutPreferredStock",
+          "proceedsFromIssuanceOfCommonStock",
+          "proceedsFromIssuanceOfLongTermDebtAndCapitalSecuritiesNet",
+          "proceedsFromIssuanceOfPreferredStock",
+          "proceedsFromRepurchaseOfEquity",
+          "proceedsFromSaleOfTreasuryStock",
+          "changeInCashAndCashEquivalents",
+          "changeInExchangeRate",
+          "netIncome"
+        ]
+      }
+    }
+  },
+  "summary": {
+    "report_type": "annual",
+    "periods": 2,
+    "data_source": "alpha_vantage"
+  }
+}
+
+=== fundamentals.financial_indicators ===
+
+{
+  "success": true,
+  "message": "成功获取财务指标",
+  "data": {
+    "preview": [
+      {
+        "LatestQuarter": "2025-09-30",
+        "ROE": null,
+        "ROA": null,
+        "GrossProfitTTM": "195201008000",
+        "ProfitMargin": "0.269",
+        "OperatingMarginTTM": "0.317",
+        "EPS": "7.46"
+      }
+    ],
+    "meta": {
+      "total_rows": 1,
+      "preview_rows": 1,
+      "columns": [
+        "LatestQuarter",
+        "ROE",
+        "ROA",
+        "GrossProfitTTM",
+        "ProfitMargin",
+        "OperatingMarginTTM",
+        "EPS"
+      ]
+    }
+  },
+  "summary": {
+    "report_type": "annual",
+    "periods": 2,
+    "data_source": "alpha_vantage"
+  }
+}
+
+=== fundamentals.valuation_indicators ===
+
+{
+  "success": true,
+  "message": "成功获取估值指标",
+  "data": {
+    "pe": null,
+    "pb": null,
+    "ps": null,
+    "dividend_yield": null,
+    "update_date": null
+  },
+  "summary": {
+    "data_source": "alpha_vantage",
+    "include_market_comparison": false
+  }
+}
+
+=== fundamentals.earnings_data ===
+
+{
+  "success": true,
+  "message": "成功获取业绩数据",
+  "data": {
+    "forecast": {
+      "preview": [
+        {
+          "fiscalDateEnding": "2025-12-31",
+          "reportedDate": "2026-01-29",
+          "reportedEPS": "None",
+          "estimatedEPS": "2.67",
+          "surprise": "0",
+          "surprisePercentage": "None",
+          "reportTime": "post-market"
+        },
+        {
+          "fiscalDateEnding": "2025-09-30",
+          "reportedDate": "2025-10-30",
+          "reportedEPS": "1.85",
+          "estimatedEPS": "1.76",
+          "surprise": "0.09",
+          "surprisePercentage": "5.1136",
+          "reportTime": "post-market"
+        },
+        {
+          "fiscalDateEnding": "2025-06-30",
+          "reportedDate": "2025-07-31",
+          "reportedEPS": "1.57",
+          "estimatedEPS": "1.43",
+          "surprise": "0.14",
+          "surprisePercentage": "9.7902",
+          "reportTime": "post-market"
+        },
+        {
+          "fiscalDateEnding": "2025-03-31",
+          "reportedDate": "2025-05-01",
+          "reportedEPS": "1.65",
+          "estimatedEPS": "1.62",
+          "surprise": "0.03",
+          "surprisePercentage": "1.8519",
+          "reportTime": "post-market"
+        },
+        {
+          "fiscalDateEnding": "2024-12-31",
+          "reportedDate": "2025-01-30",
+          "reportedEPS": "2.4",
+          "estimatedEPS": "2.34",
+          "surprise": "0.06",
+          "surprisePercentage": "2.5641",
+          "reportTime": "post-market"
+        }
+      ],
+      "meta": {
+        "total_rows": 5,
+        "preview_rows": 5,
+        "columns": [
+          "fiscalDateEnding",
+          "reportedDate",
+          "reportedEPS",
+          "estimatedEPS",
+          "surprise",
+          "surprisePercentage",
+          "reportTime"
+        ]
+      }
+    },
+    "express": {
+      "preview": [
+        {
+          "fiscalDateEnding": "2025-12-31",
+          "reportedEPS": "0"
+        },
+        {
+          "fiscalDateEnding": "2025-09-30",
+          "reportedEPS": "7.47"
+        },
+        {
+          "fiscalDateEnding": "2024-09-30",
+          "reportedEPS": "6.08"
+        },
+        {
+          "fiscalDateEnding": "2023-09-30",
+          "reportedEPS": "6.12"
+        },
+        {
+          "fiscalDateEnding": "2022-09-30",
+          "reportedEPS": "6.11"
+        }
+      ],
+      "meta": {
+        "total_rows": 5,
+        "preview_rows": 5,
+        "columns": [
+          "fiscalDateEnding",
+          "reportedEPS"
+        ]
+      }
+    }
+  },
+  "summary": {
+    "data_source": "alpha_vantage",
+    "total_forecast": 120,
+    "total_express": 31
+  }
+}
