@@ -8,30 +8,11 @@ import json
 
 from tradingagents.agents.utils.agentstate.agent_states import (
     AgentState,
-    AnalystMemorySummary,
     InvestDebateState,
     ResearchSummary,
 )
-
-
-def _build_curr_situation_from_summaries(state: AgentState) -> str:
-    """从四个 Analyst 的 MemorySummary 中构造当前情境描述。"""
-    market_summary: AnalystMemorySummary = state["market_analyst_summary"]
-    news_summary: AnalystMemorySummary = state["news_analyst_summary"]
-    sentiment_summary: AnalystMemorySummary = state["sentiment_analyst_summary"]
-    fundamentals_summary: AnalystMemorySummary = state["fundamentals_analyst_summary"]
-
-    market_report = market_summary["today_report"]
-    news_report = news_summary["today_report"]
-    sentiment_report = sentiment_summary["today_report"]
-    fundamentals_report = fundamentals_summary["today_report"]
-
-    return (
-        f"{market_report}\n\n"
-        f"{sentiment_report}\n\n"
-        f"{news_report}\n\n"
-        f"{fundamentals_report}"
-    )
+from tradingagents.agents.utils.state_helpers import build_curr_situation_from_summaries
+from tradingagents.agents.utils.prompt_loader import load_prompt_template
 
 
 def create_bear_researcher(llm: BaseChatModel, memory: Any) -> Callable[[AgentState], Dict[str, Any]]:
@@ -53,10 +34,16 @@ def create_bear_researcher(llm: BaseChatModel, memory: Any) -> Callable[[AgentSt
         
         history = prev_debate.get("history", "")
         bear_history = prev_debate.get("bear_history", "")
+        bull_history = prev_debate.get("bull_history", "")
         current_response = prev_debate.get("current_response", "")
+        count = prev_debate.get("count", 0)
+        
+        # 计算当前轮次（每轮包含 bull 和 bear 各一次发言）
+        round_number = (count // 2) + 1
+        is_first_round = count < 2
 
         # 2. 从四个 Analyst 的 MemorySummary 中构造当前情境
-        curr_situation = _build_curr_situation_from_summaries(state)
+        curr_situation = build_curr_situation_from_summaries(state)
         market_research_report = state["market_analyst_summary"]["today_report"]
         sentiment_report = state["sentiment_analyst_summary"]["today_report"]
         news_report = state["news_analyst_summary"]["today_report"]
@@ -68,27 +55,23 @@ def create_bear_researcher(llm: BaseChatModel, memory: Any) -> Callable[[AgentSt
         for i, rec in enumerate(past_memories, 1):
             past_memory_str += rec.get("recommendation", "") + "\n\n"
 
-        prompt = f"""你是一位看跌分析师，主张不投资该股票。你的目标是提出一个有理有据的论证，强调风险、挑战和负面指标。利用提供的研究和数据，有效突出潜在的不利因素并反驳看涨观点。
-
-重点关注：
-
-- 风险和挑战：强调可能阻碍股票表现的因素，如市场饱和、财务不稳定或宏观经济威胁。
-- 竞争劣势：强调诸如市场定位较弱、创新下降或来自竞争对手的威胁等脆弱性。
-- 负面指标：使用财务数据、市场趋势或最近的不利新闻中的证据来支持你的立场。
-- 看涨反驳：用具体数据和合理推理批判性地分析看涨论点，揭露弱点或过度乐观的假设。
-- 参与辩论：以对话的方式呈现你的论证，直接参与看涨分析师的观点，有效辩论，而不仅仅是列举事实。
-
-可用资源：
-
-市场研究报告：{market_research_report}
-社交媒体情绪报告：{sentiment_report}
-最新时事新闻：{news_report}
-公司基本面报告：{fundamentals_report}
-辩论对话历史：{history}
-上次看涨论点：{current_response}
-类似情况的反思和经验教训：{past_memory_str}
-使用这些信息来提出令人信服的看跌论证，反驳看涨的主张，并参与动态辩论，展示投资该股票的风险和弱点。你还必须处理反思，从过去的经验和错误中学习。
-"""
+        # 加载并渲染 prompt 模板
+        prompt = load_prompt_template(
+            agent_type="researchers",
+            agent_name="bear_researcher",
+            context={
+                "market_research_report": market_research_report,
+                "sentiment_report": sentiment_report,
+                "news_report": news_report,
+                "fundamentals_report": fundamentals_report,
+                "history": history,
+                "current_response": current_response,
+                "past_memory_str": past_memory_str,
+                "round_number": round_number,
+                "is_first_round": is_first_round,
+                "bull_history": bull_history,
+            },
+        )
 
         response = llm.invoke(prompt)
         content: str = getattr(response, "content", str(response))

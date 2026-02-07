@@ -6,6 +6,7 @@ Fundamentals Summary Node
 
 from typing import Callable, Any, Dict
 from tradingagents.agents.utils.agentstate.agent_states import AgentState, AnalystMemorySummary
+from tradingagents.agents.pre_open.summary._db_helpers import query_today_report, query_history_report
 
 
 def create_fundamentals_summary_node(conn: Any) -> Callable[[AgentState], Dict[str, Any]]:
@@ -47,8 +48,8 @@ def create_fundamentals_summary_node(conn: Any) -> Callable[[AgentState], Dict[s
         trading_session = state.get("trading_session", "post_close")
         
         # 第二阶段：查询数据库
-        today_report = _query_today_report(conn, symbol, trade_date)
-        history_report = _query_history_report(conn, symbol, trade_date, trading_session)
+        today_report = query_today_report(conn, "fundamentals", symbol, trade_date, "Fundamentals Analysis Report")
+        history_report = query_history_report(conn, "fundamentals", symbol, trade_date, trading_session, "Fundamentals History Summary")
         
         # 第三阶段：构建 AnalystMemorySummary
         summary: AnalystMemorySummary = {

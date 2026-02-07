@@ -4,30 +4,11 @@ from typing import Any, Dict
 
 from tradingagents.agents.utils.agentstate.agent_states import (
     AgentState,
-    AnalystMemorySummary,
     RiskDebateState,
     RiskSummary,
 )
-
-
-def _build_curr_situation_from_summaries(state: AgentState) -> str:
-    """从四个 Analyst 的 MemorySummary 中构造当前情境描述。"""
-    market_summary: AnalystMemorySummary = state["market_analyst_summary"]
-    news_summary: AnalystMemorySummary = state["news_analyst_summary"]
-    sentiment_summary: AnalystMemorySummary = state["sentiment_analyst_summary"]
-    fundamentals_summary: AnalystMemorySummary = state["fundamentals_analyst_summary"]
-
-    market_report = market_summary["today_report"]
-    news_report = news_summary["today_report"]
-    sentiment_report = sentiment_summary["today_report"]
-    fundamentals_report = fundamentals_summary["today_report"]
-
-    return (
-        f"{market_report}\n\n"
-        f"{sentiment_report}\n\n"
-        f"{news_report}\n\n"
-        f"{fundamentals_report}"
-    )
+from tradingagents.agents.utils.state_helpers import build_curr_situation_from_summaries
+from tradingagents.agents.utils.prompt_loader import load_prompt_template
 
 
 def create_safe_debator(llm: Any):
@@ -61,11 +42,18 @@ def create_safe_debator(llm: Any):
 
         history = prev_debate.get("history", "")
         safe_history = prev_debate.get("safe_history", "")
+        risky_history = prev_debate.get("risky_history", "")
+        neutral_history = prev_debate.get("neutral_history", "")
         current_risky_response = prev_debate.get("current_risky_response", "")
         current_neutral_response = prev_debate.get("current_neutral_response", "")
+        count = prev_debate.get("count", 0)
+        
+        # 计算当前轮次（每轮包含 risky、neutral、safe 各一次发言）
+        round_number = (count // 3) + 1
+        is_first_round = count < 3
 
         # 2. 从四个 Analyst 的 MemorySummary 中构造当前情境
-        market_research_report = _build_curr_situation_from_summaries(state)
+        market_research_report = build_curr_situation_from_summaries(state)
         sentiment_report = state["sentiment_analyst_summary"]["today_report"]
         news_report = state["news_analyst_summary"]["today_report"]
         fundamentals_report = state["fundamentals_analyst_summary"]["today_report"]
@@ -78,20 +66,27 @@ def create_safe_debator(llm: Any):
             else state.get("investment_plan", "")
         )
 
-        prompt = f"""作为保守/谨慎风险分析师，你的主要目标是保护资产、最小化波动性，并确保稳定可靠的增长。你优先考虑稳定性、安全性和风险缓解，仔细评估潜在损失、经济衰退和市场波动。在评估交易员的决策或计划时，批判性地审视高风险因素，指出决策可能在何处使公司暴露于不当风险，以及更谨慎的替代方案如何能够确保长期收益。以下是交易员的决策：
+        # 4. 加载并渲染 prompt 模板
+        prompt = load_prompt_template(
+            agent_type="risk_mgmt",
+            agent_name="conservative_debator",
+            context={
+                "trader_decision": trader_decision,
+                "market_research_report": market_research_report,
+                "sentiment_report": sentiment_report,
+                "news_report": news_report,
+                "fundamentals_report": fundamentals_report,
+                "history": history,
+                "current_risky_response": current_risky_response,
+                "current_neutral_response": current_neutral_response,
+                "round_number": round_number,
+                "is_first_round": is_first_round,
+                "risky_history": risky_history,
+                "neutral_history": neutral_history,
+            },
+        )
 
-{trader_decision}
-
-你的任务是积极反驳激进和中性分析师的论点，强调他们的观点可能忽视的潜在威胁或未能优先考虑可持续性。直接回应他们的观点，从以下数据源中构建令人信服的低风险方法调整方案：
-
-市场研究报告：{market_research_report}
-社交媒体情绪报告：{sentiment_report}
-最新时事报告：{news_report}
-公司基本面报告：{fundamentals_report}
-以下是当前对话历史：{history} 以下是激进分析师的最后回应：{current_risky_response} 以下是中性分析师的最后回应：{current_neutral_response}。如果没有其他观点的回应，不要编造，只需陈述你的观点。
-
-通过质疑他们的乐观态度并强调他们可能忽视的潜在不利因素来参与辩论。回应他们的每一个反驳点，展示为什么保守立场最终是公司资产最安全的路径。专注于辩论和批判他们的论点，以证明低风险策略相对于他们的方法的优势。以对话的方式输出，就像在说话一样，不要使用任何特殊格式。"""
-
+        # 5. 调用 LLM 生成论证
         response = llm.invoke(prompt)
         content: str = getattr(response, "content", str(response))
 

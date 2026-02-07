@@ -61,9 +61,10 @@ TradeSwarm 是一个可**连续自治运行数周**、具备**多智能体协作
 ### 技术实现
 
 - **LangGraph 1.2.0** + LangChain：工作流编排
-- **SQLite** (`memory.db`) + **ChromaDB**：数据持久化
-- **Tushare/AKShare**：数据源
+- **SQLite** (`memory.db` / `test.db`) + **ChromaDB**：数据持久化
+- **yfinance** + **Alpha Vantage**：数据源
 - 统一的 `AgentState` 状态管理
+- **Jinja2**：Prompt 模板化
 
 ### 核心模块
 
@@ -106,10 +107,11 @@ TradeSwarm/
 │   └── config.yaml            # 系统配置文件（LLM配置、数据源配置等）
 ├── datasources/               # 数据源模块
 │   └── data_sources/          # 数据源提供者
-│       ├── akshare_provider.py
-│       └── tushare_provider.py
+│       ├── yfinance_provider.py
+│       └── alphavantage_provider.py
 ├── tradingagents/             # 交易智能体模块
 │   ├── agents/                # 智能体实现
+│   │   ├── analysts/          # 分析师（Market/News/Fundamentals/Sentiment）
 │   │   ├── pre_open/          # 开盘前分析模块
 │   │   │   ├── summary/       # Summary 节点
 │   │   │   ├── researchers/   # 研究员（Bull/Bear）
@@ -120,15 +122,22 @@ TradeSwarm/
 │   │   ├── post_close/        # 收盘复盘模块（待实现）
 │   │   ├── time_router/       # 时间路由节点
 │   │   └── utils/             # 工具模块
-│   │       └── agentstate/    # AgentState 定义
-│   └── graph/                 # LangGraph 工作流
-│       └── pre_open/          # 开盘前交易图
-│           ├── trading_graph.py
-│           └── subgraphs/     # 子图（Research/Risk）
-└── utils/                     # 工具模块
-    ├── config_loader.py       # 配置加载器
-    ├── data_utils.py          # 数据处理工具
-    └── llm_utils.py           # LLM工具函数
+│   │       ├── agentstate/    # AgentState 定义
+│   │       ├── prompt_loader.py  # Prompt 模板加载器
+│   │       └── memory_db_helper.py  # 数据库工具
+│   ├── graph/                 # LangGraph 工作流
+│   │   ├── trading_graph.py   # 主交易图
+│   │   ├── utils.py           # 工具函数（LLM 加载）
+│   │   └── subgraphs/         # 子图（Research/Risk）
+│   └── tool_nodes/            # 工具节点
+│       └── utils/             # 数据工具（market_tools, news_tools 等）
+├── utils/                     # 工具模块
+│   ├── config_loader.py       # 配置加载器
+│   ├── data_utils.py          # 数据处理工具
+│   └── llm_utils.py           # LLM工具函数
+├── run_analysts_to_db.py      # 运行 Analyst 并保存到数据库
+├── run_graph_from_summary.py  # 运行完整交易图
+└── export_db_to_json.py       # 导出数据库内容
 ```
 
 ---
@@ -143,25 +152,22 @@ TradeSwarm/
 - **SQLite**: 关系型数据库（`memory.db`）
 
 ### 数据源
-- **Tushare Pro**: 专业的金融数据接口
-- **AKShare**: 开源的金融数据接口
+- **yfinance**: 股票市场数据和历史行情
+- **Alpha Vantage**: 新闻、基本面数据和财务指标
 
 ### 数据能力明细
 
 | 指标名称 | 数据源 | 对应函数 | 简要说明 |
 | :--- | :--- | :--- | :--- |
-| **日线行情** | Tushare | `get_daily` | 获取历史日线数据（开高低收、成交量）|
-| **每日指标** | Tushare | `get_daily_basic` | 获取每日收盘后的基本面指标（PE、PB、换手率等）|
-| **实时盘口** | Tushare | `get_realtime_orderbook` | 获取实时五档买卖盘口及最新价 |
-| **公司信息** | Tushare/AKShare | `get_company_info` | 获取单个公司的详细背景、主营业务等 |
-| **财务报表** | Tushare/AKShare | `get_financial_statements` | 获取三大财务报表（利润表、资产负债表、现金流量表）|
-| **财务指标** | Tushare/AKShare | `get_financial_indicators` | 获取 ROE、ROA、毛利率等计算后指标 |
-| **估值指标** | AKShare | `get_valuation_indicators` | 获取盘中实时的 PE/PB 估值数据 |
-| **业绩预告/快报** | Tushare/AKShare | `get_earnings_data` | 获取上市公司业绩预告/快报 |
-| **宏观新闻** | AKShare | `get_macro_news` | 获取央视/百度财经等宏观新闻资讯 |
-| **北向资金** | AKShare | `get_northbound_money_flow` | 获取沪深港通北向资金实时流向 |
-| **全球指数** | AKShare | `get_global_indices_performance` | 获取美股、港股等全球核心指数涨跌幅 |
-| **实时汇率** | AKShare | `get_currency_exchange_rate` | 获取美元兑人民币实时汇率 (USD/CNY) |
+| **日线行情** | yfinance | `get_stock_data` | 获取历史日线数据（开高低收、成交量、涨跌幅等）|
+| **技术指标** | yfinance | `get_indicators` | 获取 RSI、MACD、移动平均线等技术指标 |
+| **公司信息** | Alpha Vantage | `get_company_info` | 获取公司基本信息、行业分类等 |
+| **财务报表** | Alpha Vantage | `get_financial_statements` | 获取三大财务报表（利润表、资产负债表、现金流量表）|
+| **财务指标** | Alpha Vantage | `get_financial_indicators` | 获取 ROE、ROA、毛利率等计算后指标 |
+| **估值指标** | Alpha Vantage | `get_valuation_indicators` | 获取 PE、PB、市值等估值数据 |
+| **业绩数据** | Alpha Vantage | `get_earnings_data` | 获取年度和季度业绩数据 |
+| **公司新闻** | Alpha Vantage | `get_news` | 获取公司相关新闻（支持历史日期过滤）|
+| **宏观新闻** | Alpha Vantage | `get_global_news` | 获取宏观经济新闻 |
 
 ---
 
@@ -177,7 +183,7 @@ pip install -r requirements.txt
 
 # 设置环境变量
 export DASHSCOPE_API_KEY="your-api-key"
-export TUSHARE_TOKEN="your-tushare-token"
+export ALPHA_VANTAGE_API_KEY="your-alpha-vantage-key"
 ```
 
 ### 配置文件
@@ -190,16 +196,24 @@ llm:
   base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
   model_name: "qwen-plus"
   temperature: 0.1
+
+alpha_vantage:
+  api_keys:
+    - "your-api-key-1"
+    - "your-api-key-2"
 ```
 
 ### 运行示例
 
 ```bash
-# 运行完整交易图
-python -m tradingagents.graph.pre_open.test_trading_graph
+# 1. 运行 Analyst 并保存到数据库
+python run_analysts_to_db.py
 
-# 运行基本面分析师
-python -m tradingagents.agents.pre_open.summary.fundamentals_summary.node
+# 2. 运行完整交易图（从 Summary 节点开始）
+python run_graph_from_summary.py
+
+# 3. 导出数据库内容
+python export_db_to_json.py
 ```
 
 ---
@@ -256,14 +270,53 @@ python -m tradingagents.agents.pre_open.summary.fundamentals_summary.node
 
 ---
 
-## 注意事项
+## Graph 架构说明
 
-1. **环境变量**：需要设置 `DASHSCOPE_API_KEY` 和 `TUSHARE_TOKEN`
-2. **数据库**：使用 SQLite 数据库（`memory.db`），会在首次运行时自动创建
-3. **API 限制**：Tushare 有调用频率限制，注意缓存机制
-4. **Prompt 语言**：建议使用中文编写 prompt
+### 主交易图结构
+
+主交易图 (`trading_graph.py`) 定义了完整的交易决策流程：
+
+1. **Summary 节点**（串行执行）：
+   - `market_summary` → `news_summary` → `sentiment_summary` → `fundamentals_summary`
+   - 从数据库读取 Analyst 报告并生成摘要
+
+2. **Research 子图**：
+   - Bull/Bear 研究员进行 2 轮辩论
+   - Research Manager 生成最终投资计划
+
+3. **Trader 节点**：
+   - 根据 Research Plan 生成执行计划
+
+4. **Risk 子图**：
+   - Risky/Neutral/Conservative 风险辩论者进行 2 轮辩论
+   - Risk Manager 生成最终交易决策
+
+### 子图设计
+
+- **Research 子图**：固定 2 轮辩论（bull → bear → bull → bear → research_manager）
+- **Risk 子图**：固定 2 轮辩论（risky → neutral → safe → risky → neutral → safe → risk_manager）
+- 子图通过 `conditional_edge` 控制辩论轮次
+- 子图状态自动合并到主图 `AgentState`
+
+### 状态管理
+
+- 所有节点共享 `AgentState` TypedDict
+- 节点通过返回字典更新状态
+- 子图的状态更新会自动传播到主图
+
+详细技术实现请参考 `tradingagents/graph/` 目录下的代码。
 
 ---
 
-**最后更新**: 2026-01-25  
+## 注意事项
+
+1. **环境变量**：需要设置 `DASHSCOPE_API_KEY` 和 `ALPHA_VANTAGE_API_KEY`
+2. **数据库**：使用 SQLite 数据库（`test.db` 用于测试，`memory.db` 用于生产），会在首次运行时自动创建
+3. **API 限制**：Alpha Vantage 有调用频率限制，系统已实现多 API Key 轮询机制
+4. **Prompt 语言**：所有 Prompt 已模板化（Jinja2），使用中文编写
+5. **LLM 代理**：Qwen LLM 不支持代理，系统会自动处理代理设置
+
+---
+
+**最后更新**: 2026-02-05  
 **维护者**: TradeSwarm Team

@@ -6,6 +6,7 @@ Market Summary Node
 
 from typing import Callable, Any, Dict
 from tradingagents.agents.utils.agentstate.agent_states import AgentState, AnalystMemorySummary
+from tradingagents.agents.pre_open.summary._db_helpers import query_today_report, query_history_report
 
 
 def create_market_summary_node(conn: Any) -> Callable[[AgentState], Dict[str, Any]]:
@@ -52,14 +53,8 @@ def create_market_summary_node(conn: Any) -> Callable[[AgentState], Dict[str, An
         # SELECT report_content FROM analyst_reports
         # WHERE analyst_type='market' AND symbol=? AND trade_date=?
         # ORDER BY trade_timestamp DESC LIMIT 1
-        today_report = _query_today_report(conn, symbol, trade_date)
-        
-        # TODO: 实际实现时，从数据库查询 history_report 字段
-        # SQL 示例：
-        # SELECT history_report FROM analyst_reports
-        # WHERE analyst_type='market' AND symbol=? AND trade_date=?
-        # ORDER BY created_at DESC LIMIT 1
-        history_report = _query_history_report(conn, symbol, trade_date, trading_session)
+        today_report = query_today_report(conn, "market", symbol, trade_date, "Market Analysis Report")
+        history_report = query_history_report(conn, "market", symbol, trade_date, trading_session, "Market History Summary")
         
         # 第三阶段：构建 AnalystMemorySummary
         summary: AnalystMemorySummary = {
@@ -81,7 +76,7 @@ def _query_today_report(conn: Any, symbol: str, trade_date: str) -> str:
     注意：Market Analyst 可能在同一日生成多个快照，应返回最新的一个。
     
     Args:
-        conn: 数据管理器实例
+        conn: 数据管理器实例（MemoryDBHelper 或 sqlite3.Connection）
         symbol: 股票代码（如 '000001'）
         trade_date: 交易日期（如 '2024-01-15'）
     
@@ -89,7 +84,15 @@ def _query_today_report(conn: Any, symbol: str, trade_date: str) -> str:
         今日最新报告内容
     """
     try:
-        # 使用 conn 的 cursor 获取游标
+        # 如果 conn 是 MemoryDBHelper，使用其方法
+        if hasattr(conn, 'query_today_report'):
+            result = conn.query_today_report("market", symbol, trade_date)
+            if result:
+                return f"# Market Analysis Report - {symbol} ({trade_date})\n\n{result}"
+            else:
+                return f"# Market Analysis Report - {symbol} ({trade_date})\n\n未找到市场分析报告数据。"
+        
+        # 否则，假设是 sqlite3.Connection
         cursor = conn.cursor()
         
         # 执行查询：Market 按周更新
@@ -114,11 +117,11 @@ def _query_today_report(conn: Any, symbol: str, trade_date: str) -> str:
             return f"# Market Analysis Report - {symbol} ({trade_date})\n\n{result[0]}"
         else:
             # 如果没有查询到结果，返回标题 + 提示信息
-            return f"# Market Analysis Report - {symbol} ({trade_date})\n\n未找到基本面分析报告数据。"
+            return f"# Market Analysis Report - {symbol} ({trade_date})\n\n未找到市场分析报告数据。"
             
     except Exception as e:
         # 异常处理：如果查询失败，返回错误信息（或可以记录日志）
-        print(f"查询基本面报告时发生错误: {e}")
+        print(f"查询市场报告时发生错误: {e}")
         # 返回标题 + 错误信息
         return f"# Market Analysis Report - {symbol} ({trade_date})\n\n查询错误: {str(e)}"
 
@@ -128,7 +131,7 @@ def _query_history_report(conn: Any, symbol: str, trade_date: str, trading_sessi
     从数据库查询 Market Analyst 的历史摘要
     
     Args:
-        conn: 数据管理器实例
+        conn: 数据管理器实例（MemoryDBHelper 或 sqlite3.Connection）
         symbol: 股票代码
         trade_date: 交易日期
         trading_session: 交易时段（'pre_open' 或 'post_close'）
@@ -137,6 +140,22 @@ def _query_history_report(conn: Any, symbol: str, trade_date: str, trading_sessi
         历史摘要内容
     """
     try:
+        # 如果 conn 是 MemoryDBHelper，使用其方法
+        if hasattr(conn, 'query_history_reports'):
+            reports = conn.query_history_reports("market", symbol, trade_date, lookback_days=7)
+            if reports:
+                report_contents = [r["report_content"] for r in reports if r.get("report_content")]
+                history_report = "\n\n".join(report_contents)
+            else:
+                history_report = ""
+            
+            session_desc = "开盘前" if trading_session == 'pre_open' else "收盘后"
+            return f"""# Market History Summary - {symbol}
+
+## 近期市场趋势分析 ({session_desc})
+{history_report}"""
+        
+        # 否则，假设是 sqlite3.Connection
         cursor = conn.cursor()
         sql = """
             SELECT report_content 
@@ -166,18 +185,18 @@ def _query_history_report(conn: Any, symbol: str, trade_date: str, trading_sessi
 
         # 返回标题 + 拼接的 history_report
         session_desc = "开盘前" if trading_session == 'pre_open' else "收盘后"
-        return f"""# Fundamentals History Summary - {symbol}
+        return f"""# Market History Summary - {symbol}
 
-## 近期基本面趋势分析 ({session_desc})
+## 近期市场趋势分析 ({session_desc})
 {history_report}"""
 
     except Exception as e:
         # 异常处理：如果查询失败，返回错误信息
         print(f"查询历史摘要时发生错误: {e}")
         session_desc = "开盘前" if trading_session == 'pre_open' else "收盘后"
-        return f"""# Fundamentals History Summary - {symbol}
+        return f"""# Market History Summary - {symbol}
 
-## 近期基本面趋势分析 ({session_desc})
+## 近期市场趋势分析 ({session_desc})
 
 查询错误: {str(e)}"""
 

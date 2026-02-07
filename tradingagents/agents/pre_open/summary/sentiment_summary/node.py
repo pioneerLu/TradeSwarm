@@ -6,6 +6,7 @@ Sentiment Summary Node
 
 from typing import Callable, Any, Dict
 from tradingagents.agents.utils.agentstate.agent_states import AgentState, AnalystMemorySummary
+from tradingagents.agents.pre_open.summary._db_helpers import query_today_report, query_history_report
 
 
 def create_sentiment_summary_node(conn: Any) -> Callable[[AgentState], Dict[str, Any]]:
@@ -47,8 +48,8 @@ def create_sentiment_summary_node(conn: Any) -> Callable[[AgentState], Dict[str,
         trading_session = state.get("trading_session", "post_close")
         
         # 第二阶段：查询数据库
-        today_report = _query_today_report(conn, symbol, trade_date)
-        history_report = _query_history_report(conn, symbol, trade_date, trading_session)
+        today_report = query_today_report(conn, "sentiment", symbol, trade_date, "Social Media Sentiment Analysis Report")
+        history_report = query_history_report(conn, "sentiment", symbol, trade_date, trading_session, "Sentiment History Summary")
         
         # 第三阶段：构建 AnalystMemorySummary
         summary: AnalystMemorySummary = {
@@ -79,11 +80,11 @@ def _query_today_report(conn: Any, symbol: str, trade_date: str) -> str:
         # 使用 conn 的 cursor 获取游标
         cursor = conn.cursor()
         
-        # 执行查询：News 按周更新
+        # 执行查询：Sentiment 按天更新
         sql = """
             SELECT report_content 
             FROM analyst_reports
-            WHERE analyst_type='market' 
+            WHERE analyst_type='sentiment' 
                 AND symbol=? 
                 AND trade_date=?
             ORDER BY created_at DESC 
@@ -98,16 +99,16 @@ def _query_today_report(conn: Any, symbol: str, trade_date: str) -> str:
         
         # 如果查询到结果，返回标题 + 报告内容
         if result and result[0]:
-            return f"# News Analysis Report - {symbol} ({trade_date})\n\n{result[0]}"
+            return f"# Social Media Sentiment Analysis Report - {symbol} ({trade_date})\n\n{result[0]}"
         else:
             # 如果没有查询到结果，返回标题 + 提示信息
-            return f"# News Analysis Report - {symbol} ({trade_date})\n\n未找到基本面分析报告数据。"
+            return f"# Social Media Sentiment Analysis Report - {symbol} ({trade_date})\n\n未找到情绪分析报告数据。"
             
     except Exception as e:
         # 异常处理：如果查询失败，返回错误信息（或可以记录日志）
-        print(f"查询基本面报告时发生错误: {e}")
+        print(f"查询情绪报告时发生错误: {e}")
         # 返回标题 + 错误信息
-        return f"# News Analysis Report - {symbol} ({trade_date})\n\n查询错误: {str(e)}"
+        return f"# Social Media Sentiment Analysis Report - {symbol} ({trade_date})\n\n查询错误: {str(e)}"
 
     return f"""# News Analysis Report - {symbol} ({trade_date})
 #     return f"""# Social Media Sentiment Analysis Report - {symbol} ({trade_date})
@@ -162,7 +163,7 @@ def _query_history_report(conn: Any, symbol: str, trade_date: str, trading_sessi
         sql = """
             SELECT report_content 
             FROM analyst_reports
-            WHERE analyst_type='news' 
+            WHERE analyst_type='sentiment' 
                 AND symbol=? 
                 AND trade_date <= ?
                 AND trade_date >= date(?, '-7 days')
@@ -187,20 +188,20 @@ def _query_history_report(conn: Any, symbol: str, trade_date: str, trading_sessi
 
         # 返回标题 + 拼接的 history_report
         session_desc = "开盘前" if trading_session == 'pre_open' else "收盘后"
-        return f"""# Fundamentals History Summary - {symbol}
+        return f"""# Sentiment History Summary - {symbol}
 
-## 近期基本面趋势分析 ({session_desc})
+## 近期情绪趋势分析 ({session_desc})
 {history_report}"""
 
     except Exception as e:
         # 异常处理：如果查询失败，返回错误信息
         print(f"查询历史摘要时发生错误: {e}")
         session_desc = "开盘前" if trading_session == 'pre_open' else "收盘后"
-        return f"""# Fundamentals History Summary - {symbol}
+        return f"""# Sentiment History Summary - {symbol}
 
-## 近期基本面趋势分析 ({session_desc})
+## 近期情绪趋势分析 ({session_desc})
 
-# 查询错误: {str(e)}"""
+查询错误: {str(e)}"""
 #     session_desc = "开盘前" if trading_session == 'pre_open' else "收盘后"
 #     return f"""# Sentiment History Summary - {symbol}
 

@@ -1,36 +1,15 @@
 from __future__ import annotations
 
 from typing import Callable, Any, Dict
-from pathlib import Path
-from jinja2 import Template
 from langchain_core.language_models import BaseChatModel
 
 from tradingagents.agents.utils.agentstate.agent_states import (
     AgentState,
-    AnalystMemorySummary,
     RiskDebateState,
     RiskSummary,
 )
-
-
-def _build_curr_situation_from_summaries(state: AgentState) -> str:
-    """从四个 Analyst 的 MemorySummary 中构造当前情境描述。"""
-    market_summary: AnalystMemorySummary = state["market_analyst_summary"]
-    news_summary: AnalystMemorySummary = state["news_analyst_summary"]
-    sentiment_summary: AnalystMemorySummary = state["sentiment_analyst_summary"]
-    fundamentals_summary: AnalystMemorySummary = state["fundamentals_analyst_summary"]
-
-    market_report = market_summary["today_report"]
-    news_report = news_summary["today_report"]
-    sentiment_report = sentiment_summary["today_report"]
-    fundamentals_report = fundamentals_summary["today_report"]
-
-    return (
-        f"{market_report}\n\n"
-        f"{sentiment_report}\n\n"
-        f"{news_report}\n\n"
-        f"{fundamentals_report}"
-    )
+from tradingagents.agents.utils.state_helpers import build_curr_situation_from_summaries
+from tradingagents.agents.utils.prompt_loader import load_prompt_template
 
 
 def create_risk_manager(llm: BaseChatModel, memory: Any) -> Callable[[AgentState], Dict[str, Any]]:
@@ -88,7 +67,7 @@ def create_risk_manager(llm: BaseChatModel, memory: Any) -> Callable[[AgentState
         history = prev_debate.get("history", "")
 
         # 2. 从四个 Analyst 的 MemorySummary 中构造当前情境
-        curr_situation = _build_curr_situation_from_summaries(state)
+        curr_situation = build_curr_situation_from_summaries(state)
         past_memories = memory.get_memories(curr_situation, n_matches=2)
 
         past_memory_str = ""
@@ -103,38 +82,16 @@ def create_risk_manager(llm: BaseChatModel, memory: Any) -> Callable[[AgentState
             else state.get("investment_plan", "")
         )
 
-        # 4. 加载并渲染 prompt 模板（如果存在）
-        prompt_path = Path(__file__).parent / "prompt.j2"
-        if prompt_path.exists():
-            with open(prompt_path, "r", encoding="utf-8") as f:
-                template = Template(f.read())
-            prompt = template.render(
-                trader_plan=trader_plan,
-                past_memory_str=past_memory_str,
-                history=history
-            )
-        else:
-            # 如果没有模板文件，使用默认 prompt
-            prompt = f"""作为风险管理法官和辩论促进者，你的目标是评估三位风险分析师——激进、中性和保守——之间的辩论，并为交易员确定最佳行动方案。你的决策必须得出明确的建议：买入、卖出或持有。仅在有具体论据充分支持时才选择持有，不要在所有观点看似合理时将其作为默认选项。力求清晰和果断。
-
-决策指导原则：
-1. **总结关键论点**：提取每位分析师最有力的观点，重点关注与当前情况的关联性。
-2. **提供理由**：用辩论中的直接引用和反驳来支持你的建议。
-3. **完善交易员的计划**：从交易员的原始计划 **{trader_plan}** 开始，根据分析师的观点进行调整。
-4. **从过往错误中学习**：运用 **{past_memory_str}** 中的经验教训来纠正先前的误判，改进你现在的决策，确保不会做出导致亏损的错误买入/卖出/持有决定。
-
-交付内容：
-- 清晰且可执行的建议：买入、卖出或持有。
-- 基于辩论和过往反思的详细推理。
-
----
-
-**分析师辩论历史：**  
-{history}
-
----
-
-专注于可执行的洞察和持续改进。基于过往经验，批判性地评估所有观点，确保每个决策都能带来更好的结果。"""
+        # 4. 加载并渲染 prompt 模板
+        prompt = load_prompt_template(
+            agent_type="managers",
+            agent_name="risk_manager",
+            context={
+                "trader_plan": trader_plan,
+                "past_memory_str": past_memory_str,
+                "history": history,
+            },
+        )
 
         # 5. 调用 LLM 生成决策
         response = llm.invoke(input=prompt)

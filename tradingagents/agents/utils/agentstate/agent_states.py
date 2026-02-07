@@ -43,6 +43,54 @@ class TradingStrategy(TypedDict):
   validity_factors: Annotated[List[ValidityFactor], "有效因子"]
   expiration: Annotated[str, "策略有效期"]
 
+######## 需要完善，先用着
+class StrategySelection(TypedDict):
+    """
+    策略选择结果
+    
+    由 Strategy Selector Agent 生成，包含：
+    - 选中的策略类型（strategy_type）
+    - 策略选择理由（reasoning）
+    - 策略适用性分析（strategy_analysis）
+    - 风险调整建议（risk_adjustment）
+    """
+    strategy_type: Annotated[
+        Literal[
+            "trend_following",
+            "mean_reversion", 
+            "momentum_breakout",
+            "reversal",
+            "range_trading",
+            "default_timing"
+        ],
+        "选中的策略类型（必须与 trading_sys/strategies/strategy_lib.py 中的 STRATEGY_MAPPING 匹配）"
+    ]
+    
+    reasoning: Annotated[
+        str,
+        "策略选择理由（Markdown 格式，说明为什么选择该策略，基于哪些分析师的报告和风险决策）"
+    ]
+    
+    strategy_analysis: Annotated[
+        str,
+        "策略适用性分析（Markdown 格式，分析该策略在当前市场环境下的适用性，包括优势、风险和注意事项）"
+    ]
+    
+    risk_adjustment: Annotated[
+        Optional[str],
+        "风险调整建议（可选，如果 Risk Manager 建议降低风险，可以建议使用更保守的策略变体或调整参数）"
+    ]
+    
+    confidence: Annotated[
+        float,
+        "策略选择置信度（0-1，表示对该策略选择的信心程度）"
+    ]
+    
+    alternative_strategies: Annotated[
+        Optional[List[str]],
+        "备选策略列表（可选，如果首选策略不适用，可以列出备选策略）"
+    ]
+
 
 # ==================== Analyst 私有 State ====================
 # 这些 State 仅用于 Analyst 节点内部执行，不进入全局 State
@@ -207,6 +255,9 @@ class AgentState(MessagesState):
     # ========== Risk 流程结果 ==========
     risk_summary: Annotated[Optional[RiskSummary], "Risk Manager 的完整结果（包含辩论状态和最终交易决策）"]
     final_trade_decision: Annotated[Optional[str], "最终交易决策（从 risk_summary.final_trade_decision 提取）"]
+    
+    # ========== Strategy Selection 流程结果 ==========
+    strategy_selection: Annotated[Optional[StrategySelection], "Strategy Selector 的策略选择结果"]
     
     # ========== Trader 执行计划 ==========
     trader_investment_plan: Annotated[Optional[str], "Trader 生成的最终执行计划"]
