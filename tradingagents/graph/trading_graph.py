@@ -6,7 +6,8 @@
 2. Research 子图：bull/bear 辩论 → research_manager
 3. Trader：生成执行计划
 4. Risk 子图：risky/neutral/safe 辩论 → risk_manager
-5. 结束
+5. Strategy Selector：根据风险决策和市场状态选择交易策略（仅在 BUY/SELL 时）
+6. 结束
 """
 
 from typing import Any, TYPE_CHECKING
@@ -24,6 +25,7 @@ from tradingagents.agents.pre_open.summary.news_summary.node import create_news_
 from tradingagents.agents.pre_open.summary.sentiment_summary.node import create_sentiment_summary_node
 from tradingagents.agents.pre_open.summary.fundamentals_summary.node import create_fundamentals_summary_node
 from tradingagents.agents.pre_open.trader.trader import create_trader
+from tradingagents.agents.pre_open.managers.strategy_selector.agent import create_strategy_selector
 from tradingagents.graph.subgraphs.research_subgraph import create_research_subgraph_simple
 from tradingagents.graph.subgraphs.risk_subgraph import create_risk_subgraph_simple
 
@@ -53,6 +55,9 @@ def create_trading_graph(
     # 创建 Trader 节点
     trader_node = create_trader(llm, memory)
     
+    # 创建策略选择器节点
+    strategy_selector_node = create_strategy_selector(llm, memory)
+    
     # 创建子图
     research_subgraph = create_research_subgraph_simple(llm, memory)
     risk_subgraph = create_risk_subgraph_simple(llm, memory)
@@ -68,6 +73,9 @@ def create_trading_graph(
     
     # 添加 Trader 节点
     workflow.add_node("trader", trader_node)
+    
+    # 添加策略选择器节点
+    workflow.add_node("strategy_selector", strategy_selector_node)
 
     workflow.add_node("research_subgraph", research_subgraph)
     workflow.add_node("risk_subgraph", risk_subgraph)
@@ -87,8 +95,11 @@ def create_trading_graph(
     # Trader 完成后进入 Risk 子图
     workflow.add_edge("trader", "risk_subgraph")
     
-    # Risk 子图完成后结束
-    workflow.add_edge("risk_subgraph", END)
+    # Risk 子图完成后进入策略选择器
+    workflow.add_edge("risk_subgraph", "strategy_selector")
+    
+    # 策略选择器完成后结束
+    workflow.add_edge("strategy_selector", END)
     
     return workflow.compile()
 
