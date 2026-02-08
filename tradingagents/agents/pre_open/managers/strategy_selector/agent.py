@@ -1,8 +1,10 @@
 """
-策略选择器 Agent
+策略选择器 Agent（Regime 判断者）
 
-根据 Risk Manager 的决策和分析师报告，选择最适合的交易策略。
-仅在 Risk Manager 决策为 BUY 或 SELL 时选择策略，HOLD 时不操作。
+作为市场状态（regime）判断者，根据市场分析、Trader 的交易计划（止损、仓位等）和分析师报告，
+选择最适合的交易策略。
+
+流程位置：Trader 之后，Risk Subgraph 之前
 """
 
 from __future__ import annotations
@@ -32,47 +34,54 @@ VALID_STRATEGY_TYPES = [
 ]
 
 
-def parse_risk_decision(risk_summary: Optional[Dict[str, Any]]) -> Optional[str]:
+def parse_trader_output(trader_output: Optional[str]) -> Dict[str, Any]:
     """
-    解析 Risk Manager 的决策
+    解析 Trader 的输出，提取交易计划信息
     
     Args:
-        risk_summary: Risk Manager 的输出
+        trader_output: Trader 节点的输出（trader_investment_plan）
         
     Returns:
-        "BUY", "SELL", "HOLD", 或 None
+        包含 action, order_plan, risk_controls 等信息的字典
     """
-    if not risk_summary:
-        return None
+    if not trader_output:
+        return {
+            "action": "HOLD",
+            "order_plan": [],
+            "risk_controls": {},
+            "summary": "",
+            "comment": "",
+        }
     
-    final_decision = risk_summary.get("final_trade_decision", "")
-    if not final_decision:
-        return None
-    
-    # 尝试从 JSON 中解析
     try:
-        # 如果 final_trade_decision 是 JSON 字符串，解析它
-        if isinstance(final_decision, str):
-            # 尝试提取 JSON
-            json_match = re.search(r'\{[^}]+\}', final_decision, re.DOTALL)
-            if json_match:
-                decision_json = json.loads(json_match.group())
-                decision = decision_json.get("final_decision", "").upper()
-                if decision in ["BUY", "SELL", "HOLD"]:
-                    return decision
+        # 尝试从 JSON 中解析
+        trader_json = extract_json_from_text(trader_output)
+        if trader_json:
+            return {
+                "action": trader_json.get("action", "HOLD"),
+                "order_plan": trader_json.get("order_plan", []),
+                "risk_controls": trader_json.get("risk_controls", {}),
+                "summary": trader_json.get("summary", ""),
+                "comment": trader_json.get("comment", ""),
+            }
     except (json.JSONDecodeError, AttributeError):
         pass
     
-    # 如果无法解析 JSON，尝试从文本中提取
-    final_decision_upper = final_decision.upper()
-    if "BUY" in final_decision_upper or "买入" in final_decision:
-        return "BUY"
-    elif "SELL" in final_decision_upper or "卖出" in final_decision:
-        return "SELL"
-    elif "HOLD" in final_decision_upper or "持有" in final_decision:
-        return "HOLD"
+    # 如果无法解析 JSON，尝试从文本中提取关键信息
+    trader_output_upper = trader_output.upper()
+    action = "HOLD"
+    if "BUY" in trader_output_upper or "买入" in trader_output:
+        action = "BUY"
+    elif "SELL" in trader_output_upper or "卖出" in trader_output:
+        action = "SELL"
     
-    return None
+    return {
+        "action": action,
+        "order_plan": [],
+        "risk_controls": {},
+        "summary": trader_output[:200] if trader_output else "",
+        "comment": "",
+    }
 
 
 def create_strategy_selector(
@@ -80,10 +89,13 @@ def create_strategy_selector(
     memory: Any
 ) -> Callable[[AgentState], Dict[str, Any]]:
     """
-    创建策略选择器 Agent 节点函数
+    创建策略选择器 Agent 节点函数（Regime 判断者）
     
-    该函数返回一个符合 LangGraph 节点规范的函数，用于根据风险决策和分析师报告选择交易策略。
-    仅在 Risk Manager 决策为 BUY 或 SELL 时选择策略，HOLD 时不操作。
+    该函数返回一个符合 LangGraph 节点规范的函数，用于：
+    1. 判断当前市场状态（regime）
+    2. 根据市场状态和 Trader 的交易计划（止损、仓位等）选择交易策略
+    
+    流程位置：Trader 之后，Risk Subgraph 之前
     
     Args:
         llm: LangChain BaseChatModel 实例，用于生成策略选择
@@ -94,33 +106,37 @@ def create_strategy_selector(
         
     节点函数返回值:
         dict 包含以下键:
-            - strategy_selection: StrategySelection 对象（如果决策为 BUY/SELL）
-            - 如果决策为 HOLD，则不更新 strategy_selection
+            - strategy_selection: StrategySelection 对象（如果 Trader 决策为 BUY/SELL）
+            - 如果决策为 HOLD，则返回 default_timing 策略
     """
     
     def strategy_selector_node(state: AgentState) -> Dict[str, Any]:
         """
-        策略选择器节点的执行函数
+        策略选择器节点的执行函数（Regime 判断者）
         
         Args:
             state: 当前的 AgentState
             
         Returns:
-            包含 strategy_selection 的更新字典（如果决策为 BUY/SELL）
+            包含 strategy_selection 的更新字典
         """
         company_name = state.get("company_of_interest", "")
         trade_date = state.get("trade_date", "")
         
-        # 1. 读取 Risk Manager 的决策
-        risk_summary: Optional[Dict[str, Any]] = state.get("risk_summary")
-        risk_decision = parse_risk_decision(risk_summary)
+        # 1. 读取 Trader 的输出（交易计划）
+        trader_output: Optional[str] = state.get("trader_investment_plan")
+        trader_info = parse_trader_output(trader_output)
+        trader_action = trader_info.get("action", "HOLD")
+        trader_order_plan = trader_info.get("order_plan", [])
+        trader_risk_controls = trader_info.get("risk_controls", {})
+        trader_summary = trader_info.get("summary", "")
+        trader_comment = trader_info.get("comment", "")
         
-        # 2. 判断是否需要选择策略
-        # 如果决策为 HOLD 或无法解析，不选择策略
-        if risk_decision not in ["BUY", "SELL"]:
-            # 返回空的 strategy_selection 或 None，表示不选择策略
+        # 2. 如果 Trader 决策为 HOLD，不选择策略
+        if trader_action not in ["BUY", "SELL"]:
+            print(f"[Strategy Selector] Trader 决策为 {trader_action}，不选择具体策略。")
             return {
-                "strategy_selection": None,
+                "strategy_selection": None,  # 返回 None，不选择策略
             }
         
         # 3. 读取分析师报告
@@ -134,14 +150,10 @@ def create_strategy_selector(
         sentiment_report = sentiment_summary.get("today_report", "") if isinstance(sentiment_summary, dict) else ""
         fundamentals_report = fundamentals_summary.get("today_report", "") if isinstance(fundamentals_summary, dict) else ""
         
-        # 4. 读取 Research Manager 和 Risk Manager 的输出
+        # 4. 读取 Research Manager 的输出
         research_summary: Optional[Dict[str, Any]] = state.get("research_summary")
         investment_plan = (
             research_summary.get("investment_plan", "") if research_summary else ""
-        )
-        
-        final_trade_decision = (
-            risk_summary.get("final_trade_decision", "") if risk_summary else ""
         )
         
         # 5. 构建当前情境（用于检索历史记忆，可选）
@@ -155,6 +167,15 @@ def create_strategy_selector(
         else:
             past_memory_str = "无历史记忆。"
         
+        # 5. 准备 Trader 的交易计划信息（用于策略选择时考虑）
+        trader_plan_str = json.dumps({
+            "action": trader_action,
+            "order_plan": trader_order_plan,
+            "risk_controls": trader_risk_controls,
+            "summary": trader_summary,
+            "comment": trader_comment,
+        }, ensure_ascii=False, indent=2)
+        
         # 6. 加载并渲染 prompt 模板
         prompt = load_prompt_template(
             agent_type="managers",
@@ -162,8 +183,8 @@ def create_strategy_selector(
             context={
                 "company_name": company_name,
                 "trade_date": trade_date,
-                "risk_decision": risk_decision,
-                "final_trade_decision": final_trade_decision,
+                "trader_action": trader_action,
+                "trader_plan": trader_plan_str,
                 "investment_plan": investment_plan,
                 "market_report": market_report,
                 "news_report": news_report,

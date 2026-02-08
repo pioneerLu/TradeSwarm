@@ -4,9 +4,9 @@
 完整的交易决策流程：
 1. Summary Nodes（并行）：market, news, sentiment, fundamentals
 2. Research 子图：bull/bear 辩论 → research_manager
-3. Trader：生成执行计划
-4. Risk 子图：risky/neutral/safe 辩论 → risk_manager
-5. Strategy Selector：根据风险决策和市场状态选择交易策略（仅在 BUY/SELL 时）
+3. Trader：生成初步交易计划（包括止损、仓位等）
+4. Strategy Selector：作为 regime（市场状态）判断者，根据市场状态和 trader 的建议选择交易策略
+5. Risk 子图：risky/neutral/safe 辩论 → risk_manager（最终风险评估）
 6. 结束
 """
 
@@ -92,14 +92,14 @@ def create_trading_graph(
     # Research 子图完成后进入 Trader
     workflow.add_edge("research_subgraph", "trader")
     
-    # Trader 完成后进入 Risk 子图
-    workflow.add_edge("trader", "risk_subgraph")
+    # Trader 完成后进入策略选择器（regime 判断）
+    workflow.add_edge("trader", "strategy_selector")
     
-    # Risk 子图完成后进入策略选择器
-    workflow.add_edge("risk_subgraph", "strategy_selector")
+    # 策略选择器完成后进入 Risk 子图（最终风险评估）
+    workflow.add_edge("strategy_selector", "risk_subgraph")
     
-    # 策略选择器完成后结束
-    workflow.add_edge("strategy_selector", END)
+    # Risk 子图完成后结束
+    workflow.add_edge("risk_subgraph", END)
     
     return workflow.compile()
 

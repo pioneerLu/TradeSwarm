@@ -218,6 +218,40 @@ def save_node_output(
                     else:
                         f.write(str(v) + "\n")
         
+        # 保存 trader 的输出（完整内容）
+        if "trader_investment_plan" in state and state["trader_investment_plan"]:
+            f.write(f"\ntrader_investment_plan:\n")
+            f.write("="*80 + "\n")
+            trader_output = state["trader_investment_plan"]
+            if isinstance(trader_output, str):
+                try:
+                    parsed = json.loads(trader_output)
+                    f.write(json.dumps(parsed, ensure_ascii=False, indent=2) + "\n")
+                except:
+                    f.write(str(trader_output) + "\n")
+            else:
+                f.write(str(trader_output) + "\n")
+        
+        # 保存 strategy_selection 的输出（完整内容）
+        if "strategy_selection" in state and state["strategy_selection"]:
+            f.write(f"\nstrategy_selection:\n")
+            f.write("="*80 + "\n")
+            strategy_selection = state["strategy_selection"]
+            if isinstance(strategy_selection, dict):
+                for k, v in strategy_selection.items():
+                    f.write(f"\n{k}:\n")
+                    f.write("-"*40 + "\n")
+                    if isinstance(v, str):
+                        try:
+                            parsed = json.loads(v)
+                            f.write(json.dumps(parsed, ensure_ascii=False, indent=2) + "\n")
+                        except:
+                            f.write(str(v) + "\n")
+                    else:
+                        f.write(str(v) + "\n")
+            else:
+                f.write(str(strategy_selection) + "\n")
+        
         # 保存其他关键字段（完整内容，不截断）
         for key in ["research_result", "investment_plan", "final_trade_decision", 
                     "trading_strategy", "trading_strategy_status"]:
