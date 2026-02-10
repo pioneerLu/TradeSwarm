@@ -52,7 +52,7 @@ STRATEGY_MAPPING = {
 ### 2. 执行策略
 
 ```python
-from trading_sys.strategies.strategy_lib import execute_strategy, STRATEGY_MAPPING
+from tradingagents.core.strategies import execute_strategy, STRATEGY_MAPPING
 
 # 从 AgentState 获取策略选择结果
 strategy_selection = state.get("strategy_selection")
@@ -88,7 +88,7 @@ Strategy Selector Agent
     ↓
 验证: 检查是否在 STRATEGY_MAPPING 中
     ↓
-trading_sys.execute_strategy(strategy_type, df, is_holding)
+execute_strategy(strategy_type, df, is_holding)
     ↓
 输出: StrategyResult (signal, confidence, stop_loss, take_profit, reason)
     ↓

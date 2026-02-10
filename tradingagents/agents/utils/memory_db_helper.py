@@ -34,11 +34,18 @@ class MemoryDBHelper:
         self._ensure_table_exists()
     
     def _ensure_table_exists(self) -> None:
-        """确保 analyst_reports 表存在。"""
+        """确保底层数据表存在。
+
+        当前包括：
+
+        - analyst_reports: 存储原始的 today_report 报告
+        - analyst_summaries: 存储 7 个交易日滚动窗口的结构化 summary
+        """
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
-        
-        create_table_sql = """
+
+        # 原始报告表（today_report）
+        create_reports_table_sql = """
         CREATE TABLE IF NOT EXISTS analyst_reports (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             analyst_type TEXT NOT NULL,
@@ -48,7 +55,42 @@ class MemoryDBHelper:
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
         """
-        cursor.execute(create_table_sql)
+        cursor.execute(create_reports_table_sql)
+
+        # 新增：summary 表（7 日滚动窗口的结构化 summary）
+        create_summaries_table_sql = """
+        CREATE TABLE IF NOT EXISTS analyst_summaries (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            analyst_type TEXT NOT NULL,
+            symbol TEXT NOT NULL,
+            trade_date TEXT NOT NULL,              -- summary 对应日期（窗口结束日，T）
+            summary_content TEXT NOT NULL,         -- 结构化 summary（通常为 JSON 字符串）
+            window_start_date TEXT NOT NULL,       -- 窗口开始日期（T-6，按交易日计算）
+            window_end_date TEXT NOT NULL,         -- 窗口结束日期（T）
+            source_reports_count INTEGER,          -- 窗口内原始报告数量
+            llm_model TEXT,                        -- 可选：使用的 LLM 模型标识
+            token_usage INTEGER,                   -- 可选：token 消耗
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(analyst_type, symbol, trade_date)
+        )
+        """
+        cursor.execute(create_summaries_table_sql)
+
+        # 索引：加速按 analyst_type / symbol / trade_date 查询
+        cursor.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_analyst_reports_lookup
+            ON analyst_reports(analyst_type, symbol, trade_date)
+            """
+        )
+        cursor.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_analyst_summaries_lookup
+            ON analyst_summaries(analyst_type, symbol, trade_date)
+            """
+        )
+
         conn.commit()
         conn.close()
     
@@ -204,6 +246,147 @@ class MemoryDBHelper:
         except Exception as e:
             print(f"[ERROR] 查询历史报告失败: {e}")
             return []
+
+    # ------------------------------------------------------------------
+    # Summary（7 日窗口结构化历史报告）相关接口
+    # ------------------------------------------------------------------
+
+    def upsert_summary(
+        self,
+        analyst_type: str,
+        symbol: str,
+        trade_date: str,
+        summary_content: str,
+        window_start_date: str,
+        window_end_date: str,
+        source_reports_count: int,
+        llm_model: Optional[str] = None,
+        token_usage: Optional[int] = None,
+    ) -> bool:
+        """插入或更新 7 日窗口的结构化 summary。
+
+        - 如果 (analyst_type, symbol, trade_date) 已存在，则执行 UPDATE
+        - 否则执行 INSERT
+        """
+        try:
+            conn = self._get_connection()
+            cursor = conn.cursor()
+
+            sql = """
+            INSERT INTO analyst_summaries (
+                analyst_type,
+                symbol,
+                trade_date,
+                summary_content,
+                window_start_date,
+                window_end_date,
+                source_reports_count,
+                llm_model,
+                token_usage,
+                created_at,
+                updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            ON CONFLICT(analyst_type, symbol, trade_date)
+            DO UPDATE SET
+                summary_content = excluded.summary_content,
+                window_start_date = excluded.window_start_date,
+                window_end_date = excluded.window_end_date,
+                source_reports_count = excluded.source_reports_count,
+                llm_model = excluded.llm_model,
+                token_usage = excluded.token_usage,
+                updated_at = CURRENT_TIMESTAMP
+            """
+
+            cursor.execute(
+                sql,
+                (
+                    analyst_type,
+                    symbol,
+                    trade_date,
+                    summary_content,
+                    window_start_date,
+                    window_end_date,
+                    source_reports_count,
+                    llm_model,
+                    token_usage,
+                ),
+            )
+            conn.commit()
+            cursor.close()
+
+            print(
+                "[OK] 成功更新 summary: "
+                f"{analyst_type} - {symbol} - {trade_date} "
+                f"(窗口 {window_start_date} ~ {window_end_date}, 报告数={source_reports_count})"
+            )
+            return True
+
+        except Exception as e:
+            print(f"[ERROR] 更新 summary 失败: {e}")
+            if self.conn:
+                self.conn.rollback()
+            return False
+
+    def query_summary(
+        self,
+        analyst_type: str,
+        symbol: str,
+        trade_date: str,
+    ) -> Optional[Dict[str, Any]]:
+        """查询指定日期的结构化 summary（7 日滚动窗口）。
+
+        按 (analyst_type, symbol, trade_date) 精确匹配。
+        """
+        try:
+            conn = self._get_connection()
+            cursor = conn.cursor()
+
+            sql = """
+            SELECT
+                id,
+                analyst_type,
+                symbol,
+                trade_date,
+                summary_content,
+                window_start_date,
+                window_end_date,
+                source_reports_count,
+                llm_model,
+                token_usage,
+                created_at,
+                updated_at
+            FROM analyst_summaries
+            WHERE analyst_type = ?
+              AND symbol = ?
+              AND trade_date = ?
+            LIMIT 1
+            """
+
+            cursor.execute(sql, (analyst_type, symbol, trade_date))
+            row = cursor.fetchone()
+            cursor.close()
+
+            if not row:
+                return None
+
+            return {
+                "id": row[0],
+                "analyst_type": row[1],
+                "symbol": row[2],
+                "trade_date": row[3],
+                "summary_content": row[4],
+                "window_start_date": row[5],
+                "window_end_date": row[6],
+                "source_reports_count": row[7],
+                "llm_model": row[8],
+                "token_usage": row[9],
+                "created_at": row[10],
+                "updated_at": row[11],
+            }
+
+        except Exception as e:
+            print(f"[ERROR] 查询 summary 失败: {e}")
+            return None
     
     def query_all_reports(
         self,
@@ -481,6 +664,44 @@ def query_history_reports(
     """
     with MemoryDBHelper(db_path) as helper:
         return helper.query_history_reports(analyst_type, symbol, trade_date, lookback_days)
+
+
+def upsert_summary(
+    analyst_type: str,
+    symbol: str,
+    trade_date: str,
+    summary_content: str,
+    window_start_date: str,
+    window_end_date: str,
+    source_reports_count: int,
+    llm_model: Optional[str] = None,
+    token_usage: Optional[int] = None,
+    db_path: str = "memory.db",
+) -> bool:
+    """便捷函数：插入或更新 summary。"""
+    with MemoryDBHelper(db_path) as helper:
+        return helper.upsert_summary(
+            analyst_type=analyst_type,
+            symbol=symbol,
+            trade_date=trade_date,
+            summary_content=summary_content,
+            window_start_date=window_start_date,
+            window_end_date=window_end_date,
+            source_reports_count=source_reports_count,
+            llm_model=llm_model,
+            token_usage=token_usage,
+        )
+
+
+def query_summary(
+    analyst_type: str,
+    symbol: str,
+    trade_date: str,
+    db_path: str = "memory.db",
+) -> Optional[Dict[str, Any]]:
+    """便捷函数：查询指定日期的 summary。"""
+    with MemoryDBHelper(db_path) as helper:
+        return helper.query_summary(analyst_type, symbol, trade_date)
 
 
 if __name__ == "__main__":

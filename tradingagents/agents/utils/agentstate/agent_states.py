@@ -262,6 +262,10 @@ class AgentState(MessagesState):
     # ========== Trader 执行计划 ==========
     trader_investment_plan: Annotated[Optional[str], "Trader 生成的最终执行计划"]
 
+    # ========== 仓位信息 ==========
+    current_position: Annotated[Optional[Dict[str, Any]], "当前持仓信息 {symbol: {shares, entry_price, entry_date, current_price, pnl, pnl_pct}}"]
+    portfolio_state: Annotated[Optional[Dict[str, Any]], "组合状态 {total_value, cash, positions_value, total_return, positions}"]
+
     # trading params
     trading_session: Annotated[Literal["pre_open","market_open", "intraday","post_close"], "交易会话阶段"]
     trading_strategy: Annotated[Optional[TradingStrategy], "交易策略"]

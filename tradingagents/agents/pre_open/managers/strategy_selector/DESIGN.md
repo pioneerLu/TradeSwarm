@@ -169,7 +169,7 @@ class StrategySelection(TypedDict):
 策略选择 Agent 的输出需要转换为 `trading_sys` 可以使用的格式：
 
 ```python
-from trading_sys.strategies.strategy_lib import execute_strategy, STRATEGY_MAPPING
+from tradingagents.core.strategies import execute_strategy, STRATEGY_MAPPING
 
 # 从 AgentState 获取策略选择结果
 strategy_selection = state.get("strategy_selection")
@@ -203,7 +203,7 @@ Strategy Selector Agent
     ↓
 转换为: strategy_type (str)
     ↓
-trading_sys.execute_strategy(strategy_type, df, is_holding)
+execute_strategy(strategy_type, df, is_holding)
     ↓
 输出: StrategyResult (signal, confidence, stop_loss, take_profit, reason)
     ↓
@@ -213,7 +213,7 @@ Trader Node 执行交易
 ## 实现要点
 
 1. **策略信息获取**：
-   - 从 `trading_sys/strategies/strategy_lib.py` 导入 `STRATEGY_INFO`
+   - 从 `tradingagents/core/strategies` 导入 `STRATEGY_INFO`
    - 在 prompt 中提供所有可用策略的信息，帮助 LLM 做出选择
 
 2. **输出验证**：

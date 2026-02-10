@@ -42,31 +42,43 @@ def create_bear_researcher(llm: BaseChatModel, memory: Any) -> Callable[[AgentSt
         round_number = (count // 2) + 1
         is_first_round = count < 2
 
-        # 2. 从四个 Analyst 的 MemorySummary 中构造当前情境
+        # 2. 从四个 Analyst 的 MemorySummary 中构造当前情境（仅用于 trader 记忆，不在 research 中显式使用）
         curr_situation = build_curr_situation_from_summaries(state)
-        market_research_report = state["market_analyst_summary"]["today_report"]
-        sentiment_report = state["sentiment_analyst_summary"]["today_report"]
-        news_report = state["news_analyst_summary"]["today_report"]
-        fundamentals_report = state["fundamentals_analyst_summary"]["today_report"]
-        
-        past_memories = memory.get_memories(curr_situation, n_matches=2)
+        market_summary = state["market_analyst_summary"]
+        news_summary = state["news_analyst_summary"]
+        sentiment_summary = state["sentiment_analyst_summary"]
+        fundamentals_summary = state["fundamentals_analyst_summary"]
 
-        past_memory_str = ""
-        for i, rec in enumerate(past_memories, 1):
-            past_memory_str += rec.get("recommendation", "") + "\n\n"
+        # 当日报告
+        market_research_report = market_summary["today_report"]
+        news_report = news_summary["today_report"]
+        sentiment_report = sentiment_summary["today_report"]
+        fundamentals_report = fundamentals_summary["today_report"]
+
+        # 最近 7 日 history 摘要
+        market_history_summary = market_summary["history_report"]
+        news_history_summary = news_summary["history_report"]
+        sentiment_history_summary = sentiment_summary["history_report"]
+        fundamentals_history_summary = fundamentals_summary["history_report"]
 
         # 加载并渲染 prompt 模板
         prompt = load_prompt_template(
             agent_type="researchers",
             agent_name="bear_researcher",
             context={
+                # 当日四个分析师报告
                 "market_research_report": market_research_report,
                 "sentiment_report": sentiment_report,
                 "news_report": news_report,
                 "fundamentals_report": fundamentals_report,
+                # 过去 7 日四个分析师的 history 摘要
+                "market_history_summary": market_history_summary,
+                "news_history_summary": news_history_summary,
+                "sentiment_history_summary": sentiment_history_summary,
+                "fundamentals_history_summary": fundamentals_history_summary,
+                # 辩论状态
                 "history": history,
                 "current_response": current_response,
-                "past_memory_str": past_memory_str,
                 "round_number": round_number,
                 "is_first_round": is_first_round,
                 "bull_history": bull_history,

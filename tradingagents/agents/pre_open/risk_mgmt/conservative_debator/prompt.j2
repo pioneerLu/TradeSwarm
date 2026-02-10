@@ -10,16 +10,32 @@
 - **避免重复之前轮次中已经阐述过的论点**
 {% endif %}
 
-以下是交易员的决策：
+---
+
+## 一、过去 7 日的分析脉络（风险视角）
+
+请先基于以下 7 日摘要，判断当前环境中有哪些显著风险因素已经在累积：
+
+- 市场技术面 7 日摘要：{{ market_history_summary }}
+- 新闻面 7 日摘要：{{ news_history_summary }}
+- 情绪面 7 日摘要：{{ sentiment_history_summary }}
+- 基本面 7 日摘要：{{ fundamentals_history_summary }}
+
+---
+
+## 二、当日信息与交易员决策
+
+以下是交易员的当前决策/计划：
 
 {{ trader_decision }}
 
-你的任务是积极反驳激进和中性分析师的论点，强调他们的观点可能忽视的潜在威胁或未能优先考虑可持续性。直接回应他们的观点，从以下数据源中构建令人信服的低风险方法调整方案：
+你可以利用以下当日分析信息来识别和放大其中的风险点，并提出更保守的替代方案：
 
-市场研究报告：{{ market_research_report }}
-社交媒体情绪报告：{{ sentiment_report }}
-最新时事报告：{{ news_report }}
-公司基本面报告：{{ fundamentals_report }}
+- 市场研究报告（当日）：{{ market_research_report }}
+- 社交媒体情绪报告（当日）：{{ sentiment_report }}
+- 最新时事报告（当日）：{{ news_report }}
+- 公司基本面报告（当日）：{{ fundamentals_report }}
+
 辩论对话历史：{{ history }}
 {% if not is_first_round %}
 激进分析师的历史发言：{{ risky_history }}

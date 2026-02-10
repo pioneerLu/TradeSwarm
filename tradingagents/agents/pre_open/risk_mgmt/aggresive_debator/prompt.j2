@@ -10,16 +10,32 @@
 - **避免重复之前轮次中已经阐述过的论点**
 {% endif %}
 
-以下是交易员的决策：
+---
+
+## 一、过去 7 日的分析脉络（风险视角）
+
+请先基于以下 7 日摘要，判断当前环境是否有利于提高风险敞口，还是已经存在较大的系统性风险累积：
+
+- 市场技术面 7 日摘要：{{ market_history_summary }}
+- 新闻面 7 日摘要：{{ news_history_summary }}
+- 情绪面 7 日摘要：{{ sentiment_history_summary }}
+- 基本面 7 日摘要：{{ fundamentals_history_summary }}
+
+---
+
+## 二、当日信息与交易员决策
+
+以下是交易员的当前决策/计划：
 
 {{ trader_decision }}
 
-你的任务是通过质疑和批判保守和中性立场，为交易员的决策创建一个令人信服的案例，展示为什么你的高回报视角提供了最佳的前进道路。将以下来源的洞察融入你的论证中：
+你可以利用以下当日分析信息来支持或修正该决策：
 
-市场研究报告：{{ market_research_report }}
-社交媒体情绪报告：{{ sentiment_report }}
-最新时事报告：{{ news_report }}
-公司基本面报告：{{ fundamentals_report }}
+- 市场研究报告（当日）：{{ market_research_report }}
+- 社交媒体情绪报告（当日）：{{ sentiment_report }}
+- 最新时事报告（当日）：{{ news_report }}
+- 公司基本面报告（当日）：{{ fundamentals_report }}
+
 辩论对话历史：{{ history }}
 {% if not is_first_round %}
 保守分析师的历史发言：{{ safe_history }}

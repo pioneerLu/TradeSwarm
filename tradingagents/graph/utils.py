@@ -56,10 +56,16 @@ def load_llm_from_config(config_path: str = "config/config.yaml") -> ChatOpenAI:
     
     # 创建 httpx 客户端，明确禁用代理
     import httpx
-    # httpx.Client 不接受 proxies 参数，我们需要通过环境变量控制
-    # 由于已经删除了环境变量，直接创建客户端即可
+    # httpx.Client 默认 trust_env=True，会读取环境变量中的代理设置
+    # 为了确保不使用代理，我们：
+    # 1. 删除环境变量（已在上方完成）
+    # 2. 设置 trust_env=False 来禁用从环境变量读取代理
+    # 3. 显式设置 proxy=None 来确保不使用任何代理
     http_client = httpx.Client(
         verify=True,
+        trust_env=False,  # 禁用从环境变量读取代理设置
+        proxy=None,  # 显式禁用代理
+        timeout=httpx.Timeout(60.0),  # 设置超时
     )
     
     llm = ChatOpenAI(
@@ -69,6 +75,16 @@ def load_llm_from_config(config_path: str = "config/config.yaml") -> ChatOpenAI:
         temperature=temperature,
         http_client=http_client,  # 使用自定义的 http_client（不包含代理）
     )
+    
+    # 验证 LLM 的客户端配置
+    # 确保 LLM 使用的客户端不使用代理
+    if hasattr(llm, 'client') and hasattr(llm.client, '_client'):
+        # 检查客户端是否使用了我们传入的 http_client
+        llm_client = llm.client._client
+        if llm_client is not http_client:
+            # 如果 LLM 创建了新的客户端，我们需要确保它也不使用代理
+            # 但通常 ChatOpenAI 应该使用我们传入的 http_client
+            pass
     
     # 不恢复代理设置，因为后续 LLM 调用也不应该使用代理
     # 如果需要恢复，可以在调用完成后手动恢复

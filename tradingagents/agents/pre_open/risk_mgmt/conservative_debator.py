@@ -52,11 +52,23 @@ def create_safe_debator(llm: Any):
         round_number = (count // 3) + 1
         is_first_round = count < 3
 
-        # 2. 从四个 Analyst 的 MemorySummary 中构造当前情境
-        market_research_report = build_curr_situation_from_summaries(state)
-        sentiment_report = state["sentiment_analyst_summary"]["today_report"]
-        news_report = state["news_analyst_summary"]["today_report"]
-        fundamentals_report = state["fundamentals_analyst_summary"]["today_report"]
+        # 2. 从四个 Analyst 的 MemorySummary 中读取当日与 7 日脉络（无 memory，仅用已有 summary）
+        market_summary = state["market_analyst_summary"]
+        news_summary = state["news_analyst_summary"]
+        sentiment_summary = state["sentiment_analyst_summary"]
+        fundamentals_summary = state["fundamentals_analyst_summary"]
+
+        # 当日报告
+        market_research_report = market_summary["today_report"]
+        news_report = news_summary["today_report"]
+        sentiment_report = sentiment_summary["today_report"]
+        fundamentals_report = fundamentals_summary["today_report"]
+
+        # 最近 7 日 history 摘要
+        market_history_summary = market_summary["history_report"]
+        news_history_summary = news_summary["history_report"]
+        sentiment_history_summary = sentiment_summary["history_report"]
+        fundamentals_history_summary = fundamentals_summary["history_report"]
 
         # 3. 读取 research_summary 中的 investment_plan 作为 trader_decision
         research_summary: Dict[str, Any] | None = state.get("research_summary")  # type: ignore[assignment]
@@ -72,10 +84,17 @@ def create_safe_debator(llm: Any):
             agent_name="conservative_debator",
             context={
                 "trader_decision": trader_decision,
+                # 当日分析
                 "market_research_report": market_research_report,
                 "sentiment_report": sentiment_report,
                 "news_report": news_report,
                 "fundamentals_report": fundamentals_report,
+                # 7 日 history 摘要
+                "market_history_summary": market_history_summary,
+                "news_history_summary": news_history_summary,
+                "sentiment_history_summary": sentiment_history_summary,
+                "fundamentals_history_summary": fundamentals_history_summary,
+                # 风险辩论状态
                 "history": history,
                 "current_risky_response": current_risky_response,
                 "current_neutral_response": current_neutral_response,

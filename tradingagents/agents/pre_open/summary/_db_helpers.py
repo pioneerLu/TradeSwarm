@@ -86,22 +86,37 @@ def query_history_report(
         历史摘要内容（包含标题）
     """
     try:
-        # 如果 conn 是 MemoryDBHelper，使用其方法
-        if hasattr(conn, 'query_history_reports'):
-            reports = conn.query_history_reports(analyst_type, symbol, trade_date, lookback_days=7)
+        # 如果 conn 是 MemoryDBHelper，优先使用结构化 summary（7 日窗口）
+        if hasattr(conn, "query_summary"):
+            summary = conn.query_summary(analyst_type, symbol, trade_date)
+            if summary and summary.get("summary_content"):
+                session_desc = "开盘前" if trading_session == "pre_open" else "收盘后"
+                # 这里直接返回结构化 summary 内容，由上层 Prompt 再决定如何使用
+                return f"""# {report_title} - {symbol}
+
+## 近期趋势分析 ({session_desc})
+{summary['summary_content']}"""
+
+        # 否则（或没有 summary），回退到旧逻辑：查询过去 7 天的原始报告并拼接
+        if hasattr(conn, "query_history_reports"):
+            reports = conn.query_history_reports(
+                analyst_type, symbol, trade_date, lookback_days=7
+            )
             if reports:
-                report_contents = [r["report_content"] for r in reports if r.get("report_content")]
+                report_contents = [
+                    r["report_content"] for r in reports if r.get("report_content")
+                ]
                 history_report = "\n\n".join(report_contents)
             else:
                 history_report = ""
-            
-            session_desc = "开盘前" if trading_session == 'pre_open' else "收盘后"
+
+            session_desc = "开盘前" if trading_session == "pre_open" else "收盘后"
             return f"""# {report_title} - {symbol}
 
 ## 近期趋势分析 ({session_desc})
 {history_report}"""
-        
-        # 否则，假设是 sqlite3.Connection
+
+        # 否则，假设是 sqlite3.Connection，直接从 analyst_reports 拼接
         cursor = conn.cursor()
         sql = """
             SELECT report_content 
@@ -114,7 +129,7 @@ def query_history_report(
                 AND report_content != ''
             ORDER BY trade_date ASC
         """
-        
+
         cursor.execute(sql, (analyst_type, symbol, trade_date, trade_date))
         results = cursor.fetchall()
         cursor.close()
@@ -124,7 +139,7 @@ def query_history_report(
             report_contents = [row[0] for row in results if row[0]]
             history_report = "\n\n".join(report_contents)
 
-        session_desc = "开盘前" if trading_session == 'pre_open' else "收盘后"
+        session_desc = "开盘前" if trading_session == "pre_open" else "收盘后"
         return f"""# {report_title} - {symbol}
 
 ## 近期趋势分析 ({session_desc})
@@ -132,7 +147,7 @@ def query_history_report(
 
     except Exception as e:
         print(f"查询{analyst_type}历史摘要时发生错误: {e}")
-        session_desc = "开盘前" if trading_session == 'pre_open' else "收盘后"
+        session_desc = "开盘前" if trading_session == "pre_open" else "收盘后"
         return f"""# {report_title} - {symbol}
 
 ## 近期趋势分析 ({session_desc})
