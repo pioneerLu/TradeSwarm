@@ -1,9 +1,7 @@
 """
 股票池配置
-各行业 Top 10 股票（按市值/知名度选取）
 """
 
-# 各行业 Top 10 股票
 SECTOR_STOCKS = {
     # 科技 (Technology)
     'Technology': [
@@ -72,7 +70,6 @@ SECTOR_STOCKS = {
         'TMUS',   # T-Mobile
         'CHTR',   # Charter
         'EA',     # Electronic Arts
-        # 'ATVI',   # Activision (已退市，2023年被MSFT收购)
     ],
     
     # 工业 (Industrials)

@@ -217,7 +217,7 @@ def create_strategy_selector(
                     f"\n\n[注意：原始策略类型无效，已降级到 default_timing]"
                 )
             
-            # 构建 StrategySelection 对象
+            # 构建 StrategySelection 对象（包含标准化决策字段）
             strategy_selection: StrategySelection = {
                 "strategy_type": strategy_type,  # type: ignore
                 "reasoning": strategy_data.get("reasoning", ""),
@@ -225,6 +225,8 @@ def create_strategy_selector(
                 "risk_adjustment": strategy_data.get("risk_adjustment"),
                 "confidence": float(strategy_data.get("confidence", 0.5)),
                 "alternative_strategies": strategy_data.get("alternative_strategies"),
+                "market_regime": strategy_data.get("market_regime"),
+                "expected_behavior": strategy_data.get("expected_behavior"),
             }
             
         except (json.JSONDecodeError, KeyError, ValueError) as e:

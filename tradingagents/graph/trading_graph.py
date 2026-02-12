@@ -46,7 +46,7 @@ def create_trading_graph(
     Returns:
         编译好的 StateGraph
     """
-    # 创建 Summary 节点（传入 None，使用写死的文本）
+    # 创建 Summary 节点
     market_summary_node = create_market_summary_node(data_manager)
     news_summary_node = create_news_summary_node(data_manager)
     sentiment_summary_node = create_sentiment_summary_node(data_manager)

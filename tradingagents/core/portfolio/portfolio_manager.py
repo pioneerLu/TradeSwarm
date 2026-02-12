@@ -262,6 +262,20 @@ class PortfolioManager:
         
         return actions
     
+    def get_recent_trades(self, days: int = 1) -> List[Dict[str, Any]]:
+        """
+        获取最近 N 天的交易记录
+        
+        Args:
+            days: 最近天数，默认 1 天
+            
+        Returns:
+            交易记录列表
+        """
+        from datetime import datetime, timedelta
+        cutoff_date = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
+        return [t for t in self.trades if t.get("date", "") >= cutoff_date]
+    
     def get_portfolio_state(self) -> Dict[str, Any]:
         """获取组合状态"""
         return {

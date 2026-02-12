@@ -91,6 +91,17 @@ class StrategySelection(TypedDict):
         "备选策略列表（可选，如果首选策略不适用，可以列出备选策略）"
     ]
 
+    # 以下为标准化决策字段，由 Strategy Selector 负责给出，供 daily summary / Reflector 使用
+    market_regime: Annotated[
+        Optional[str],
+        "市场状态描述，例如 'trend_up_low_vol'、'trend_down_high_vol'、'sideways_consolidation'、'volatile_breakout' 等"
+    ]
+
+    expected_behavior: Annotated[
+        Optional[str],
+        "预期市场行为，例如 'continuation'、'reversal'、'consolidation'、'breakout' 等"
+    ]
+
 
 # ==================== Analyst 私有 State ====================
 # 这些 State 仅用于 Analyst 节点内部执行，不进入全局 State

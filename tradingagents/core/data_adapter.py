@@ -9,7 +9,7 @@
 import pandas as pd
 from typing import Optional
 
-from ..data.loader import load_stock_data
+from .data.loader import load_stock_data
 
 
 class DataAdapter:

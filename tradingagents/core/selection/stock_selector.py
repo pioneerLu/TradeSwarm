@@ -10,8 +10,8 @@ import numpy as np
 from typing import List, Dict, Optional
 from datetime import datetime, timedelta
 
-from ..data.loader import load_stock_data
 from .market_regime import MarketRegime
+from ..data_adapter import DataAdapter
 
 
 class StockSelector:
@@ -21,16 +21,18 @@ class StockSelector:
     使用多因子模型对股票进行排名，选出 Top N
     """
     
-    def __init__(self, stock_pool: List[str], top_n: int = 5):
+    def __init__(self, stock_pool: List[str], top_n: int = 5, data_adapter: Optional[DataAdapter] = None):
         """
         初始化选股器
         
         Args:
             stock_pool: 股票池列表
             top_n: 每次选择的股票数量
+            data_adapter: 数据适配器（如果为None，则创建新的）
         """
         self.stock_pool = stock_pool
         self.top_n = top_n
+        self.data_adapter = data_adapter or DataAdapter(use_cache=True)
         
         # 默认因子权重（震荡市配置）
         self.default_weights = {
@@ -42,7 +44,7 @@ class StockSelector:
             'trend_strength': 0.20,     # 趋势强度
         }
         
-        # 方案三：基于市场状态的权重配置
+        # 方案二：基于市场状态的权重配置
         # 牛市权重配置
         self.bull_weights = {
             'momentum_20d': 0.30,       # 动量因子权重高（追涨）
@@ -83,7 +85,7 @@ class StockSelector:
         self.min_ic_samples = 20  # 最小样本数（至少需要20个数据点）
         self.ic_history = {}  # 存储历史IC值 {factor_name: [ic1, ic2, ...]}
         
-        # 市场状态平滑（方案三，保留但默认不使用）
+        # 市场状态平滑（方案二）
         self._regime_history = []  # 记录最近N次的市场状态
         self._regime_smooth_window = 3  # 需要连续3次相同状态才切换
         
@@ -284,7 +286,7 @@ class StockSelector:
     
     def _identify_market_regime(self, market_df: pd.DataFrame) -> MarketRegime:
         """
-        识别市场状态（方案三）
+        识别市场状态（方案二）
         
         Args:
             market_df: 市场指数数据（如SPY）
@@ -406,16 +408,14 @@ class StockSelector:
             return self._data_cache[cache_key]
         
         try:
-            # 计算开始日期
-            end_dt = datetime.strptime(end_date, '%Y-%m-%d')
-            start_dt = end_dt - timedelta(days=lookback_days + 30)  # 多加30天缓冲
-            start_date = start_dt.strftime('%Y-%m-%d')
-            
-            df = load_stock_data(symbol, start_date, end_date, use_cache=True)
+            # 使用 DataAdapter 加载数据
+            df = self.data_adapter.load_stock_data_until(symbol, end_date)
             
             if df is not None and len(df) > 20:
-                self._data_cache[cache_key] = df
-                return df
+                # 确保有足够的历史数据
+                if len(df) >= lookback_days:
+                    self._data_cache[cache_key] = df
+                    return df
             return None
         except Exception as e:
             print(f"  [WARN] 加载 {symbol} 失败: {e}")
@@ -535,8 +535,8 @@ class StockSelector:
                 print(f"  [IC权重] 计算IC失败: {e}，使用默认权重")
                 self.factor_weights = self.default_weights.copy()
         
-        # 方案三：识别市场状态并切换权重（保留但默认不使用）
-        # 如果需要使用方案三，可以设置 self.use_ic_weights = False
+        # 方案二：识别市场状态并切换权重（保留但默认不使用）
+        # 如果需要使用方案二，可以设置 self.use_ic_weights = False
         if not self.use_ic_weights:
             spy_df = self.load_data('SPY', date)
             if spy_df is not None:

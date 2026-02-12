@@ -219,6 +219,8 @@ market_data/
 
 # Backtest results
 backtest_results/
+backtest_results_*/
+backtest_results_archive/
 performance_reports/
 
 # Trading related files
@@ -242,3 +244,5 @@ trading_sys/
 
 # Temporary directories
 need_to_add/
+
+docs_archive/

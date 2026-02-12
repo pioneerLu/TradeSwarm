@@ -77,6 +77,48 @@ class MemoryDBHelper:
         """
         cursor.execute(create_summaries_table_sql)
 
+        # 新增：daily_trading_summaries 表（日级交易摘要）
+        create_daily_summaries_table_sql = """
+        CREATE TABLE IF NOT EXISTS daily_trading_summaries (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date TEXT NOT NULL,                    -- 交易日期 (YYYY-MM-DD)
+            symbol TEXT NOT NULL,                  -- 股票代码
+            market_regime TEXT,                    -- 市场状态（如 'trend_up_low_vol'）
+            selected_strategy TEXT,                 -- 选择的策略（如 'momentum_20d'）
+            expected_behavior TEXT,                 -- 预期行为（如 'continuation'）
+            actual_return REAL,                    -- 实际收益率（%）
+            actual_max_drawdown REAL,               -- 实际最大回撤（%）
+            positioning TEXT,                      -- 仓位状态（如 'full', 'partial', 'empty'）
+            anomaly TEXT,                          -- 异常情况描述（可选）
+            summary_json TEXT NOT NULL,            -- 完整 JSON summary（包含所有字段）
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(date, symbol)
+        )
+        """
+        cursor.execute(create_daily_summaries_table_sql)
+
+        # 新增：cycle_reflections 表（周期级反思）
+        create_cycle_reflections_table_sql = """
+        CREATE TABLE IF NOT EXISTS cycle_reflections (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            cycle_type TEXT NOT NULL,                 -- 周期类型：'weekly' 或 'monthly'
+            cycle_start_date TEXT NOT NULL,            -- 周期开始日期
+            cycle_end_date TEXT NOT NULL,              -- 周期结束日期
+            symbol TEXT,                               -- 股票代码（可选，如果为多标的则为 NULL）
+            reflection_content TEXT NOT NULL,          -- 结构化反思内容（JSON 字符串）
+            key_insights TEXT,                         -- 关键洞察（文本摘要）
+            error_patterns TEXT,                      -- 错误模式（JSON 数组）
+            success_patterns TEXT,                     -- 成功模式（JSON 数组）
+            strategy_conditions TEXT,                   -- 策略适用条件（JSON 对象）
+            environment_biases TEXT,                   -- 环境判断偏差（JSON 数组）
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            UNIQUE(cycle_type, cycle_start_date, cycle_end_date, symbol)
+        )
+        """
+        cursor.execute(create_cycle_reflections_table_sql)
+
         # 索引：加速按 analyst_type / symbol / trade_date 查询
         cursor.execute(
             """
@@ -88,6 +130,18 @@ class MemoryDBHelper:
             """
             CREATE INDEX IF NOT EXISTS idx_analyst_summaries_lookup
             ON analyst_summaries(analyst_type, symbol, trade_date)
+            """
+        )
+        cursor.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_daily_trading_summaries_lookup
+            ON daily_trading_summaries(date, symbol)
+            """
+        )
+        cursor.execute(
+            """
+            CREATE INDEX IF NOT EXISTS idx_cycle_reflections_lookup
+            ON cycle_reflections(cycle_type, cycle_start_date, cycle_end_date, symbol)
             """
         )
 
@@ -585,6 +639,371 @@ class MemoryDBHelper:
             print(f"[ERROR] 获取统计信息失败: {e}")
             return {"total_reports": 0, "by_type": {}}
     
+    # ------------------------------------------------------------------
+    # Daily Trading Summaries（日级交易摘要）相关接口
+    # ------------------------------------------------------------------
+
+    def upsert_daily_trading_summary(
+        self,
+        date: str,
+        symbol: str,
+        summary_json: str,
+        market_regime: Optional[str] = None,
+        selected_strategy: Optional[str] = None,
+        expected_behavior: Optional[str] = None,
+        actual_return: Optional[float] = None,
+        actual_max_drawdown: Optional[float] = None,
+        positioning: Optional[str] = None,
+        anomaly: Optional[str] = None,
+    ) -> bool:
+        """
+        插入或更新日级交易摘要。
+
+        Args:
+            date: 交易日期 (YYYY-MM-DD)
+            symbol: 股票代码
+            summary_json: 完整 JSON summary（字符串）
+            market_regime: 市场状态（可选）
+            selected_strategy: 选择的策略（可选）
+            expected_behavior: 预期行为（可选）
+            actual_return: 实际收益率（可选）
+            actual_max_drawdown: 实际最大回撤（可选）
+            positioning: 仓位状态（可选）
+            anomaly: 异常情况描述（可选）
+
+        Returns:
+            是否成功
+        """
+        try:
+            conn = self._get_connection()
+            cursor = conn.cursor()
+
+            sql = """
+            INSERT INTO daily_trading_summaries (
+                date,
+                symbol,
+                market_regime,
+                selected_strategy,
+                expected_behavior,
+                actual_return,
+                actual_max_drawdown,
+                positioning,
+                anomaly,
+                summary_json,
+                created_at,
+                updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            ON CONFLICT(date, symbol)
+            DO UPDATE SET
+                market_regime = excluded.market_regime,
+                selected_strategy = excluded.selected_strategy,
+                expected_behavior = excluded.expected_behavior,
+                actual_return = excluded.actual_return,
+                actual_max_drawdown = excluded.actual_max_drawdown,
+                positioning = excluded.positioning,
+                anomaly = excluded.anomaly,
+                summary_json = excluded.summary_json,
+                updated_at = CURRENT_TIMESTAMP
+            """
+
+            cursor.execute(
+                sql,
+                (
+                    date,
+                    symbol,
+                    market_regime,
+                    selected_strategy,
+                    expected_behavior,
+                    actual_return,
+                    actual_max_drawdown,
+                    positioning,
+                    anomaly,
+                    summary_json,
+                ),
+            )
+            conn.commit()
+            cursor.close()
+
+            print(
+                f"[OK] 成功更新 daily trading summary: {date} - {symbol}"
+            )
+            return True
+
+        except Exception as e:
+            print(f"[ERROR] 更新 daily trading summary 失败: {e}")
+            if self.conn:
+                self.conn.rollback()
+            return False
+
+    def query_daily_trading_summary(
+        self,
+        date: str,
+        symbol: str,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        查询指定日期的 daily trading summary。
+
+        Args:
+            date: 交易日期
+            symbol: 股票代码
+
+        Returns:
+            summary 字典，如果不存在返回 None
+        """
+        try:
+            conn = self._get_connection()
+            cursor = conn.cursor()
+
+            sql = """
+            SELECT
+                id,
+                date,
+                symbol,
+                market_regime,
+                selected_strategy,
+                expected_behavior,
+                actual_return,
+                actual_max_drawdown,
+                positioning,
+                anomaly,
+                summary_json,
+                created_at,
+                updated_at
+            FROM daily_trading_summaries
+            WHERE date = ? AND symbol = ?
+            LIMIT 1
+            """
+
+            cursor.execute(sql, (date, symbol))
+            row = cursor.fetchone()
+            cursor.close()
+
+            if not row:
+                return None
+
+            return {
+                "id": row[0],
+                "date": row[1],
+                "symbol": row[2],
+                "market_regime": row[3],
+                "selected_strategy": row[4],
+                "expected_behavior": row[5],
+                "actual_return": row[6],
+                "actual_max_drawdown": row[7],
+                "positioning": row[8],
+                "anomaly": row[9],
+                "summary_json": row[10],
+                "created_at": row[11],
+                "updated_at": row[12],
+            }
+
+        except Exception as e:
+            print(f"[ERROR] 查询 daily trading summary 失败: {e}")
+            return None
+
+    def query_daily_trading_summaries_by_date_range(
+        self,
+        symbol: str,
+        start_date: str,
+        end_date: str,
+    ) -> List[Dict[str, Any]]:
+        """
+        查询日期范围内的所有 daily trading summaries。
+
+        Args:
+            symbol: 股票代码
+            start_date: 开始日期
+            end_date: 结束日期
+
+        Returns:
+            summary 列表
+        """
+        try:
+            conn = self._get_connection()
+            cursor = conn.cursor()
+
+            sql = """
+            SELECT
+                id,
+                date,
+                symbol,
+                market_regime,
+                selected_strategy,
+                expected_behavior,
+                actual_return,
+                actual_max_drawdown,
+                positioning,
+                anomaly,
+                summary_json,
+                created_at,
+                updated_at
+            FROM daily_trading_summaries
+            WHERE symbol = ? AND date >= ? AND date <= ?
+            ORDER BY date ASC
+            """
+
+            cursor.execute(sql, (symbol, start_date, end_date))
+            results = cursor.fetchall()
+            cursor.close()
+
+            summaries = []
+            for row in results:
+                summaries.append({
+                    "id": row[0],
+                    "date": row[1],
+                    "symbol": row[2],
+                    "market_regime": row[3],
+                    "selected_strategy": row[4],
+                    "expected_behavior": row[5],
+                    "actual_return": row[6],
+                    "actual_max_drawdown": row[7],
+                    "positioning": row[8],
+                    "anomaly": row[9],
+                    "summary_json": row[10],
+                    "created_at": row[11],
+                    "updated_at": row[12],
+                })
+
+            return summaries
+
+        except Exception as e:
+            print(f"[ERROR] 查询 daily trading summaries 失败: {e}")
+            return []
+
+    def upsert_cycle_reflection(
+        self,
+        cycle_type: str,
+        cycle_start_date: str,
+        cycle_end_date: str,
+        reflection_content: str,
+        symbol: Optional[str] = None,
+        key_insights: Optional[str] = None,
+        error_patterns: Optional[str] = None,
+        success_patterns: Optional[str] = None,
+        strategy_conditions: Optional[str] = None,
+        environment_biases: Optional[str] = None,
+    ) -> bool:
+        """
+        插入或更新周期反思记录。
+
+        Args:
+            cycle_type: 周期类型（'weekly' 或 'monthly'）
+            cycle_start_date: 周期开始日期
+            cycle_end_date: 周期结束日期
+            reflection_content: 结构化反思内容（JSON 字符串）
+            symbol: 股票代码（可选）
+            key_insights: 关键洞察（文本摘要）
+            error_patterns: 错误模式（JSON 数组字符串）
+            success_patterns: 成功模式（JSON 数组字符串）
+            strategy_conditions: 策略适用条件（JSON 对象字符串）
+            environment_biases: 环境判断偏差（JSON 数组字符串）
+
+        Returns:
+            是否成功
+        """
+        try:
+            conn = self._get_connection()
+            cursor = conn.cursor()
+
+            sql = """
+            INSERT OR REPLACE INTO cycle_reflections (
+                cycle_type, cycle_start_date, cycle_end_date, symbol,
+                reflection_content, key_insights, error_patterns, success_patterns,
+                strategy_conditions, environment_biases, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            """
+
+            cursor.execute(
+                sql,
+                (
+                    cycle_type,
+                    cycle_start_date,
+                    cycle_end_date,
+                    symbol,
+                    reflection_content,
+                    key_insights,
+                    error_patterns,
+                    success_patterns,
+                    strategy_conditions,
+                    environment_biases,
+                ),
+            )
+
+            conn.commit()
+            cursor.close()
+            return True
+        except Exception as e:
+            print(f"[ERROR] 插入/更新 cycle reflection 失败: {e}")
+            return False
+
+    def query_cycle_reflection(
+        self,
+        cycle_type: str,
+        cycle_start_date: str,
+        cycle_end_date: str,
+        symbol: Optional[str] = None,
+    ) -> Optional[Dict[str, Any]]:
+        """
+        查询周期反思记录。
+
+        Args:
+            cycle_type: 周期类型
+            cycle_start_date: 周期开始日期
+            cycle_end_date: 周期结束日期
+            symbol: 股票代码（可选）
+
+        Returns:
+            反思记录字典，如果不存在则返回 None
+        """
+        try:
+            conn = self._get_connection()
+            cursor = conn.cursor()
+
+            if symbol:
+                sql = """
+                SELECT
+                    id, cycle_type, cycle_start_date, cycle_end_date, symbol,
+                    reflection_content, key_insights, error_patterns, success_patterns,
+                    strategy_conditions, environment_biases, created_at, updated_at
+                FROM cycle_reflections
+                WHERE cycle_type = ? AND cycle_start_date = ? AND cycle_end_date = ? AND symbol = ?
+                """
+                cursor.execute(sql, (cycle_type, cycle_start_date, cycle_end_date, symbol))
+            else:
+                sql = """
+                SELECT
+                    id, cycle_type, cycle_start_date, cycle_end_date, symbol,
+                    reflection_content, key_insights, error_patterns, success_patterns,
+                    strategy_conditions, environment_biases, created_at, updated_at
+                FROM cycle_reflections
+                WHERE cycle_type = ? AND cycle_start_date = ? AND cycle_end_date = ? AND symbol IS NULL
+                """
+                cursor.execute(sql, (cycle_type, cycle_start_date, cycle_end_date))
+
+            result = cursor.fetchone()
+            cursor.close()
+
+            if result:
+                return {
+                    "id": result[0],
+                    "cycle_type": result[1],
+                    "cycle_start_date": result[2],
+                    "cycle_end_date": result[3],
+                    "symbol": result[4],
+                    "reflection_content": result[5],
+                    "key_insights": result[6],
+                    "error_patterns": result[7],
+                    "success_patterns": result[8],
+                    "strategy_conditions": result[9],
+                    "environment_biases": result[10],
+                    "created_at": result[11],
+                    "updated_at": result[12],
+                }
+            return None
+        except Exception as e:
+            print(f"[ERROR] 查询 cycle reflection 失败: {e}")
+            return None
+
     def __enter__(self):
         """上下文管理器入口。"""
         return self

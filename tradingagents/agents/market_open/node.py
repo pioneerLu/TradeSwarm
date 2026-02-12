@@ -53,13 +53,35 @@ def create_market_open_executor(
             print(f"[MarketOpen] 缺少必要参数: symbol={symbol}, trade_date={trade_date}")
             return {}
         
-        # 1. 检查风险决策
+        # 1. 检查风险决策（解析 JSON 获取 final_decision）
         risk_summary = state.get("risk_summary")
+        risk_decision = None
         if risk_summary:
-            final_decision = risk_summary.get("final_trade_decision", "")
-            if final_decision and "HOLD" in final_decision.upper():
-                print(f"[MarketOpen] {symbol} 风险决策为 HOLD，不执行交易")
-                return {}
+            final_decision_str = risk_summary.get("final_trade_decision", "")
+            if final_decision_str:
+                try:
+                    final_decision_json = extract_json_from_text(final_decision_str)
+                    if final_decision_json:
+                        risk_decision = final_decision_json.get("final_decision", "").upper()
+                except:
+                    # 如果解析失败，回退到字符串匹配
+                    if "HOLD" in final_decision_str.upper():
+                        risk_decision = "HOLD"
+        
+        if risk_decision == "HOLD":
+            print(f"[MarketOpen] {symbol} 风险决策为 HOLD，不执行交易")
+            # 即使不执行交易，也要返回当前仓位状态
+            return {
+                "current_position": portfolio_manager.get_position(symbol),
+                "portfolio_state": portfolio_manager.get_portfolio_state(),
+                "execution_log": [{
+                    "timestamp": trade_date,
+                    "action": "hold",
+                    "price": 0.0,
+                    "volume": 0,
+                    "reason": "风险决策为 HOLD",
+                }],
+            }
         
         # 2. 读取策略选择和交易计划
         strategy_selection = state.get("strategy_selection")
@@ -100,7 +122,24 @@ def create_market_open_executor(
             print(f"[MarketOpen] {symbol} 无法获取 {next_trading_day} 的开盘价")
             return {}
         
-        # 7. 根据信号决定是否执行交易
+        # 7. 检查当天是否已经执行过交易（确保每天只执行一次）
+        # 检查交易记录，如果当天已经有交易，则不执行
+        today_trades = [t for t in portfolio_manager.trades if t.get("date") == trade_date]
+        if today_trades:
+            print(f"[MarketOpen] {symbol} 当天 ({trade_date}) 已执行过交易，跳过")
+            return {
+                "current_position": portfolio_manager.get_position(symbol),
+                "portfolio_state": portfolio_manager.get_portfolio_state(),
+                "execution_log": [{
+                    "timestamp": trade_date,
+                    "action": "hold",
+                    "price": 0.0,
+                    "volume": 0,
+                    "reason": "当天已执行过交易",
+                }],
+            }
+        
+        # 8. 根据信号决定是否执行交易
         executed = False
         execution_reason = strategy_result.reason
         
@@ -148,7 +187,7 @@ def create_market_open_executor(
                 if executed:
                     execution_reason = f"执行卖出: {strategy_result.reason}"
         
-        # 8. 更新 AgentState 中的仓位信息
+        # 9. 更新 AgentState 中的仓位信息
         updated_position = portfolio_manager.get_position(symbol)
         portfolio_state = portfolio_manager.get_portfolio_state()
         
