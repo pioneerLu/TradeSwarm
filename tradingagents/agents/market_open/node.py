@@ -55,7 +55,8 @@ def create_market_open_executor(
         
         # 1. 检查风险决策（解析 JSON 获取 final_decision）
         risk_summary = state.get("risk_summary")
-        risk_decision = None
+        risk_decision: Optional[str] = None
+        risk_position_size: Optional[float] = None
         if risk_summary:
             final_decision_str = risk_summary.get("final_trade_decision", "")
             if final_decision_str:
@@ -63,6 +64,13 @@ def create_market_open_executor(
                     final_decision_json = extract_json_from_text(final_decision_str)
                     if final_decision_json:
                         risk_decision = final_decision_json.get("final_decision", "").upper()
+                        # position_size 由 Risk Manager 提供，表示推荐的最大仓位占组合比例（0-1）
+                        try:
+                            raw_pos_size = final_decision_json.get("position_size")
+                            if isinstance(raw_pos_size, (int, float)):
+                                risk_position_size = float(raw_pos_size)
+                        except Exception:
+                            risk_position_size = None
                 except:
                     # 如果解析失败，回退到字符串匹配
                     if "HOLD" in final_decision_str.upper():
@@ -154,6 +162,13 @@ def create_market_open_executor(
             except:
                 pass
         
+        # 上层（Trader + Risk）的合意方向，用于在策略无信号时兜底执行
+        upper_level_action: Optional[str] = None
+        if risk_decision in {"BUY", "SELL"}:
+            upper_level_action = risk_decision
+        elif trader_action in {"BUY", "SELL"}:
+            upper_level_action = trader_action
+
         if strategy_result.signal == Signal.BUY and not is_holding:
             # 买入信号且未持仓
             if trader_action and trader_action == "HOLD":
@@ -186,6 +201,39 @@ def create_market_open_executor(
                 )
                 if executed:
                     execution_reason = f"执行卖出: {strategy_result.reason}"
+        else:
+            # 策略给出 HOLD 或与持仓状态不匹配时，考虑上层（Trader + Risk）决策兜底
+            # 规则：当 Trader 与 Risk 至少一方明确给出 BUY/SELL，策略不得静默否决，只能影响仓位大小
+            if upper_level_action == "BUY" and not is_holding:
+                # 使用 Risk 给出的 position_size 作为上限，否则退回到目标金额的一半做探索仓位
+                buy_amount: Optional[float] = None
+                if risk_position_size is not None and risk_position_size > 0:
+                    buy_amount = portfolio_manager.total_value * min(risk_position_size, 1.0)
+                else:
+                    buy_amount = portfolio_manager.get_target_amount(symbol) * 0.5
+
+                executed = portfolio_manager.execute_buy(
+                    symbol=symbol,
+                    price=execution_price,
+                    amount=buy_amount,
+                    date=next_trading_day,
+                    strategy_type=strategy_type,
+                    stop_loss_price=strategy_result.stop_loss_price,
+                    take_profit_price=strategy_result.take_profit_price,
+                    reason=f"上层决策BUY，策略无明确信号，按上层决策执行（探索仓位）: {strategy_result.reason}",
+                )
+                if executed:
+                    execution_reason = "上层决策为 BUY，但策略信号为 HOLD，按上层决策以受限仓位执行买入"
+
+            elif upper_level_action == "SELL" and is_holding:
+                executed = portfolio_manager.execute_sell(
+                    symbol=symbol,
+                    price=execution_price,
+                    date=next_trading_day,
+                    reason=f"上层决策SELL，策略无明确信号，按上层决策执行卖出: {strategy_result.reason}",
+                )
+                if executed:
+                    execution_reason = "上层决策为 SELL，但策略信号为 HOLD，按上层决策执行卖出"
         
         # 9. 更新 AgentState 中的仓位信息
         updated_position = portfolio_manager.get_position(symbol)
