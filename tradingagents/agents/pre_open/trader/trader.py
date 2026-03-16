@@ -24,7 +24,9 @@ def create_trader(llm: BaseChatModel, memory: Any) -> Callable[[AgentState], Dic
         )
         
         # 从四个 Analyst 的 MemorySummary 中构造当前情境
-        curr_situation = build_curr_situation_from_summaries(state)
+        curr_situation = build_curr_situation_from_summaries(
+            state, include_history=True, max_length=4000
+        )
         past_memories = memory.get_memories(curr_situation, n_matches=2)
 
         past_memory_str = ""
@@ -65,16 +67,45 @@ def create_trader(llm: BaseChatModel, memory: Any) -> Callable[[AgentState], Dic
         # 格式化仓位信息
         position_info = ""
         if current_position:
+            shares = current_position.get("shares")
+            if shares is None:
+                shares = 0.0
+            entry_price = current_position.get("entry_price")
+            if entry_price is None:
+                entry_price = 0.0
+            entry_date = current_position.get("entry_date") or ""
+            current_price = current_position.get("current_price")
+            if current_price is None:
+                current_price = 0.0
+            pnl = current_position.get("pnl")
+            if pnl is None:
+                pnl = 0.0
+            pnl_pct = current_position.get("pnl_pct")
+            if pnl_pct is None:
+                pnl_pct = 0.0
+
+            sl_raw = current_position.get("stop_loss_price")
+            if sl_raw is None:
+                sl_str = "未设置"
+            else:
+                sl_str = f"${sl_raw:.2f}"
+
+            tp_raw = current_position.get("take_profit_price")
+            if tp_raw is None:
+                tp_str = "未设置"
+            else:
+                tp_str = f"${tp_raw:.2f}"
+
             position_info = f"""
 当前持仓信息：
-- 持仓股数: {current_position.get('shares', 0):.0f}
-- 建仓价格: ${current_position.get('entry_price', 0):.2f}
-- 建仓日期: {current_position.get('entry_date', '')}
-- 当前价格: ${current_position.get('current_price', 0):.2f}
-- 盈亏金额: ${current_position.get('pnl', 0):.2f}
-- 盈亏百分比: {current_position.get('pnl_pct', 0):.2f}%
-- 止损价: ${current_position.get('stop_loss_price', 0):.2f if current_position.get('stop_loss_price') else '未设置'}
-- 止盈价: ${current_position.get('take_profit_price', 0):.2f if current_position.get('take_profit_price') else '未设置'}
+- 持仓股数: {shares:.0f}
+- 建仓价格: ${entry_price:.2f}
+- 建仓日期: {entry_date}
+- 当前价格: ${current_price:.2f}
+- 盈亏金额: ${pnl:.2f}
+- 盈亏百分比: {pnl_pct:.2f}%
+- 止损价: {sl_str}
+- 止盈价: {tp_str}
 """
         else:
             position_info = "\n当前未持仓。\n"

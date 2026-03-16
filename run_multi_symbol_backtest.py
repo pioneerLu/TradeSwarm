@@ -28,7 +28,7 @@ project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
 from tradingagents.graph.trading_graph import create_trading_graph
-from tradingagents.graph.utils import load_llm_from_config
+from tradingagents.graph.utils import load_llm_from_config, create_chroma_memory_if_available
 from tradingagents.agents.utils.memory_db_helper import MemoryDBHelper
 from tradingagents.agents.utils.agentstate.agent_states import AgentState
 from tradingagents.core.data_adapter import DataAdapter
@@ -58,31 +58,62 @@ logger = logging.getLogger(__name__)
 
 
 class DatabaseMemory:
-    """从数据库读取历史经验的 Memory 类"""
-    
-    def __init__(self, db_path: str, symbol: str, limit: int = 10):
+    """从 cycle_reflections 读取历史经验的 Memory 类，供 past_memory_str 使用"""
+
+    def __init__(self, db_path: str, symbol: str, limit: int = 5):
         self.db_helper = MemoryDBHelper(db_path)
         self.symbol = symbol
         self.limit = limit
-    
-    def get_memories(self, current_situation: str, n_matches: int = 2) -> List[Dict[str, Any]]:
-        """获取历史经验记忆"""
-        # 从 cycle_reflections 表中读取最近的反思记录
+
+    def get_memories(self, current_situation: str, n_matches: int = 3) -> List[Dict[str, Any]]:
+        """从 cycle_reflections 查询周期反思记录，构造 recommendation 供 agent 使用"""
         try:
-            reflections = self.db_helper.query_cycle_reflection(
-                cycle_type="weekly",
+            reflections = self.db_helper.query_cycle_reflections_by_symbol(
                 symbol=self.symbol,
-                limit=self.limit
+                cycle_type="weekly",
+                limit=max(self.limit, n_matches),
             )
-            if reflections:
-                return [{"content": r.get("reflection_content", "")} for r in reflections]
+            if not reflections:
+                return []
+
+            memories = []
+            for r in reflections[:n_matches]:
+                recommendation = _build_recommendation_from_reflection(r)
+                matched_situation = f"周期 {r.get('cycle_start_date', '')} ~ {r.get('cycle_end_date', '')}"
+                memories.append({
+                    "matched_situation": matched_situation,
+                    "recommendation": recommendation,
+                    "similarity_score": 0.8,
+                })
+            return memories
+
         except Exception as e:
-            logger.warning(f"获取历史记忆失败: {e}")
-        return []
-    
+            logger.warning(f"从 cycle_reflections 读取记忆失败: {e}")
+            return []
+
     def save_memory(self, content: str) -> bool:
         """保存记忆（由 Reflector 负责）"""
         return True
+
+    def close(self) -> None:
+        """关闭数据库连接"""
+        self.db_helper.close()
+
+
+def _build_recommendation_from_reflection(r: Dict[str, Any]) -> str:
+    """从 cycle_reflection 记录构造 recommendation 文本"""
+    parts = []
+    if r.get("key_insights"):
+        parts.append(f"关键洞察：{r['key_insights']}")
+    if r.get("error_patterns"):
+        parts.append(f"错误模式：{r['error_patterns']}")
+    if r.get("success_patterns"):
+        parts.append(f"成功模式：{r['success_patterns']}")
+    if r.get("strategy_conditions"):
+        parts.append(f"策略适用条件：{r['strategy_conditions']}")
+    if r.get("environment_biases"):
+        parts.append(f"环境判断偏差：{r['environment_biases']}")
+    return "\n".join(parts) if parts else "无结构化反思内容。"
 
 
 def get_trading_days(data_adapter: DataAdapter, start_date: str, end_date: str) -> List[str]:
@@ -441,7 +472,10 @@ def run_cycle_reflection(
     logger.info(f"\n[Reflector] 开始周期反思（{cycle_type}: {cycle_start_date} ~ {cycle_end_date}）...")
     
     try:
-        reflector_node = create_reflector_node(llm=llm, db_helper=db_helper)
+        chroma_memory = create_chroma_memory_if_available()
+        reflector_node = create_reflector_node(
+            llm=llm, db_helper=db_helper, chroma_memory=chroma_memory
+        )
         
         # 为每个标的运行反思（或合并所有标的）
         for symbol in symbols:

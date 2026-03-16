@@ -26,6 +26,7 @@ from tradingagents.agents.utils.json_parser import extract_json_from_text
 def create_reflector_node(
     llm: BaseChatModel,
     db_helper: MemoryDBHelper,
+    chroma_memory: Optional[Any] = None,
 ) -> Callable[[AgentState], Dict[str, Any]]:
     """
     创建 Reflector Agent 节点。
@@ -33,6 +34,7 @@ def create_reflector_node(
     Args:
         llm: 用于生成反思的 LLM 实例
         db_helper: MemoryDBHelper 实例
+        chroma_memory: 可选，FinancialSituationMemory 实例，写入 cycle_reflections 后同时写入 ChromaDB 供语义召回
 
     Returns:
         一个符合 LangGraph 节点签名的函数：fn(state) -> updates
@@ -128,6 +130,20 @@ def create_reflector_node(
 
             if success:
                 print(f"[Reflector] 成功写入周期反思: {cycle_type} ({cycle_start_date} ~ {cycle_end_date})")
+                # 同时写入 ChromaDB 供语义召回（若已配置）
+                if chroma_memory and hasattr(chroma_memory, "add_situations"):
+                    try:
+                        situation = _build_situation_for_chroma(
+                            symbol=symbol,
+                            cycle_start_date=cycle_start_date,
+                            cycle_end_date=cycle_end_date,
+                            summary_text=summary_text,
+                        )
+                        recommendation = _build_recommendation_from_reflection_json(reflection_json)
+                        chroma_memory.add_situations([(situation, recommendation)])
+                        print("[Reflector] 已同步写入 ChromaDB")
+                    except Exception as chroma_err:
+                        print(f"[Reflector] ChromaDB 写入失败（已忽略）: {chroma_err}")
             else:
                 print(f"[Reflector] 写入周期反思失败")
 
@@ -159,6 +175,34 @@ def create_reflector_node(
             }
 
     return reflector_node
+
+
+def _build_situation_for_chroma(
+    symbol: str,
+    cycle_start_date: str,
+    cycle_end_date: str,
+    summary_text: str,
+) -> str:
+    """构建 ChromaDB situation 文本，用于语义相似检索。"""
+    # 截断 summary 避免过长
+    summary_trunc = summary_text[:800] + "..." if len(summary_text) > 800 else summary_text
+    return f"标的 {symbol}，周期 {cycle_start_date}~{cycle_end_date}。{cycle_start_date}至{cycle_end_date}交易表现摘要：\n{summary_trunc}"
+
+
+def _build_recommendation_from_reflection_json(reflection_json: Dict[str, Any]) -> str:
+    """从 reflection JSON 构造 recommendation 文本。"""
+    parts = []
+    if reflection_json.get("key_insights"):
+        parts.append(f"关键洞察：{reflection_json['key_insights']}")
+    if reflection_json.get("error_patterns"):
+        parts.append(f"错误模式：{json.dumps(reflection_json['error_patterns'], ensure_ascii=False)}")
+    if reflection_json.get("success_patterns"):
+        parts.append(f"成功模式：{json.dumps(reflection_json['success_patterns'], ensure_ascii=False)}")
+    if reflection_json.get("strategy_conditions"):
+        parts.append(f"策略适用条件：{json.dumps(reflection_json['strategy_conditions'], ensure_ascii=False)}")
+    if reflection_json.get("environment_biases"):
+        parts.append(f"环境判断偏差：{json.dumps(reflection_json['environment_biases'], ensure_ascii=False)}")
+    return "\n".join(parts) if parts else "无结构化反思内容。"
 
 
 def _format_summaries_for_reflection(summaries: List[Dict[str, Any]]) -> str:
@@ -226,4 +270,3 @@ def _get_reflector_user_prompt(
 4. 是否存在对市场状态的误判？如何改进？
 
 请输出 JSON 格式的反思报告。"""
-

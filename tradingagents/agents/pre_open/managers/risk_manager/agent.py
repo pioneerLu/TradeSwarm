@@ -66,8 +66,10 @@ def create_risk_manager(llm: BaseChatModel, memory: Any) -> Callable[[AgentState
 
         history = prev_debate.get("history", "")
 
-        # 2. 从四个 Analyst 的 MemorySummary 中构造当前情境
-        curr_situation = build_curr_situation_from_summaries(state)
+        # 2. 从四个 Analyst 的 MemorySummary 中构造当前情境（含 7 日脉络，便于语义召回）
+        curr_situation = build_curr_situation_from_summaries(
+            state, include_history=True, max_length=4000
+        )
         past_memories = memory.get_memories(curr_situation, n_matches=2)
 
         past_memory_str = ""
@@ -91,9 +93,9 @@ def create_risk_manager(llm: BaseChatModel, memory: Any) -> Callable[[AgentState
         sentiment_today_report = sentiment_summary["today_report"]
         fundamentals_today_report = fundamentals_summary["today_report"]
 
-        # 3. 读取 research_summary 中的 investment_plan
+        # 3. 读取交易员计划：优先使用 Trader 的 trader_investment_plan，fallback 到 Research 的 investment_plan
         research_summary: Dict[str, Any] | None = state.get("research_summary")  # type: ignore[assignment]
-        trader_plan = (
+        trader_plan = state.get("trader_investment_plan") or (
             research_summary.get("investment_plan", "")  # type: ignore[union-attr]
             if research_summary is not None
             else state.get("investment_plan", "")
@@ -103,19 +105,31 @@ def create_risk_manager(llm: BaseChatModel, memory: Any) -> Callable[[AgentState
         current_position = state.get("current_position")
         portfolio_state = state.get("portfolio_state")
         
-        # 格式化仓位信息
+        # 格式化仓位信息（防止 None 参与数值格式化导致异常）
         position_info = ""
         if current_position:
+            shares = current_position.get("shares") or 0.0
+            entry_price = current_position.get("entry_price") or 0.0
+            entry_date = current_position.get("entry_date") or ""
+            current_price = current_position.get("current_price") or 0.0
+            pnl = current_position.get("pnl") or 0.0
+            pnl_pct = current_position.get("pnl_pct") or 0.0
+
+            sl_raw = current_position.get("stop_loss_price")
+            sl_str = f"${sl_raw:.2f}" if sl_raw is not None else "未设置"
+            tp_raw = current_position.get("take_profit_price")
+            tp_str = f"${tp_raw:.2f}" if tp_raw is not None else "未设置"
+
             position_info = f"""
 当前持仓信息：
-- 持仓股数: {current_position.get('shares', 0):.0f}
-- 建仓价格: ${current_position.get('entry_price', 0):.2f}
-- 建仓日期: {current_position.get('entry_date', '')}
-- 当前价格: ${current_position.get('current_price', 0):.2f}
-- 盈亏金额: ${current_position.get('pnl', 0):.2f}
-- 盈亏百分比: {current_position.get('pnl_pct', 0):.2f}%
-- 止损价: ${current_position.get('stop_loss_price', 0):.2f if current_position.get('stop_loss_price') else '未设置'}
-- 止盈价: ${current_position.get('take_profit_price', 0):.2f if current_position.get('take_profit_price') else '未设置'}
+- 持仓股数: {shares:.0f}
+- 建仓价格: ${entry_price:.2f}
+- 建仓日期: {entry_date}
+- 当前价格: ${current_price:.2f}
+- 盈亏金额: ${pnl:.2f}
+- 盈亏百分比: {pnl_pct:.2f}%
+- 止损价: {sl_str}
+- 止盈价: {tp_str}
 """
         else:
             position_info = "\n当前未持仓。\n"
@@ -123,12 +137,16 @@ def create_risk_manager(llm: BaseChatModel, memory: Any) -> Callable[[AgentState
         # 格式化组合状态
         portfolio_info = ""
         if portfolio_state:
+            total_value = portfolio_state.get("total_value") or 0.0
+            cash = portfolio_state.get("cash") or 0.0
+            positions_value = portfolio_state.get("positions_value") or 0.0
+            total_return = portfolio_state.get("total_return") or 0.0
             portfolio_info = f"""
 组合状态：
-- 总资产: ${portfolio_state.get('total_value', 0):,.2f}
-- 现金: ${portfolio_state.get('cash', 0):,.2f}
-- 持仓市值: ${portfolio_state.get('positions_value', 0):,.2f}
-- 总收益率: {portfolio_state.get('total_return', 0):.2f}%
+- 总资产: ${total_value:,.2f}
+- 现金: ${cash:,.2f}
+- 持仓市值: ${positions_value:,.2f}
+- 总收益率: {total_return:.2f}%
 """
 
         # 4. 加载并渲染 prompt 模板

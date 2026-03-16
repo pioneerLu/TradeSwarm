@@ -61,8 +61,9 @@ def create_research_manager(llm: BaseChatModel, memory: Any) -> Callable[[AgentS
         history = prev_debate.get("history", "")
 
         # 2. 从四个 Analyst 的 MemorySummary 中构造当前情境，并检索历史经验记忆
-        curr_situation = build_curr_situation_from_summaries(state)
-
+        curr_situation = build_curr_situation_from_summaries(
+            state, include_history=True, max_length=4000
+        )
         past_memories = memory.get_memories(curr_situation, n_matches=2)
         past_memory_str = ""
         for rec in past_memories:

@@ -11,7 +11,7 @@ from typing import Any
 
 from tradingagents.agents.post_close.reflector import create_reflector_node
 from tradingagents.agents.utils.memory_db_helper import MemoryDBHelper
-from tradingagents.graph.utils import load_llm_from_config
+from tradingagents.graph.utils import load_llm_from_config, create_chroma_memory_if_available
 from tradingagents.agents.utils.agentstate.agent_states import AgentState
 
 
@@ -29,7 +29,10 @@ def run_reflector(
     db_helper = MemoryDBHelper(db_path)
 
     try:
-        reflector_node = create_reflector_node(llm=llm, db_helper=db_helper)
+        chroma_memory = create_chroma_memory_if_available()
+        reflector_node = create_reflector_node(
+            llm=llm, db_helper=db_helper, chroma_memory=chroma_memory
+        )
         state: AgentState = {
             "cycle_type": cycle_type,
             "cycle_start_date": start_date,

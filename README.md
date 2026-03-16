@@ -13,6 +13,8 @@ pip install -r requirements.txt
 # 2. 配置环境变量
 export DASHSCOPE_API_KEY="your-api-key"
 export ALPHA_VANTAGE_API_KEY="your-alpha-vantage-key"
+# 可选：行情 fallback（yfinance 失败时用 Financial Data API Free 级别）
+export FINANCIALDATA_API_KEY="your-financialdata-key"
 
 # 3. 创建配置文件 config/config.yaml
 
@@ -206,13 +208,50 @@ History Maintainer → analyst_summaries 表（7 日滚动摘要）→ 下一交
 
 ```bash
 # 单标的回测
-python run_single_symbol_backtest.py --symbol NVDA --start 2025-11-06 --end 2025-11-08
+python run_single_symbol_backtest.py --symbol NVDA --start 2026-01-13 --end 2026-02-13
+
+# 指定初始持仓（例如首日持有 50 股 NVDA）
+python run_single_symbol_backtest.py --symbol NVDA --start 2026-01-13 --end 2026-01-19 --initial-shares 200
+
+# 使用预构建报告快速回测（不调用 Analyst LLM）
+python run_single_symbol_backtest.py --symbol NVDA --start 2026-01-13 --end 2026-01-19 --use-db-reports-only --initial-shares 200
+
+# 显示 Pre-Open 各节点进度（便于定位卡住位置，每个 LLM 节点约 1–2 分钟）
+python run_single_symbol_backtest.py --symbol NVDA --start 2026-01-13 --end 2026-01-19 --use-db-reports-only --verbose
 
 # 多标的、多周期回测
 python run_multi_symbol_backtest.py --start_date 2024-01-01 --end_date 2024-01-31 --cycle_type monthly
 
 # 周期反思
 python run_reflector_cycle.py --cycle_type weekly --start_date 2024-01-01 --end_date 2024-01-07
+```
+
+## 数据构建与维护
+
+```bash
+# 构建 Analyst 报告到 memory.db（指定日期或最近 N 个交易日）
+python build_analyst_dataset.py --symbol NVDA --dates 2026-02-12 --db memory.db --use-silicon --no-export
+python build_analyst_dataset.py --symbol NVDA --end 2026-02-12 --trading-days 7 --db memory.db --use-silicon
+
+# 仅补全失败/缺失的报告，节省 API
+python build_analyst_dataset.py --symbol NVDA --dates 2026-02-12 --only-missing --db memory.db --use-silicon --no-export
+
+# 批量补全 API 失败报告（从后往前，每日期间隔 5 分钟）
+python rebuild_failed_reports.py
+
+# 检查失败报告
+python check_api_failures.py   # 输出到 api_failures_report.txt
+```
+
+## 数据查看
+
+```bash
+# 命令行查看报告
+python view_report.py --list                    # 列出 NVDA 可用日期
+python view_report.py 2026-02-12 fundamentals  # 查看指定报告
+
+# Web 界面查看（http://127.0.0.1:5555）
+python -m db_viewer.app
 ```
 
 ## 项目结构
@@ -223,11 +262,16 @@ TradeSwarm/
 │   ├── agents/            # Agent 实现
 │   ├── graph/            # LangGraph 图定义
 │   └── core/             # 核心模块（portfolio, selection 等）
-├── datasources/          # 数据源模块
-├── config/               # 配置文件
-├── docs/                 # 文档
-├── run_*.py             # 运行脚本
-└── requirements.txt     # 依赖
+├── datasources/           # 数据源模块
+├── db_viewer/             # memory.db Web 查看器
+├── config/                # 配置文件
+├── docs/                  # 文档
+├── run_*.py               # 运行脚本
+├── build_analyst_dataset.py  # 构建 Analyst 数据集
+├── rebuild_failed_reports.py # 补全 API 失败报告
+├── check_api_failures.py    # 检查失败报告
+├── view_report.py           # 查看单条报告
+└── requirements.txt
 ```
 
 ## 关键代码位置
@@ -244,13 +288,23 @@ TradeSwarm/
 | **数据适配器** | `tradingagents/core/data_adapter.py` | 数据源统一接口 |
 | **数据库操作** | `tradingagents/agents/utils/memory_db_helper.py` | SQLite 数据库操作 |
 
+## 文档索引
+
+| 文档 | 说明 |
+|------|------|
+| `docs/HANDOVER.md` | 项目交接文档（架构、模块、状态总览） |
+| `docs/开发日志.md` | HOLD 修复、数据构建、Bug 修复、功能增强记录 |
+| `KNOWN_ISSUES.md` | 已知问题与限制 |
+| `Project_TODOs.md` | 项目待办与规划 |
+
 ## 注意事项
 
-1. **API 限制**：Alpha Vantage 免费版 5 次/分钟，500 次/天，系统已实现多 Key 轮询和缓存
+1. **API 限制**：Alpha Vantage 免费版 5 次/分钟，500 次/天，系统已实现多 Key 轮询和缓存；数据构建时建议使用 `--only-missing` 仅补失败报告
 2. **数据库**：首次运行自动创建 SQLite 数据库（`memory.db`）
 3. **配置**：需要创建 `config/config.yaml`，参考模板或 README 中的配置示例
 4. **图内 vs 图外**：Pre-Open 图只包含决策逻辑，Market Open 和 Post Close 在图外执行
+5. **已知问题**：详见 `KNOWN_ISSUES.md`；开发记录与修复历史见 `docs/开发日志.md`
 
 ---
 
-**最后更新**: 2026-02-13
+**最后更新**: 2026-02-27

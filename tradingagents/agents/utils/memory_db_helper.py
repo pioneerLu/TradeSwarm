@@ -9,7 +9,7 @@ Memory DB 交互工具模块
 - 统计信息
 """
 
-from typing import Any, Dict, List, Optional
+from typing import Any, Callable, Dict, List, Optional
 from datetime import datetime, timedelta
 import sqlite3
 from pathlib import Path
@@ -22,15 +22,22 @@ class MemoryDBHelper:
     提供与 memory.db 数据库交互的完整功能。
     """
     
-    def __init__(self, db_path: str = "memory.db") -> None:
+    def __init__(
+        self,
+        db_path: str = "memory.db",
+        trading_dates_resolver: Optional[Callable[[str, int], List[str]]] = None,
+    ) -> None:
         """
         初始化数据库连接。
         
         Args:
             db_path: 数据库文件路径，默认为 "memory.db"
+            trading_dates_resolver: 可选，用于获取交易日历。签名为 (end_date, n) -> 最近 n 个交易日列表。
+                若提供，query_history_reports 将按交易日而非自然日回溯；否则回退到 date(?, '-n days')。
         """
         self.db_path = Path(db_path)
         self.conn: Optional[sqlite3.Connection] = None
+        self.trading_dates_resolver = trading_dates_resolver
         self._ensure_table_exists()
     
     def _ensure_table_exists(self) -> None:
@@ -203,7 +210,50 @@ class MemoryDBHelper:
             if self.conn:
                 self.conn.rollback()
             return False
-    
+
+    def insert_report_or_update(
+        self,
+        analyst_type: str,
+        symbol: str,
+        trade_date: str,
+        report_content: str,
+    ) -> bool:
+        """
+        插入或更新报告：若已存在相同 (analyst_type, symbol, trade_date) 则更新内容，否则插入。
+        保证每个 (analyst_type, symbol, trade_date) 仅保留一条记录，避免重复。
+        """
+        try:
+            conn = self._get_connection()
+            cursor = conn.cursor()
+            cursor.execute(
+                """
+                SELECT id FROM analyst_reports
+                WHERE analyst_type = ? AND symbol = ? AND trade_date = ?
+                ORDER BY id DESC LIMIT 1
+                """,
+                (analyst_type, symbol, trade_date),
+            )
+            row = cursor.fetchone()
+            if row:
+                report_id = row[0]
+                cursor.execute(
+                    """
+                    UPDATE analyst_reports SET report_content = ?, created_at = CURRENT_TIMESTAMP WHERE id = ?
+                    """,
+                    (report_content, report_id),
+                )
+                conn.commit()
+                cursor.close()
+                print(f"[OK] 已更新报告: {analyst_type} - {symbol} - {trade_date}")
+                return True
+            cursor.close()
+            return self.insert_report(analyst_type, symbol, trade_date, report_content)
+        except Exception as e:
+            print(f"[ERROR] 插入/更新报告失败: {e}")
+            if self.conn:
+                self.conn.rollback()
+            return False
+
     def query_today_report(
         self,
         analyst_type: str,
@@ -261,7 +311,7 @@ class MemoryDBHelper:
             analyst_type: 分析师类型
             symbol: 股票代码
             trade_date: 交易日期（基准日期）
-            lookback_days: 回溯天数，默认 7 天
+            lookback_days: 回溯交易日数，默认 7 天。若提供 trading_dates_resolver 则按交易日回溯，否则按自然日。
             
         Returns:
             报告列表，每个元素包含 id, trade_date, report_content, created_at
@@ -269,7 +319,27 @@ class MemoryDBHelper:
         try:
             conn = self._get_connection()
             cursor = conn.cursor()
-            
+
+            if self.trading_dates_resolver:
+                dates = self.trading_dates_resolver(trade_date, lookback_days)
+                if dates:
+                    placeholders = ",".join("?" * len(dates))
+                    sql = f"""
+                    SELECT id, trade_date, report_content, created_at
+                    FROM analyst_reports
+                    WHERE analyst_type=? AND symbol=? AND trade_date IN ({placeholders})
+                        AND report_content IS NOT NULL AND report_content != ''
+                    ORDER BY trade_date ASC, created_at ASC
+                    """
+                    cursor.execute(sql, (analyst_type, symbol) + tuple(dates))
+                    results = cursor.fetchall()
+                    cursor.close()
+                    reports = [
+                        {"id": r[0], "trade_date": r[1], "report_content": r[2], "created_at": r[3]}
+                        for r in results
+                    ]
+                    return reports
+
             sql = """
             SELECT id, trade_date, report_content, created_at
             FROM analyst_reports
@@ -281,7 +351,7 @@ class MemoryDBHelper:
                 AND report_content != ''
             ORDER BY trade_date ASC, created_at ASC
             """.format(lookback_days)
-            
+
             cursor.execute(sql, (analyst_type, symbol, trade_date, trade_date))
             results = cursor.fetchall()
             cursor.close()
@@ -1003,6 +1073,65 @@ class MemoryDBHelper:
         except Exception as e:
             print(f"[ERROR] 查询 cycle reflection 失败: {e}")
             return None
+
+    def query_cycle_reflections_by_symbol(
+        self,
+        symbol: str,
+        cycle_type: str = "weekly",
+        limit: int = 5,
+    ) -> List[Dict[str, Any]]:
+        """
+        按 symbol 查询最近的周期反思记录，用于 past_memory_str 召回。
+
+        Args:
+            symbol: 股票代码
+            cycle_type: 周期类型（'weekly' 或 'monthly'）
+            limit: 返回条数上限
+
+        Returns:
+            反思记录列表，每条包含 id, cycle_type, cycle_start_date, cycle_end_date,
+            symbol, reflection_content, key_insights, error_patterns, success_patterns,
+            strategy_conditions, environment_biases 等字段
+        """
+        try:
+            conn = self._get_connection()
+            cursor = conn.cursor()
+
+            sql = """
+                SELECT
+                    id, cycle_type, cycle_start_date, cycle_end_date, symbol,
+                    reflection_content, key_insights, error_patterns, success_patterns,
+                    strategy_conditions, environment_biases, created_at, updated_at
+                FROM cycle_reflections
+                WHERE cycle_type = ? AND symbol = ?
+                ORDER BY cycle_end_date DESC, created_at DESC
+                LIMIT ?
+            """
+            cursor.execute(sql, (cycle_type, symbol, limit))
+            rows = cursor.fetchall()
+            cursor.close()
+
+            results = []
+            for row in rows:
+                results.append({
+                    "id": row[0],
+                    "cycle_type": row[1],
+                    "cycle_start_date": row[2],
+                    "cycle_end_date": row[3],
+                    "symbol": row[4],
+                    "reflection_content": row[5],
+                    "key_insights": row[6],
+                    "error_patterns": row[7],
+                    "success_patterns": row[8],
+                    "strategy_conditions": row[9],
+                    "environment_biases": row[10],
+                    "created_at": row[11],
+                    "updated_at": row[12],
+                })
+            return results
+        except Exception as e:
+            print(f"[ERROR] 按 symbol 查询 cycle reflections 失败: {e}")
+            return []
 
     def __enter__(self):
         """上下文管理器入口。"""
