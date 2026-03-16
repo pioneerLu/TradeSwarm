@@ -1,0 +1,96 @@
+# Financial Data API 测试结果
+# 时间: 2026-03-15T17:52:47.609495
+# Base URL: https://financialdata.net/api/v1
+
+
+================================================================================
+
+## stock-prices
+  订阅级别: Free  用途: 行情 OHLCV，可作 DataAdapter/策略 备用
+  参数: {'identifier': 'NVDA'}
+
+  结果: 列表，共 300 条
+  预览 (前3条):
+[
+  {
+    "trading_symbol": "NVDA",
+    "date": "2026-03-13",
+    "open": 184.92,
+    "high": 186.09,
+    "low": 179.94,
+    "close": 180.25,
+    "volume": 160988400.0
+  },
+  {
+    "trading_symbol": "NVDA",
+    "date": "2026-03-12",
+    "open": 184.05,
+    "high": 184.94,
+    "low": 181.75,
+    "close": 183.14,
+    "volume": 155762700.0
+  },
+  {
+    "trading_symbol": "NVDA",
+    "date": "2026-03-11",
+    "open": 185.91,
+    "high": 187.62,
+    "low": 184.45,
+    "close": 186.03,
+    "volume": 145280400.0
+  }
+]
+
+
+================================================================================
+
+## company-information
+  订阅级别: Standard  用途: 公司信息，对应 get_company_info
+  参数: {'identifier': 'NVDA'}
+
+  错误: HTTP 401: 
+
+
+================================================================================
+
+## key-metrics
+  订阅级别: Standard  用途: 关键指标 P/E 等，对应 fundamentals 估值
+  参数: {'identifier': 'NVDA'}
+
+  错误: HTTP 401: 
+
+
+================================================================================
+
+## income-statements
+  订阅级别: Standard  用途: 利润表，对应财务报表
+  参数: {'identifier': 'NVDA', 'period': 'year'}
+
+  错误: HTTP 401: 
+
+
+================================================================================
+
+## balance-sheet-statements
+  订阅级别: Standard  用途: 资产负债表
+  参数: {'identifier': 'NVDA', 'period': 'year'}
+
+  错误: HTTP 401: 
+
+
+================================================================================
+
+## press-releases
+  订阅级别: Premium  用途: 公司新闻/公告，对应 News Analyst 部分数据
+  参数: {'identifier': 'NVDA'}
+
+  错误: HTTP 401: 
+
+
+================================================================================
+
+## earnings-releases
+  订阅级别: Standard  用途: 业绩公告，对应 earnings
+  参数: {'identifier': 'NVDA'}
+
+  错误: HTTP 401: 
