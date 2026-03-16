@@ -177,6 +177,7 @@ test_output/
 *.tmp
 test_output.log
 test_output*.log
+analyst_dataset_*.json
 
 # Test directory and test files
 test/
@@ -192,8 +193,10 @@ test_results/
 test.db
 *.db-journal
 
-# Sample data files
+# Sample / export data files
 test_db_export.json
+*_sample.json
+api_failures_report.txt
 
 # Research output and reports
 research_output/

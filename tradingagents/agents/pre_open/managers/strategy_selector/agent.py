@@ -156,8 +156,10 @@ def create_strategy_selector(
             research_summary.get("investment_plan", "") if research_summary else ""
         )
         
-        # 5. 构建当前情境（用于检索历史记忆，可选）
-        curr_situation = build_curr_situation_from_summaries(state)
+        # 5. 构建当前情境（用于检索历史记忆，含 7 日脉络）
+        curr_situation = build_curr_situation_from_summaries(
+            state, include_history=True, max_length=4000
+        )
         past_memories = memory.get_memories(curr_situation, n_matches=2) if memory else []
         
         past_memory_str = ""

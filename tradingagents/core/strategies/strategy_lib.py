@@ -421,19 +421,51 @@ def range_trading_strategy(df: pd.DataFrame, is_holding: bool = False) -> Strate
             return StrategyResult(Signal.HOLD, 0.3, 0.0, 0.0, "未触及下轨")
 
 
-# ==================== 策略6: 默认择时策略（包装现有MarketTimer） ====================
-# 将现有的MarketTimer包装为统一接口
-# 注意：此策略需要在run_portfolio.py中特殊处理，因为需要MarketTimer实例
+# ==================== 策略6: 默认择时策略 ====================
+# 兜底策略：宽松 MA20 规则，在 Trader HOLD 或其它策略无信号时提供 BUY/SELL 可能
 
 def default_timing_strategy(df: pd.DataFrame, is_holding: bool = False) -> StrategyResult:
     """
-    默认择时策略（包装现有MarketTimer）
+    默认择时策略（兜底）
     
-    注意：此函数在run_portfolio.py中会被特殊处理，直接使用MarketTimer
-    这里返回HOLD作为占位符
+    宽松规则：
+    - 未持仓：价格 > MA20 则 BUY
+    - 已持仓：价格 < MA20 则 SELL
+    - 固定止损 5%，止盈 10%
     """
-    # 此策略在run_portfolio.py中直接使用MarketTimer，不通过此函数
-    return StrategyResult(Signal.HOLD, 0.0, 0.0, 0.0, "使用MarketTimer")
+    if df is None or len(df) < 20:
+        return StrategyResult(Signal.HOLD, 0.0, 0.0, 0.0, "数据不足")
+    
+    close = df['Close']
+    ma20 = close.rolling(20).mean()
+    current_price = close.iloc[-1]
+    current_ma20 = ma20.iloc[-1] if not ma20.empty and not pd.isna(ma20.iloc[-1]) else current_price
+    
+    stop_loss_pct = 0.05
+    take_profit_pct = 0.10
+    stop_loss = current_price * (1 - stop_loss_pct)
+    take_profit = current_price * (1 + take_profit_pct)
+    
+    if is_holding:
+        if current_price < current_ma20:
+            return StrategyResult(
+                Signal.SELL,
+                0.6,
+                stop_loss,
+                take_profit,
+                f"default_timing: 价格{current_price:.2f} < MA20{current_ma20:.2f}"
+            )
+        return StrategyResult(Signal.HOLD, 0.5, stop_loss, take_profit, "default_timing: 持有")
+    else:
+        if current_price > current_ma20:
+            return StrategyResult(
+                Signal.BUY,
+                0.6,
+                stop_loss,
+                take_profit,
+                f"default_timing: 价格{current_price:.2f} > MA20{current_ma20:.2f}"
+            )
+        return StrategyResult(Signal.HOLD, 0.3, 0.0, 0.0, "default_timing: 无买入信号")
 
 
 # ==================== 策略映射 ====================

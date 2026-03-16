@@ -3,7 +3,7 @@
 从 Summary 节点开始运行完整 Graph 流程
 
 功能：
-1. 从 test.db 读取 Analyst 报告
+1. 从 memory.db 读取 Analyst 报告
 2. 从 Summary 节点开始运行完整 Graph
 3. 保存每个 Agent 的中间输出
 """
@@ -275,7 +275,7 @@ def run_full_graph(
     trade_date: str,
     llm: Any,
     memory: Any,
-    db_path: str = "test.db",
+    db_path: str = "memory.db",
     output_dir: str = "graph_outputs"
 ) -> Dict[str, Any]:
     """
@@ -383,9 +383,9 @@ def main():
     print("="*80)
     
     # 配置参数
-    symbol = "AAPL"
+    symbol = "NVDA"
     trade_date = "2026-02-05"  # 使用指定的交易日期
-    db_path = "demo_data.db"  # 使用 demo_data.db
+    db_path = "memory.db"  # 使用 demo_data.db
     output_dir = "graph_outputs"
     
     # 删除旧的输出目录

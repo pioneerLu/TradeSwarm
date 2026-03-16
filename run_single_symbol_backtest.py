@@ -37,63 +37,69 @@ from tradingagents.agents.analysts.market_analyst.agent import create_market_ana
 from tradingagents.agents.analysts.news_analyst.agent import create_news_analyst
 from tradingagents.agents.analysts.fundamentals_analyst.agent import create_fundamentals_analyst
 from tradingagents.agents.analysts.social_media_analyst.agent import create_social_media_analyst
+from tradingagents.agents.utils.json_parser import extract_json_from_text
+from tradingagents.agents.pre_open.managers.strategy_selector.agent import parse_trader_output
+
+try:
+    from debug_backtest_log import set_log_file, log as debug_log
+except ImportError:
+    def set_log_file(_): ...
+    def debug_log(*_, **__): ...
 
 
 class DatabaseMemory:
-    """从数据库读取历史经验的 Memory 类"""
-    
-    def __init__(self, db_path: str, symbol: str, limit: int = 10):
+    """从 cycle_reflections 读取历史经验的 Memory 类，供 past_memory_str 使用"""
+
+    def __init__(self, db_path: str, symbol: str, limit: int = 5):
         self.db_helper = MemoryDBHelper(db_path)
         self.symbol = symbol
         self.limit = limit
-    
-    def get_memories(self, current_situation: str, n_matches: int = 2) -> List[Dict[str, Any]]:
-        """从数据库查询历史报告"""
+
+    def get_memories(self, current_situation: str, n_matches: int = 3) -> List[Dict[str, Any]]:
+        """从 cycle_reflections 查询周期反思记录，构造 recommendation 供 agent 使用"""
         try:
-            conn = self.db_helper._get_connection()
-            cursor = conn.cursor()
-            
-            sql = """
-            SELECT analyst_type, trade_date, report_content
-            FROM analyst_reports
-            WHERE symbol = ?
-                AND report_content IS NOT NULL
-                AND report_content != ''
-            ORDER BY trade_date DESC, created_at DESC
-            LIMIT ?
-            """
-            
-            cursor.execute(sql, (self.symbol, self.limit))
-            results = cursor.fetchall()
-            cursor.close()
-            
-            if not results:
+            reflections = self.db_helper.query_cycle_reflections_by_symbol(
+                symbol=self.symbol,
+                cycle_type="weekly",
+                limit=max(self.limit, n_matches),
+            )
+            if not reflections:
                 return []
-            
+
             memories = []
-            for row in results[:n_matches]:
-                analyst_type = row[0]
-                trade_date = row[1]
-                report_content = row[2]
-                
-                situation = report_content[:200] + "..." if len(report_content) > 200 else report_content
-                recommendation = "基于历史数据分析，建议谨慎操作，关注市场变化。"
-                
+            for r in reflections[:n_matches]:
+                recommendation = _build_recommendation_from_reflection(r)
+                matched_situation = f"周期 {r.get('cycle_start_date', '')} ~ {r.get('cycle_end_date', '')}"
                 memories.append({
-                    "matched_situation": situation,
+                    "matched_situation": matched_situation,
                     "recommendation": recommendation,
-                    "similarity_score": 0.7,
+                    "similarity_score": 0.8,
                 })
-            
             return memories
-            
+
         except Exception as e:
-            print(f"[WARN] 从数据库读取记忆失败: {e}")
+            print(f"[WARN] 从 cycle_reflections 读取记忆失败: {e}")
             return []
-    
+
     def close(self) -> None:
         """关闭数据库连接"""
         self.db_helper.close()
+
+
+def _build_recommendation_from_reflection(r: Dict[str, Any]) -> str:
+    """从 cycle_reflection 记录构造 recommendation 文本"""
+    parts = []
+    if r.get("key_insights"):
+        parts.append(f"关键洞察：{r['key_insights']}")
+    if r.get("error_patterns"):
+        parts.append(f"错误模式：{r['error_patterns']}")
+    if r.get("success_patterns"):
+        parts.append(f"成功模式：{r['success_patterns']}")
+    if r.get("strategy_conditions"):
+        parts.append(f"策略适用条件：{r['strategy_conditions']}")
+    if r.get("environment_biases"):
+        parts.append(f"环境判断偏差：{r['environment_biases']}")
+    return "\n".join(parts) if parts else "无结构化反思内容。"
 
 
 def get_trading_dates(start_date: str, end_date: str, data_adapter: DataAdapter) -> List[str]:
@@ -139,6 +145,8 @@ def run_single_day(
     data_adapter: DataAdapter,
     output_dir: Path,
     previous_total_value: Optional[float] = None,
+    use_db_reports_only: bool = False,
+    verbose: bool = False,
 ) -> Dict[str, Any]:
     """
     运行单日的完整流程：Pre-Open → Market Open → Post Close
@@ -172,81 +180,76 @@ def run_single_day(
     }
     
     try:
-        # ========== 运行 Analyst 生成报告 ==========
-        print(f"\n[Analyst] 开始生成分析师报告...")
-        try:
-            # 创建 Analyst 节点
-            market_analyst = create_market_analyst(llm)
-            news_analyst = create_news_analyst(llm)
-            fundamentals_analyst = create_fundamentals_analyst(llm)
-            social_media_analyst = create_social_media_analyst(llm)
-            
-            analysts = [
-                ("market", market_analyst, "market_report"),
-                ("news", news_analyst, "news_report"),
-                ("fundamentals", fundamentals_analyst, "fundamentals_report"),
-                ("sentiment", social_media_analyst, "sentiment_report"),
-            ]
-            
-            analyst_results = {}
-            for analyst_type, analyst_func, report_key in analysts:
-                print(f"  [运行] {analyst_type.upper()} Analyst...")
-                try:
-                    # 准备初始状态
-                    initial_state: AgentState = {
-                        "company_of_interest": symbol,
-                        "trade_date": trade_date,
-                        report_key: "",
-                        "messages": [],
-                    }
-                    
-                    # 运行 Analyst
-                    result = analyst_func(initial_state)
-                    
-                    # 提取报告内容
-                    report_content = result.get(report_key, "")
-                    if not report_content:
-                        # 尝试从 messages 中提取
-                        messages = result.get("messages", [])
-                        for msg in reversed(messages):
-                            if hasattr(msg, "content") and msg.content:
-                                report_content = msg.content
-                                break
-                    
-                    if report_content:
-                        # 保存到数据库
-                        success = db_helper.insert_report(
-                            analyst_type=analyst_type,
-                            symbol=symbol,
-                            trade_date=trade_date,
-                            report_content=report_content
-                        )
-                        if success:
-                            analyst_results[analyst_type] = "ok"
+        # ========== Analyst 报告：从 DB 读取或运行 LLM 生成 ==========
+        analyst_types = ("market", "news", "fundamentals", "sentiment")
+        analyst_results = {}
+
+        if use_db_reports_only:
+            print(f"\n[Analyst] 从 memory.db 读取报告（不调用 LLM）...")
+            for analyst_type in analyst_types:
+                content = db_helper.query_today_report(analyst_type, symbol, trade_date)
+                if content and content.strip():
+                    analyst_results[analyst_type] = "ok"
+                    print(f"  [OK] {analyst_type.upper()} 从 DB 读取")
+                else:
+                    analyst_results[analyst_type] = "missing"
+                    print(f"  [WARN] {analyst_type.upper()} 未找到报告")
+            day_result["analyst_results"] = analyst_results
+        else:
+            print(f"\n[Analyst] 开始生成分析师报告...")
+            try:
+                market_analyst = create_market_analyst(llm)
+                news_analyst = create_news_analyst(llm)
+                fundamentals_analyst = create_fundamentals_analyst(llm)
+                social_media_analyst = create_social_media_analyst(llm)
+                analysts = [
+                    ("market", market_analyst, "market_report"),
+                    ("news", news_analyst, "news_report"),
+                    ("fundamentals", fundamentals_analyst, "fundamentals_report"),
+                    ("sentiment", social_media_analyst, "sentiment_report"),
+                ]
+                for analyst_type, analyst_func, report_key in analysts:
+                    print(f"  [运行] {analyst_type.upper()} Analyst...")
+                    try:
+                        initial_state: AgentState = {
+                            "company_of_interest": symbol,
+                            "trade_date": trade_date,
+                            report_key: "",
+                            "messages": [],
+                        }
+                        result = analyst_func(initial_state)
+                        report_content = result.get(report_key, "")
+                        if not report_content:
+                            for msg in reversed(result.get("messages", [])):
+                                if hasattr(msg, "content") and msg.content:
+                                    report_content = msg.content
+                                    break
+                        if report_content:
+                            success = db_helper.insert_report(
+                                analyst_type=analyst_type,
+                                symbol=symbol,
+                                trade_date=trade_date,
+                                report_content=report_content,
+                            )
+                            analyst_results[analyst_type] = "ok" if success else "save_failed"
                             print(f"    [OK] {analyst_type.upper()} Analyst 报告已保存")
                         else:
-                            analyst_results[analyst_type] = "save_failed"
-                            print(f"    [FAIL] {analyst_type.upper()} Analyst 保存失败")
-                    else:
-                        analyst_results[analyst_type] = "no_content"
-                        print(f"    [WARN] {analyst_type.upper()} Analyst 未生成报告内容")
-                        
-                except Exception as e:
-                    analyst_results[analyst_type] = f"error: {str(e)}"
-                    print(f"    [ERROR] {analyst_type.upper()} Analyst 运行失败: {e}")
-                    import traceback
-                    traceback.print_exc()
-            
-            day_result["analyst_results"] = analyst_results
-            print(f"[Analyst] 完成")
-            
-        except Exception as e:
-            error_msg = f"Analyst 执行失败: {e}"
-            print(f"[ERROR] {error_msg}")
-            day_result["errors"].append(error_msg)
-            import traceback
-            traceback.print_exc()
-        
+                            analyst_results[analyst_type] = "no_content"
+                            print(f"    [WARN] {analyst_type.upper()} Analyst 未生成报告内容")
+                    except Exception as e:
+                        analyst_results[analyst_type] = f"error: {str(e)}"
+                        print(f"    [ERROR] {analyst_type.upper()} Analyst 运行失败: {e}")
+                        import traceback
+                        traceback.print_exc()
+                day_result["analyst_results"] = analyst_results
+                print(f"[Analyst] 完成")
+            except Exception as e:
+                error_msg = f"Analyst 执行失败: {e}"
+                print(f"[ERROR] {error_msg}")
+                day_result["errors"].append(error_msg)
+                import traceback
+                traceback.print_exc()
+
         # ========== Pre-Open 阶段 ==========
         print(f"\n[Pre-Open] 开始分析...")
         try:
@@ -263,10 +266,22 @@ def run_single_day(
                 "portfolio_state": portfolio_manager.get_portfolio_state(),
             }
             
-            # 运行 Graph
+            # 运行 Graph（verbose 时输出每个节点进度，便于定位卡住位置）
             final_state = None
-            for state in graph.stream(initial_state, stream_mode="values"):
-                final_state = state
+            if verbose:
+                for chunk in graph.stream(initial_state, stream_mode=["updates", "values"]):
+                    if isinstance(chunk, (list, tuple)) and len(chunk) >= 2:
+                        mode, data = chunk[0], chunk[1]
+                        if mode == "updates" and isinstance(data, dict):
+                            for node_name in data:
+                                print(f"  [Pre-Open] 完成: {node_name}")
+                        elif mode == "values":
+                            final_state = data
+                    else:
+                        final_state = chunk
+            else:
+                for state in graph.stream(initial_state, stream_mode="values"):
+                    final_state = state
             
             if final_state:
                 day_result["pre_open"] = {
@@ -274,6 +289,18 @@ def run_single_day(
                     "strategy_selection": final_state.get("strategy_selection"),
                     "risk_summary": final_state.get("risk_summary"),
                 }
+                # 诊断日志
+                trader_info = parse_trader_output(final_state.get("trader_investment_plan"))
+                risk_js = extract_json_from_text(
+                    (final_state.get("risk_summary") or {}).get("final_trade_decision", "")
+                ) if final_state.get("risk_summary") else None
+                risk_dec = (risk_js or {}).get("final_decision", "UNKNOWN")
+                debug_log(trade_date, symbol, "PRE_OPEN", {
+                    "trader_action": trader_info.get("action"),
+                    "strategy_selection": final_state.get("strategy_selection") is not None,
+                    "strategy_type": (final_state.get("strategy_selection") or {}).get("strategy_type"),
+                    "risk_decision": risk_dec,
+                })
                 print(f"[Pre-Open] 分析完成")
             else:
                 print(f"[Pre-Open] 未获取到最终状态")
@@ -309,6 +336,14 @@ def run_single_day(
             # 执行 market_open 节点
             market_open_result = market_open_node(market_open_state)
             day_result["market_open"] = market_open_result
+            
+            # 诊断日志
+            exec_log = (market_open_result or {}).get("execution_log", [{}])[0] if market_open_result else {}
+            debug_log(trade_date, symbol, "MARKET_OPEN", {
+                "action": exec_log.get("action"),
+                "reason": exec_log.get("reason"),
+                "price": exec_log.get("price"),
+            })
             
             # 更新 portfolio_manager 的状态（从 market_open_result 中获取）
             if market_open_result:
@@ -529,22 +564,22 @@ def run_single_symbol_backtest(
     start_date: str,
     end_date: str,
     initial_cash: float = 100000.0,
+    initial_shares: float = 0.0,
     db_path: str = "memory.db",
     output_dir: str = "backtest_results",
+    use_db_reports_only: bool = False,
+    verbose: bool = False,
 ) -> Dict[str, Any]:
     """
-    运行单标的多日回测
-    
+    运行单标的多日回测。
+
     Args:
         symbol: 股票代码
-        start_date: 开始日期
-        end_date: 结束日期
+        start_date / end_date: 日期范围
         initial_cash: 初始资金
-        db_path: 数据库路径
+        db_path: 数据库路径（默认 memory.db）
         output_dir: 输出目录
-    
-    Returns:
-        回测结果
+        use_db_reports_only: 若为 True，当日 Analyst 报告不从 LLM 生成，直接从 memory.db 的 analyst_reports 读取。
     """
     print(f"\n{'='*80}")
     print(f"单标的多日回测驱动器")
@@ -554,11 +589,18 @@ def run_single_symbol_backtest(
     print(f"初始资金: ${initial_cash:,.2f}")
     print(f"数据库: {db_path}")
     print(f"输出目录: {output_dir}")
-    
+    if use_db_reports_only:
+        print(f"Analyst 报告: 仅从 DB 读取（不调用 LLM）")
+    if verbose:
+        print(f"详细模式: 显示 Pre-Open 各节点完成进度")
     # 创建输出目录
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
     (output_path / "daily_results").mkdir(parents=True, exist_ok=True)
+    
+    # 初始化诊断日志
+    log_path = output_path / "backtest_debug.log"
+    set_log_file(log_path)
     
     # 初始化组件
     print(f"\n[初始化] 初始化组件...")
@@ -567,10 +609,15 @@ def run_single_symbol_backtest(
     llm = load_llm_from_config()
     print(f"  [OK] LLM 加载成功")
     
-    # 初始化数据库
+    # 初始化数据适配器（需先于 db_helper，用于交易日历）
+    data_adapter = DataAdapter(use_cache=True)
+    print(f"  [OK] 数据适配器初始化成功（使用缓存）")
+    
+    # 初始化数据库（传入交易日历解析器，使 history_report 7 日窗口按交易日回溯）
     if not Path(db_path).exists():
         print(f"[WARN] 数据库 {db_path} 不存在，将创建新数据库")
-    db_helper = MemoryDBHelper(db_path)
+    trading_dates_resolver = lambda end, n: data_adapter.get_last_n_trading_days(end, n)
+    db_helper = MemoryDBHelper(db_path, trading_dates_resolver=trading_dates_resolver)
     print(f"  [OK] 数据库连接成功")
     
     # 创建 Memory
@@ -582,10 +629,6 @@ def run_single_symbol_backtest(
     portfolio_manager.target_symbols = [symbol]  # 设置目标股票
     print(f"  [OK] 组合管理器初始化成功")
     
-    # 初始化数据适配器（使用缓存）
-    data_adapter = DataAdapter(use_cache=True)
-    print(f"  [OK] 数据适配器初始化成功（使用缓存）")
-    
     # 获取交易日历
     print(f"\n[交易日历] 获取交易日历...")
     trading_dates = get_trading_dates(start_date, end_date, data_adapter)
@@ -593,39 +636,67 @@ def run_single_symbol_backtest(
     if len(trading_dates) == 0:
         print(f"[ERROR] 未找到交易日，退出")
         return {}
+
+    # 若指定初始持仓，则在第一个交易日按开盘价建仓一次
+    if initial_shares and initial_shares > 0:
+        first_date = trading_dates[0]
+        price = data_adapter.get_price(symbol, first_date, price_type="open")
+        if price is None:
+            print(f"[WARN] 无法获取 {symbol} 在 {first_date} 的价格，初始持仓忽略")
+        else:
+            # 若成本超出现金，则按最大可买股数下调
+            max_shares = int(portfolio_manager.cash / price) if price > 0 else 0
+            shares = min(initial_shares, max_shares)
+            if shares <= 0:
+                print(f"[WARN] 现金不足以建立初始持仓，初始持仓忽略")
+            else:
+                cost = shares * price
+                portfolio_manager.cash -= cost
+                portfolio_manager.update_position(
+                    symbol=symbol,
+                    shares=shares,
+                    entry_price=price,
+                    entry_date=first_date,
+                    current_price=price,
+                    strategy_type=None,
+                    stop_loss_price=None,
+                    take_profit_price=None,
+                )
+                print(f"[初始化] 初始持仓: {symbol} {shares} 股 @ {price:.2f}，成本 {cost:.2f}，剩余现金 {portfolio_manager.cash:.2f}")
     
     # 运行每日流程
     print(f"\n[回测] 开始回测...")
     daily_results = []
     previous_total_value = initial_cash  # 初始值设为初始资金
-    
-    for i, trade_date in enumerate(trading_dates, 1):
-        print(f"\n进度: {i}/{len(trading_dates)}")
-        
-        day_result = run_single_day(
-            symbol=symbol,
-            trade_date=trade_date,
-            llm=llm,
-            memory=memory,
-            db_helper=db_helper,
-            portfolio_manager=portfolio_manager,
-            data_adapter=data_adapter,
-            output_dir=output_path,
-            previous_total_value=previous_total_value,
-        )
-        daily_results.append(day_result)
-        
-        # 更新前一天的 total_value（用于下一天的计算）
-        previous_total_value = portfolio_manager.total_value
-        
-        # 简单进度显示
-        if i % 5 == 0 or i == len(trading_dates):
-            portfolio_state = portfolio_manager.get_portfolio_state()
-            print(f"\n[进度] {i}/{len(trading_dates)} 完成")
-            print(f"  当前总资产: ${portfolio_manager.total_value:,.2f}")
-            print(f"  当前收益率: {portfolio_manager.total_return:.2f}%")
-    
-    # 生成最终报告
+
+    try:
+        for i, trade_date in enumerate(trading_dates, 1):
+            print(f"\n进度: {i}/{len(trading_dates)}")
+            day_result = run_single_day(
+                symbol=symbol,
+                trade_date=trade_date,
+                llm=llm,
+                memory=memory,
+                db_helper=db_helper,
+                portfolio_manager=portfolio_manager,
+                data_adapter=data_adapter,
+                output_dir=output_path,
+                previous_total_value=previous_total_value,
+                use_db_reports_only=use_db_reports_only,
+                verbose=verbose,
+            )
+            daily_results.append(day_result)
+            previous_total_value = portfolio_manager.total_value
+            if i % 5 == 0 or i == len(trading_dates):
+                print(f"\n[进度] {i}/{len(trading_dates)} 完成")
+                print(f"  当前总资产: ${portfolio_manager.total_value:,.2f}")
+                print(f"  当前收益率: {portfolio_manager.total_return:.2f}%")
+    except Exception as e:
+        print(f"\n[WARN] 回测过程中断: {e}")
+        import traceback
+        traceback.print_exc()
+
+    # 生成最终报告（无论是否跑完全部天数或是否异常，都写入以便查看窗口收益）
     print(f"\n[报告] 生成最终报告...")
     final_portfolio_state = portfolio_manager.get_portfolio_state()
     
@@ -682,23 +753,37 @@ def main():
     import argparse
     
     parser = argparse.ArgumentParser(description="单标的多日回测驱动器")
-    parser.add_argument("--symbol", type=str, default="AAPL", help="股票代码")
+    parser.add_argument("--symbol", type=str, default="NVDA", help="股票代码")
     parser.add_argument("--start", type=str, default="2024-01-02", help="开始日期 (YYYY-MM-DD)")
     parser.add_argument("--end", type=str, default="2024-01-31", help="结束日期 (YYYY-MM-DD)")
     parser.add_argument("--cash", type=float, default=100000.0, help="初始资金")
+    parser.add_argument("--initial-shares", type=float, default=0.0, help="初始持仓股数（在首个交易日按开盘价建仓）")
     parser.add_argument("--db", type=str, default="memory.db", help="数据库路径")
     parser.add_argument("--output", type=str, default="backtest_results", help="输出目录")
-    
+    parser.add_argument(
+        "--use-db-reports-only",
+        action="store_true",
+        help="Analyst 报告不从 LLM 生成，直接从 memory.db 的 analyst_reports 读取（适合已构建好数据集的回测）",
+    )
+    parser.add_argument(
+        "--verbose",
+        "-v",
+        action="store_true",
+        help="显示 Pre-Open 各节点完成进度，便于定位卡住位置",
+    )
     args = parser.parse_args()
-    
+
     try:
         result = run_single_symbol_backtest(
             symbol=args.symbol,
             start_date=args.start,
             end_date=args.end,
             initial_cash=args.cash,
+            initial_shares=args.initial_shares,
             db_path=args.db,
             output_dir=args.output,
+            use_db_reports_only=args.use_db_reports_only,
+            verbose=args.verbose,
         )
         
         if result:

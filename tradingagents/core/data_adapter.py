@@ -7,7 +7,8 @@
 """
 
 import pandas as pd
-from typing import Optional
+from typing import Optional, List
+from datetime import datetime, timedelta
 
 from .data.loader import load_stock_data
 
@@ -34,8 +35,11 @@ class DataAdapter:
             
             if not isinstance(df.index, pd.DatetimeIndex):
                 df.index = pd.to_datetime(df.index)
-            
-            df = df[df.index <= pd.to_datetime(date)]
+            # 与 date 比较时统一时区：若 index 带时区则把截止日转为同一时区，避免 Invalid comparison
+            cutoff = pd.to_datetime(date)
+            if df.index.tz is not None:
+                cutoff = cutoff.tz_localize(df.index.tz)
+            df = df[df.index <= cutoff]
             return df
         except Exception as e:
             print(f"[DataAdapter] 加载 {symbol} 数据失败: {e}")
@@ -49,6 +53,8 @@ class DataAdapter:
                 return None
             
             date_obj = pd.to_datetime(date)
+            if df.index.tz is not None:
+                date_obj = date_obj.tz_localize(df.index.tz)
             if date_obj not in df.index:
                 df = df[df.index <= date_obj]
                 if len(df) == 0:
@@ -65,6 +71,22 @@ class DataAdapter:
             print(f"[DataAdapter] 获取 {symbol} 在 {date} 的 {price_type} 价格失败: {e}")
             return None
     
+    def get_last_n_trading_days(self, end_date: str, n: int, symbol: str = "SPY") -> List[str]:
+        """
+        获取截止到 end_date 的最近 n 个交易日（含 end_date）。
+        用于 history_report 7 日窗口基于真实交易日历。
+        """
+        try:
+            from datetime import datetime, timedelta
+            start = (datetime.strptime(end_date, "%Y-%m-%d") - timedelta(days=max(n * 2, 60))).strftime("%Y-%m-%d")
+            df = self.load_stock_data_until(symbol, end_date, start_date=start)
+            if df is None or len(df) == 0:
+                return []
+            dates = sorted(set(d.strftime("%Y-%m-%d") for d in df.index if d.strftime("%Y-%m-%d") <= end_date))
+            return dates[-n:] if len(dates) >= n else dates
+        except Exception:
+            return []
+
     def get_next_trading_day(self, current_date: str, symbol: str = "SPY") -> Optional[str]:
         """获取下一个交易日"""
         try:
@@ -73,6 +95,8 @@ class DataAdapter:
                 return None
             
             current_date_obj = pd.to_datetime(current_date)
+            if df.index.tz is not None:
+                current_date_obj = current_date_obj.tz_localize(df.index.tz)
             future_dates = df[df.index > current_date_obj].index
             if len(future_dates) == 0:
                 return None
