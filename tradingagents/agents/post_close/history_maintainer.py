@@ -82,12 +82,15 @@ def create_history_maintainer_node(
             ("fundamentals", fundamentals_manager),
         ]:
             try:
+                print(f"[HistoryMaintainer] 开始处理 {name} summary: {symbol} @ {trade_date}")
                 ok = manager.run_daily_update(
                     llm=llm,
                     symbol=symbol,
                     trade_date=trade_date,
                     window_size=7,
                 )
+                status = "ok" if ok else "skipped"
+                print(f"[HistoryMaintainer] 完成 {name} summary: {symbol} @ {trade_date}, status={status}")
                 results["history_maintainer_log"].append(
                     {
                         "analyst_type": name,

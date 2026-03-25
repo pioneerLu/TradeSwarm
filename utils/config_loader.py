@@ -2,11 +2,49 @@
 配置加载模块：负责读取 YAML 与环境变量，提供显式验证后的统一配置字典。
 """
 
+import os
+import re
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 import yaml
 from dotenv import dotenv_values
+
+
+def _alpha_vantage_keys_from_env(env_vars: Dict[str, Any]) -> List[str]:
+    """
+    从环境读取 Alpha Vantage 密钥列表，支持：
+    - ALPHA_VANTAGE_API_KEY_1 .. ALPHA_VANTAGE_API_KEY_N（按数字序）
+    - 若无编号变量，则回退 ALPHA_VANTAGE_API_KEY
+    先读 .env（dotenv_values），再读 os.environ，同名序号以后者为准。
+    """
+    pattern = re.compile(r"^ALPHA_VANTAGE_API_KEY_(\d+)$")
+    by_idx: Dict[int, str] = {}
+
+    def ingest_numbered(mapping: Dict[str, Any]) -> None:
+        if not mapping:
+            return
+        for name, raw in mapping.items():
+            if raw is None or name is None:
+                continue
+            val = str(raw).strip().strip("\"'")
+            if not val:
+                continue
+            m = pattern.match(str(name).strip())
+            if m:
+                by_idx[int(m.group(1))] = val
+
+    ingest_numbered(env_vars or {})
+    ingest_numbered(dict(os.environ))
+
+    if by_idx:
+        return [by_idx[k] for k in sorted(by_idx.keys())]
+
+    single = (env_vars.get("ALPHA_VANTAGE_API_KEY") if env_vars else None) or os.getenv(
+        "ALPHA_VANTAGE_API_KEY", ""
+    )
+    single = str(single).strip().strip("\"'")
+    return [single] if single else []
 
 
 def load_config() -> Dict[str, Any]:
@@ -51,7 +89,6 @@ def load_config() -> Dict[str, Any]:
     env_vars = dotenv_values(env_path)
     mapping: Dict[str, tuple[str, str]] = {
         "MODEL_NAME": ("llm", "model_name"),
-        "DASHSCOPE_API_KEY": ("llm", "api_key"),
         "BASE_URL": ("llm", "base_url"),
         "TUSHARE_TOKEN": ("data_sources", "tushare_token"),
         "CURRENCY_API_KEY": ("data_sources", "currency_api_key"),
@@ -59,12 +96,29 @@ def load_config() -> Dict[str, Any]:
         "SQLITE_PATH": ("storage", "sqlite_path"),
         "CHROMA_PERSIST_DIRECTORY": ("storage", "chroma_persist_directory"),
         "CHROMA_COLLECTION": ("storage", "chroma_collection"),
+        "POLARIS_TOKEN": ("data_sources", "polaris_token"),
     }
 
     for env_key, (section, key) in mapping.items():
         env_value = env_vars.get(env_key)
         if env_value:
             config[section][key] = env_value
+
+    polaris_alt = env_vars.get("POLARIS_API_KEY")
+    if polaris_alt and not (config.get("data_sources") or {}).get("polaris_token"):
+        config["data_sources"]["polaris_token"] = polaris_alt
+
+    ds = config.setdefault("data_sources", {})
+    ds.pop("alpha_vantage_api_key_env", None)  # 历史误用字段，避免干扰 Provider
+
+    existing_av = ds.get("alpha_vantage_api_keys")
+    has_yaml_av = isinstance(existing_av, list) and any(
+        str(x).strip() for x in existing_av if x
+    )
+    if not has_yaml_av:
+        av_keys = _alpha_vantage_keys_from_env(env_vars)
+        if av_keys:
+            ds["alpha_vantage_api_keys"] = av_keys
 
     # 第四阶段：存储配置校验
     storage_config = config.get("storage", {})

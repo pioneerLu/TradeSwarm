@@ -2,7 +2,6 @@
 
 提供技术分析相关的工具节点和工具集合。
 """
-from langgraph.prebuilt import ToolNode
 from .utils.technical_tools import get_indicators
 
 
@@ -21,6 +20,8 @@ def create_technical_tool_node():
         >>> graph = StateGraph(AgentState)
         >>> graph.add_node("technical_tools", create_technical_tool_node())
     """
+    from langgraph.prebuilt import ToolNode
+
     tools = [get_indicators]
     return ToolNode(tools)
 

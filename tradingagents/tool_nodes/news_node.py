@@ -2,7 +2,6 @@
 
 提供新闻相关的工具节点和工具集合。
 """
-from langgraph.prebuilt import ToolNode
 from .utils.news_tools import get_news, get_global_news
 
 
@@ -22,6 +21,8 @@ def create_news_tool_node():
         >>> graph = StateGraph(AgentState)
         >>> graph.add_node("news_tools", create_news_tool_node())
     """
+    from langgraph.prebuilt import ToolNode
+
     tools = [get_news, get_global_news]
     return ToolNode(tools)
 

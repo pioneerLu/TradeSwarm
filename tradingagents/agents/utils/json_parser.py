@@ -81,7 +81,7 @@ def extract_json_from_text(text: str) -> Optional[Dict[str, Any]]:
 def parse_analyst_output(
     content: str,
     analyst_type: str
-) -> Tuple[str, Optional[Dict[str, Any]], Optional[Dict[str, Any]]]:
+) -> Tuple[str, Optional[Dict[str, Any]], Optional[Dict[str, Any]], Optional[Dict[str, Any]]]:
     """
     解析 Analyst 的输出，提取报告内容、结构化数据和元数据。
     
@@ -90,14 +90,15 @@ def parse_analyst_output(
         analyst_type: Analyst 类型（"market", "news", "fundamentals", "sentiment"）
         
     Returns:
-        Tuple[report_content, structured_data, metadata]:
+        Tuple[report_content, structured_data, metadata, full_json]:
             - report_content: 原始报告内容（Markdown 格式）
-            - structured_data: 解析出的结构化数据（JSON 字典）
+            - structured_data: 解析出的结构化数据（不含 detailed_report、metadata）
             - metadata: 元数据（JSON 字典）
+            - full_json: 解析到的完整 JSON 对象（供 validate_analyst_json 使用）；无 JSON 时为 None
             
     Examples:
         >>> content = '{"role": "Market Analyst", "detailed_report": "..."}'
-        >>> report, structured, metadata = parse_analyst_output(content, "market")
+        >>> report, structured, metadata, full_j = parse_analyst_output(content, "market")
         >>> structured["role"]
         'Market Analyst'
     """
@@ -106,8 +107,8 @@ def parse_analyst_output(
     
     if json_data is None:
         # 如果没有 JSON，返回原始内容作为报告
-        return content, None, None
-    
+        return content, None, None, None
+
     # 提取详细报告（如果存在）
     report_content = json_data.get("detailed_report", "")
     if not report_content:
@@ -128,7 +129,7 @@ def parse_analyst_output(
         except json.JSONDecodeError:
             pass
     
-    return report_content, structured_data, metadata
+    return report_content, structured_data, metadata, json_data
 
 
 def validate_analyst_json(json_data: Dict[str, Any], analyst_type: str) -> Tuple[bool, Optional[str]]:

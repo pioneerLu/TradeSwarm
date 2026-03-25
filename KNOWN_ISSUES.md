@@ -9,7 +9,7 @@
 ### 影响范围
 - `test_stock_selection.py` - 选股测试脚本可能因 API 限制而超时
 - `run_multi_symbol_backtest.py` - 多标的回测在选股阶段可能遇到限制
-- **Analyst 报告**：`memory.db` 中部分 fundamentals/news/sentiment 报告因 API 限流未能获取真实数据，内容为「未能获取」「API 失效」等 fallback 说明。详见 `docs/开发日志.md`，可用 `python check_api_failures.py` 扫描。
+- **Analyst 报告**：`memory.db` 中部分 fundamentals/news/sentiment 报告因 API 限流未能获取真实数据，内容为「未能获取」「API 失效」等 fallback 说明。详见 `docs/开发日志.md`，可用 `python scripts/experimental/check_api_failures.py`（或根目录薄封装）扫描。
 
 ### 解决方案
 1. **使用缓存数据**：`DataAdapter` 已支持缓存，数据下载后会自动保存

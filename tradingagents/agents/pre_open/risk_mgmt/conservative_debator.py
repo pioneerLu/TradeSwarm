@@ -140,28 +140,21 @@ def create_safe_debator(llm: Any):
 if __name__ == "__main__":
     # 保留原有的测试逻辑，但适配新的 AgentState 结构，便于后续回归验证。
     import os
+    from pathlib import Path
 
     from dotenv import load_dotenv
-    from langchain_openai import ChatOpenAI
-    from openai import OpenAI
-    
+
+    from tradingagents.graph.utils import load_llm_from_config
+
     load_dotenv()
-    
-    client = OpenAI(
-        api_key=os.getenv("DASHSCOPE_API_KEY"),
-        base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
-    )
-    
+
     print("=" * 80)
     print("开始测试 conservative_debator_node (safe_debator)")
     print("=" * 80)
-    
+
     print("\n[1/3] 初始化 LLM...")
-    llm = ChatOpenAI(
-        model="qwen-plus",
-        base_url="https://dashscope.aliyuncs.com/compatible-mode/v1",
-        api_key=os.getenv("DASHSCOPE_API_KEY"),
-    )
+    _root = Path(__file__).resolve().parents[4]
+    llm = load_llm_from_config(str(_root / "config" / "config.yaml"))
     print("✓ LLM 初始化完成")
     
     print("\n[2/3] 创建 safe_debator_node...")

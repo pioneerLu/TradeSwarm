@@ -1,0 +1,18 @@
+{
+  "symbol": "NVDA",
+  "export_mode": "rating",
+  "start_date": "2025-01-02",
+  "end_date": "2025-01-02",
+  "by_date": {
+    "2025-01-02": {
+      "date": "2025-01-02",
+      "symbol": "NVDA",
+      "export_mode": "rating",
+      "research_decision": null,
+      "fine_rating": null,
+      "final_decision": null,
+      "risk_level": null,
+      "reason": "Error code: 401 - Invalid token"
+    }
+  }
+}

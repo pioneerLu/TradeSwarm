@@ -220,6 +220,9 @@ reports/
 quote_data/
 market_data/
 
+# Lean CLI workspace (lean init 输出，含下载数据)
+lean_workspace/
+
 # Backtest results
 backtest_results/
 backtest_results_*/

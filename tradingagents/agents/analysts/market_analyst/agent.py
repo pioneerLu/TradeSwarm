@@ -81,7 +81,8 @@ def create_market_analyst(llm: BaseChatModel) -> Callable[[MarketAnalystState], 
         market_report = ""
         structured_data = None
         metadata = None
-        
+        full_json = None
+
         for msg in reversed(result["messages"]):
             # 检查是否是 AI 消息且有内容
             if hasattr(msg, 'content') and msg.content:
@@ -94,7 +95,7 @@ def create_market_analyst(llm: BaseChatModel) -> Callable[[MarketAnalystState], 
                 # 如果没有工具调用，这就是最终的 AI 回复
                 if not has_tool_calls:
                     # 解析 JSON 输出
-                    report_content, structured_data, metadata = parse_analyst_output(
+                    report_content, structured_data, metadata, full_json = parse_analyst_output(
                         msg.content, "market"
                     )
                     market_report = report_content
@@ -104,14 +105,13 @@ def create_market_analyst(llm: BaseChatModel) -> Callable[[MarketAnalystState], 
         if not market_report and result["messages"]:
             last_msg = result["messages"][-1]
             if hasattr(last_msg, 'content') and last_msg.content:
-                report_content, structured_data, metadata = parse_analyst_output(
+                report_content, structured_data, metadata, full_json = parse_analyst_output(
                     last_msg.content, "market"
                 )
                 market_report = report_content
         
-        # 验证结构化数据（如果存在）
-        if structured_data:
-            is_valid, error_msg = validate_analyst_json(structured_data, "market")
+        if full_json:
+            is_valid, error_msg = validate_analyst_json(full_json, "market")
             if not is_valid:
                 print(f"[WARN] Market Analyst JSON 验证失败: {error_msg}")
         

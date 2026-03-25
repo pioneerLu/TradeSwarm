@@ -1,0 +1,15 @@
+{
+  "symbol": "NVDA",
+  "export_mode": "backtest",
+  "start_date": "2025-01-03",
+  "end_date": "2025-01-03",
+  "signals": {
+    "2025-01-03": {
+      "action": "HOLD",
+      "reason": "Error code: 401 - Invalid token",
+      "date": "2025-01-03",
+      "symbol": "NVDA"
+    }
+  },
+  "by_execution_date": {}
+}

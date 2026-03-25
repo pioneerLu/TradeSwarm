@@ -330,10 +330,10 @@ conda activate TradeSwarm
 pip install -r requirements.txt
 
 # 环境变量（.env 或 export）
-# LLM：二选一或同时配置
-export DASHSCOPE_API_KEY="your-api-key"           # 阿里 DashScope
-export Silicon_API_KEY="your-silicon-key"         # Silicon Flow（可选）
-export base_url_silicon="https://api.siliconflow.cn/v1"
+# LLM：仅 Silicon Flow
+export Silicon_API_KEY="your-silicon-key"
+export base_url_silicon="https://api.siliconflow.cn/v1"   
+# 可选：export SILICON_MODEL="Qwen/Qwen3-32B"
 export ALPHA_VANTAGE_API_KEY="your-alpha-vantage-key"
 
 # 数据拉取需代理时（yfinance 等易被限速）
@@ -347,25 +347,19 @@ export PROXY_PORT=7890
 
 ### 5.2 配置文件
 
-创建 `config/config.yaml`（可选；LLM 也可仅靠 .env）：
+创建 `config/config.yaml`；**LLM 凭证以环境变量 `Silicon_API_KEY` 等为主**，`llm.silicon` 段提供默认模型与 base 回退：
 
 ```yaml
 llm:
-  api_key: ${DASHSCOPE_API_KEY}
-  base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
-  model_name: "qwen-plus"
-  temperature: 0.1
-  # Silicon Flow 可选（若配置了 Silicon_API_KEY，load_llm_from_config 会优先使用）
   silicon:
     api_key: ${Silicon_API_KEY}
     base_url: ${base_url_silicon}
     model_name: "Qwen/Qwen3-32B"
     temperature: 0.1
 
-alpha_vantage:
-  api_keys:
-    - "your-api-key-1"
-    - "your-api-key-2"
+data_sources:
+  tushare_token: ${TUSHARE_TOKEN}
+  # …其余见仓库内 config/config.yaml 模板
 ```
 
 ### 5.3 运行示例
@@ -416,22 +410,19 @@ python run_reflector_cycle.py \
 
 ```bash
 # 构建 Analyst 数据集（写入 memory.db，可选导出临时 JSON）
-# 数据拉取走代理、LLM 不走代理；可用 --use-silicon 使用 Silicon Flow
-python build_analyst_dataset.py --symbol NVDA --trading-days 7 --end 2026-02-13 --db memory.db --use-silicon
+# 数据拉取走代理、LLM 不走代理；LLM 固定 Silicon Flow（.env 配置密钥）
+python scripts/experimental/build_analyst_dataset.py --symbol NVDA --trading-days 7 --end 2026-02-13 --db memory.db
 # 仅从 DB 导出 JSON（不调用 LLM）
-python build_analyst_dataset.py --symbol NVDA --trading-days 7 --end 2026-02-13 --db memory.db --export-only
+python scripts/experimental/build_analyst_dataset.py --symbol NVDA --trading-days 7 --end 2026-02-13 --db memory.db --export-only
 
 # 回测中途中断时，从已有 daily_results 聚合出 backtest_report.json
 python aggregate_backtest_report.py --output-dir backtest_results_7days
 
 # 运行 Analyst 并保存到数据库
-python scripts/run_analysts_to_db.py
+python scripts/experimental/run_analysts_to_db.py
 
 # 从摘要运行完整图
-python scripts/run_graph_from_summary.py
-
-# 导出数据库内容
-python scripts/export_db_to_json.py
+python scripts/experimental/run_graph_from_summary.py
 ```
 
 详细说明请参考 `docs/运行指南.md`。
@@ -475,7 +466,7 @@ python scripts/export_db_to_json.py
 
 ### 6.2 NVDA 七日回测（2026-02-04 至 2026-02-12）
 
-**流程**：先由 `build_analyst_dataset.py` 为 NVDA 构建 7 个交易日的 Analyst 报告并写入 `memory.db`，再使用 `run_single_symbol_backtest.py --use-db-reports-only` 在相同窗口内跑决策与执行，不重复调用 Analyst LLM。
+**流程**：先由 `scripts/experimental/build_analyst_dataset.py` 为 NVDA 构建 7 个交易日的 Analyst 报告并写入 `memory.db`，再使用 `run_single_symbol_backtest.py --use-db-reports-only` 在相同窗口内跑决策与执行，不重复调用 Analyst LLM。
 
 **回测参数**：
 - 标的：NVDA
@@ -597,7 +588,7 @@ python scripts/export_db_to_json.py
 
 ### 10.1 环境变量
 
-- LLM：`DASHSCOPE_API_KEY`（DashScope）或 `Silicon_API_KEY` + `base_url_silicon`（Silicon Flow）
+- LLM：仅 `Silicon_API_KEY` + 可选 `base_url_silicon` / `SILICON_MODEL`（Silicon Flow）；`load_llm_from_config` 与 Embedding/Chroma 客户端同据 `tradingagents/llm_env_compat.py`
 - 数据拉取：需要代理时设置 `USE_PROXY=true` 及 `PROXY_HOST`/`PROXY_PORT`，或 `HTTP_PROXY`/`HTTPS_PROXY`
 - Qwen/LLM 调用不能走代理，系统会在创建 LLM 时临时清除代理、数据拉取前恢复
 
@@ -645,13 +636,13 @@ python scripts/export_db_to_json.py
 
 ### 13.1 本阶段完成内容
 
-- **数据集构建**：`build_analyst_dataset.py` 支持按「最近 N 个交易日」生成 Analyst 报告，写入 `memory.db`，并可导出临时 JSON；支持 `--use-silicon` 使用 Silicon Flow，`--export-only` 仅从 DB 导出。
+- **数据集构建**：`scripts/experimental/build_analyst_dataset.py` 支持按「最近 N 个交易日」生成 Analyst 报告，写入 `memory.db`，并可导出临时 JSON；**LLM 固定 Silicon Flow**（`--export-only` 仅从 DB 导出）。
 - **代理与 LLM 分离**：数据拉取（yfinance/交易日历）需代理时在 .env 中配置；LLM 初始化前临时清除代理环境变量，初始化后恢复，避免 LLM 走代理。
 - **DataAdapter 时区修复**：yfinance 返回带时区 Index 与 naive 日期比较会报错，已在 `tradingagents/core/data_adapter.py` 中统一时区处理（见 `KNOWN_ISSUES.md`）。
 - **memory.db 去重**：`MemoryDBHelper.insert_report_or_update` 按 (analyst_type, symbol, trade_date) 更新或插入，避免重复条；构建数据集时使用该方法。
 - **回测从 DB 读报告**：`run_single_symbol_backtest.py` 增加 `--use-db-reports-only`，当日 Analyst 报告直接从 `memory.db` 读取，不调用 Analyst LLM，适合预构建数据集后的快速回测。
 - **回测异常与聚合报告**：主循环包在 try/except 中，异常时仍会写入已完成的 daily_results 并生成 `backtest_report.json`；若中途中断未生成报告，可用 `aggregate_backtest_report.py --output-dir <dir>` 从已有 daily_results 聚合。
-- **配置与文档**：`config/config.yaml` 可配置 Silicon Flow；`README.md` 精简并含流程图；`KNOWN_ISSUES.md` 记录 yfinance 时区问题与修复。
+- **配置与文档**：`config/config.yaml` 的 `llm.silicon` 与 `.env` 的 `Silicon_API_KEY` 等为单一 LLM 来源；`README.md` / `docs/DATA_LAB.md` 已同步「仅 Silicon、无 `--use-silicon`」；`KNOWN_ISSUES.md` 记录 yfinance 时区问题与修复。
 
 ### 13.2 已移除的临时文件（本次整理）
 
@@ -660,8 +651,8 @@ python scripts/export_db_to_json.py
 
 ### 13.3 推荐实验流程（七日窗口示例）
 
-1. **构建 7 日 Analyst 数据**（需代理 + LLM 可用）  
-   `python build_analyst_dataset.py --symbol NVDA --trading-days 7 --end 2026-02-13 --db memory.db --use-silicon`
+1. **构建 7 日 Analyst 数据**（需代理 + Silicon LLM 可用）  
+   `python scripts/experimental/build_analyst_dataset.py --symbol NVDA --trading-days 7 --end 2026-02-13 --db memory.db`
 2. **回测（仅用 DB 报告，不重跑 Analyst）**  
    `python run_single_symbol_backtest.py --symbol NVDA --start 2026-02-04 --end 2026-02-12 --db memory.db --output backtest_results_7days --use-db-reports-only`
 3. **查看收益**  
@@ -672,7 +663,7 @@ python scripts/export_db_to_json.py
 
 | 用途           | 位置 |
 |----------------|------|
-| 构建 Analyst 数据集 | `build_analyst_dataset.py` |
+| 构建 Analyst 数据集 | `scripts/experimental/build_analyst_dataset.py` |
 | 单标的回测（含 --use-db-reports-only） | `run_single_symbol_backtest.py` |
 | 从 partial 结果聚合报告 | `aggregate_backtest_report.py` |
 | LLM 加载（含 Silicon/代理处理） | `tradingagents/graph/utils.py` → `load_llm_from_config` |

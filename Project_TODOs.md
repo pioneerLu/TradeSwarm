@@ -123,15 +123,14 @@
   - **影响范围**：NVDA 约 15 条报告、AAPL 6 条，涉及 2026-01-21 至 2026-02-12 多个日期。
   - **相关文件**：
     - `docs/开发日志.md` - 详细受影响列表、处理建议与已实施修正
-    - `check_api_failures.py` - 扫描脚本
-    - `rebuild_failed_reports.py` - 批量补全脚本（从后往前，`--only-missing`）
+    - `scripts/experimental/check_api_failures.py` - 扫描脚本
+    - `scripts/experimental/build_analyst_dataset.py` - 按 `--dates` + `--only-missing` 补全失败日
   - **已完成**：
-    1. ✅ `build_analyst_dataset.py` 增加 Alpha Vantage 限流（news/fundamentals/sentiment 间 sleep 13s）
+    1. ✅ `scripts/experimental/build_analyst_dataset.py` 增加 Alpha Vantage 限流（news/fundamentals/sentiment 间 sleep 13s）
     2. ✅ 报告含 API 失败关键词时跳过写入，避免污染数据集
     3. ✅ `--dates` 指定精确日期；`--only-missing` 先检测再运行，仅补失败/缺失类型
-    4. ✅ `rebuild_failed_reports.py` 批量补全，按日期从后往前执行
   - **待办**：
-    1. 执行 `python rebuild_failed_reports.py` 完成 NVDA 失败报告补建
+    1. 按 `check_api_failures` 结果对失败日执行 `build_analyst_dataset.py --dates ... --only-missing` 完成 NVDA 等标的补建
     2. 可选：Analyst 端当 API 失败时降级为 yfinance + 公开财报摘要
 
 ---

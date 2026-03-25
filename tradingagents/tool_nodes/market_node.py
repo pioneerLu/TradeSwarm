@@ -2,7 +2,6 @@
 
 提供市场数据相关的工具节点和工具集合。
 """
-from langgraph.prebuilt import ToolNode
 from .utils.market_tools import get_stock_data
 
 
@@ -21,6 +20,8 @@ def create_market_tool_node():
         >>> graph = StateGraph(AgentState)
         >>> graph.add_node("market_tools", create_market_tool_node())
     """
+    from langgraph.prebuilt import ToolNode
+
     tools = [get_stock_data]
     return ToolNode(tools)
 

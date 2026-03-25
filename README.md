@@ -10,301 +10,239 @@ conda create -n TradeSwarm python=3.12
 conda activate TradeSwarm
 pip install -r requirements.txt
 
-# 2. 配置环境变量
-export DASHSCOPE_API_KEY="your-api-key"
+# 2. 配置环境变量（.env 亦可）
+# LLM：仅 Silicon Flow（见 config/config.yaml 的 llm.silicon；可多 key 见 docs/DATA_LAB.md）
+export Silicon_API_KEY="your-silicon-key"
+export base_url_silicon="https://api.siliconflow.cn/v1"
+# 可选：export SILICON_MODEL="deepseek-ai/DeepSeek-V3.2"
 export ALPHA_VANTAGE_API_KEY="your-alpha-vantage-key"
-# 可选：行情 fallback（yfinance 失败时用 Financial Data API Free 级别）
 export FINANCIALDATA_API_KEY="your-financialdata-key"
 
 # 3. 创建配置文件 config/config.yaml
 
-# 4. 运行回测
-python run_single_symbol_backtest.py \
-    --symbol NVDA \
-    --start 2025-11-06 \
-    --end 2025-11-08 \
-    --cash 100000 \
-    --db memory.db \
-    --output backtest_results_nvda
+# 4. 正式运行见下方；造数据与维护见 docs/DATA_LAB.md
 ```
 
-## 完整系统流程图
+**设计原则**：文本数据本地 + Agent 本地决策 + QuantConnect 仅做回测。
 
-### 日级交易流程（完整）
+**入口脚本**：主流程在 `scripts/runtime/`；数据集与运维在 `scripts/experimental/`。仓库根目录同名 `.py` 为**薄封装**，与直接运行 `scripts/...` 等价。
+
+## 核心流程命令（四步）
+
+以下四条对应「数据进库 → 摘要进库 → Pre-Open 全图 → 平台回测」。**均在仓库根目录执行**（保证 `config/config.yaml`、`.env`、`memory.db` 路径一致）。
+
+**「从 Summary 开始」的含义**：`trading_graph` 的入口是四个 Summary 节点（`market_summary` → … → `fundamentals_summary`）。它们从 `analyst_reports` 读**当日**报告；**历史窗口**优先读 `analyst_summaries`（第 2 步），若无则自动回退为拼接过去多日的原始报告。因此第 2 步为**可选但推荐**（上下文更短、更省 token）。
+
+### 1. 构建 Analyst 报告写入 `memory.db`
+
+功能与 CLI **已完备**（`scripts/experimental/build_analyst_dataset.py`）。
+
+```bash
+python scripts/experimental/build_analyst_dataset.py \
+  --symbol NVDA --start 2025-01-01 --end 2025-01-06 --db memory.db \
+  --only-missing --skip-existing
+```
+
+- 代理、LLM（仅 Silicon）、`--dates` / `--types` 等见 [docs/DATA_LAB.md](docs/DATA_LAB.md)。
+
+### 2. 从已有报告生成 7 日滚动 Summary 写入 `analyst_summaries`
+
+功能与 CLI **已完备**（`scripts/experimental/run_history_maintainer_batch.py`）。**不跑本步时 Pre-Open 仍可运行**，仅历史部分会改用原始报告拼接。
+
+```bash
+python scripts/experimental/run_history_maintainer_batch.py \
+  --db memory.db --symbol NVDA --start 2025-01-01 --end 2025-01-10 --sleep-ms 500
+```
+
+### 3. 从 Summary 起跑完整 Pre-Open（Research / Trader / Risk）并导出信号
+
+**唯一推荐 CLI**：`scripts/runtime/run_signal_export.py`。默认 **`--use-db-reports-only`**：**不现场跑四个 Analyst**，仅使用 `analyst_reports` 里已有报告；**Pre-Open（Summary→Research→Trader→Risk）仍会调用 LLM**。最后 `resolve_signal` 写出 `qc_signals/signals.json`。
+
+```bash
+# 按区间（日历由 SPY 交易日推算）
+python scripts/runtime/run_signal_export.py \
+  --symbol NVDA --start 2025-01-01 --end 2025-01-10 --db memory.db --output qc_signals
+
+# 仅指定若干交易日（等价于替代原 run_graph_from_summary 单日/多日调试）
+python scripts/runtime/run_signal_export.py \
+  --symbol NVDA --dates 2025-01-02,2025-01-03 --db memory.db --output qc_signals
+```
+
+- 仅导出评级、不要可执行信号：`--export-mode rating` → `ratings.json`。
+- 多日注入模拟持仓（Trader/Risk 可见仓位）：`--simulate-portfolio [--initial-cash 100000]`。
+- 需要现场造报告时再跑四分析师：`--no-db-reports-only`（费 API/LLM，一般先用 `build_analyst_dataset`）。
+- **周期反思记忆**：本脚本内 `DatabaseMemory` 只读 `cycle_reflections`（周报）；无数据时记忆为空，属正常。
+
+`scripts/experimental/run_graph_from_summary.py` **不再作为主入口维护**；请统一使用本脚本 `--dates` 或 `--start`/`--end`。
+
+### 4. 在 QuantConnect / Lean 上跑回测（含第 3 步的一键串联）
+
+**脚本逻辑已完备**（先导出/复制 `signals.json` 再 `lean backtest`），**前提是本机 Lean + Docker（或文档中的工作区布局）已按 [quantconnect/README.md](quantconnect/README.md) 配好**。
+
+```bash
+python scripts/runtime/run_automated_backtest.py \
+  --source export --symbol NVDA --db memory.db \
+  --start 2025-01-01 --end 2025-01-10
+# 仅生成信号并复制到 quantconnect/signals/，不跑 lean：加 --skip-backtest
+```
+
+- 信号已有时也可用 `--source daily --daily-dir backtest_results/daily_results`（见下文「方式 C」）。
+
+---
+
+### 其它常用
+
+```bash
+python scripts/experimental/check_api_failures.py --symbol NVDA
+python scripts/experimental/run_db_viewer.py
+python scripts/runtime/run_reflector_cycle.py --symbol AAPL --cycle weekly --start 2024-01-01 --end 2024-01-07
+```
+
+更多参数与场景见 [docs/DATA_LAB.md](docs/DATA_LAB.md) 与 [quantconnect/README.md](quantconnect/README.md)。
+
+---
+
+## 一、信号导出与 QuantConnect 回测（方案 A）
+
+Agent 生成交易信号，QuantConnect 执行回测并输出绩效报告。
+
+**方式 A（定时）**：一键导出 + 复制 + `lean backtest`
+
+```bash
+python scripts/runtime/run_automated_backtest.py --source export --start 2025-01-01 --end 2025-03-01
+# 或：python run_automated_backtest.py ...（根目录封装）
+```
+
+**方式 B**：仅导出（需 `memory.db` 含 `analyst_reports`），再复制 `qc_signals/signals.json` → `quantconnect/signals/`
+
+```bash
+python scripts/runtime/run_signal_export.py --symbol NVDA --start 2025-01-01 --end 2025-03-01 --db memory.db --output qc_signals
+# 分析工具（仅评级，无 Portfolio / 无可执行信号）：加 --export-mode rating → 生成 qc_signals/ratings.json
+# 多日导出时注入模拟仓（Trader/Risk 可见持仓）：加 --simulate-portfolio [--initial-cash 100000]
+```
+
+**方式 C**：从已有 `backtest_results/daily_results` 转换（无需 memory.db）
+
+```bash
+python scripts/runtime/run_automated_backtest.py --source daily --daily-dir backtest_results/daily_results
+```
+
+**QuantConnect / Lean**：云上步骤与本地 CLI 详见 [`quantconnect/README.md`](quantconnect/README.md)。
+
+---
+
+## 二、数据构建（造数据 / 维护）
+
+构建与维护 `memory.db` 中的 **analyst_reports**、**analyst_summaries**，以及检查、去重、Web 查看等——**命令表与参数说明见 [docs/DATA_LAB.md](docs/DATA_LAB.md)**。
+
+---
+
+## 完整系统流程（方案 A）
 
 ```text
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  回测驱动器 (run_single_symbol_backtest.py)                                  │
-│  按日期循环，每天依次执行以下步骤：                                           │
+│  1. 数据构建（可选）                                                          │
+│  build_analyst_dataset → analyst_reports                                     │
+│  run_history_maintainer_batch → analyst_summaries                            │
 └─────────────────────────────────────────────────────────────────────────────┘
                     │
                     ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  步骤 1: Analyst 节点（并行运行，图外执行）                                  │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐    │
-│  │ Market       │  │ News         │  │ Sentiment    │  │ Fundamentals │    │
-│  │ Analyst      │  │ Analyst      │  │ Analyst      │  │ Analyst      │    │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘    │
-│         │                  │                  │                  │            │
-│         └──────────────────┴──────────────────┴──────────────────┘            │
-│                                    │                                            │
-│                                    ▼                                            │
-│                         ┌──────────────────────┐                               │
-│                         │ analyst_reports 表   │                               │
-│                         │ (SQLite 数据库)      │                               │
-│                         └──────────────────────┘                               │
+│  2. 信号导出 run_signal_export.py                                            │
+│  Analyst（DB/LLM）→ Pre-Open Graph → 信号解析器 → qc_signals/signals.json    │
 └─────────────────────────────────────────────────────────────────────────────┘
                     │
                     ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  步骤 2: Pre-Open 决策图 (trading_graph.py) - LangGraph 内部                │
-│  ┌───────────────────────────────────────────────────────────────────────┐  │
-│  │ Summary 节点（串行）                                                  │  │
-│  │  market_summary → news_summary → sentiment_summary →                 │  │
-│  │  fundamentals_summary                                               │  │
-│  │  （从 analyst_reports 表读取，生成结构化摘要）                        │  │
-│  └───────────────────────────┬───────────────────────────────────────────┘  │
-│                              │                                                │
-│                              ▼                                                │
-│  ┌───────────────────────────────────────────────────────────────────────┐  │
-│  │ Research 子图（2 轮辩论）                                             │  │
-│  │  Bull Researcher (R1) → Bear Researcher (R1) →                      │  │
-│  │  Bull Researcher (R2) → Bear Researcher (R2) →                      │  │
-│  │  Research Manager                                                    │  │
-│  │  （整合 Analyst 摘要 + 多空辩论，生成 investment_plan）             │  │
-│  └───────────────────────────┬───────────────────────────────────────────┘  │
-│                              │                                                │
-│                              ▼                                                │
-│  ┌───────────────────────────────────────────────────────────────────────┐  │
-│  │ Trader 节点                                                           │  │
-│  │  （根据 Research Plan，生成交易方向和止盈止损规则）                   │  │
-│  └───────────────────────────┬───────────────────────────────────────────┘  │
-│                              │                                                │
-│                              ▼                                                │
-│  ┌───────────────────────────────────────────────────────────────────────┐  │
-│  │ Strategy Selector 节点                                                │  │
-│  │  （判断市场状态 market_regime，选择交易策略）                          │  │
-│  └───────────────────────────┬───────────────────────────────────────────┘  │
-│                              │                                                │
-│                              ▼                                                │
-│  ┌───────────────────────────────────────────────────────────────────────┐  │
-│  │ Risk 子图（2 轮辩论）                                                 │  │
-│  │  Aggressive (R1) → Neutral (R1) → Conservative (R1) →                │  │
-│  │  Aggressive (R2) → Neutral (R2) → Conservative (R2) →               │  │
-│  │  Risk Manager                                                        │  │
-│  │  （基于 Research Plan + 风险辩论，生成 final_trade_decision）        │  │
-│  └───────────────────────────┬───────────────────────────────────────────┘  │
-│                              │                                                │
-│                              ▼                                                │
-│  输出状态 (AgentState):                                                      │
-│  - trader_investment_plan: 交易计划（BUY/SELL/HOLD + 止盈止损）            │
-│  - strategy_selection: 策略选择（market_regime + selected_strategy）        │
-│  - risk_summary: 风险决策（final_trade_decision + 仓位限制）              │
-│  └───────────────────────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────────────────────┘
-                    │
-                    ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│  步骤 3: Market Open 节点（图外执行）                                        │
-│  - 读取 Pre-Open 的决策结果（risk_summary, strategy_selection）              │
-│  - 检查风险决策（如果 final_decision == "HOLD"，不执行交易）                 │
-│  - 执行策略（execute_strategy），生成交易信号                                │
-│  - 获取 T+1 日开盘价（实际执行价格）                                        │
-│  - 调用 portfolio_manager.execute_buy/sell() 执行交易                        │
-│  - 更新仓位状态（每天最多执行一次交易）                                      │
-└─────────────────────────────────────────────────────────────────────────────┘
-                    │
-                    ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│  步骤 4: Post Close 节点（图外执行）                                         │
-│  - 更新所有持仓的当前价格（使用收盘价）                                       │
-│  - 计算单日收益率（相对于前一天的总资产）                                     │
-│  - 计算最大回撤（基于持仓的当前价格和建仓价格）                               │
-│  - 更新组合状态（PortfolioManager）                                          │
-└─────────────────────────────────────────────────────────────────────────────┘
-                    │
-                    ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│  步骤 5: Daily Summary 保存                                                 │
-│  - 从 Pre-Open 结果提取: market_regime, selected_strategy,                 │
-│    expected_behavior                                                       │
-│  - 从 Post Close 结果提取: actual_return, actual_max_drawdown              │
-│  - 保存到 daily_trading_summaries 表（SQLite）                              │
-└─────────────────────────────────────────────────────────────────────────────┘
-                    │
-                    ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│  步骤 6: History Maintainer 节点（图外执行）                                │
-│  - 为 4 类 Analyst 生成 7 日滚动摘要                                        │
-│  - 保存到 analyst_summaries 表（SQLite）                                   │
-│  - 供下一交易日使用（作为 history_report 输入到 Pre-Open 图）              │
+│  3. QuantConnect 回测                                                        │
+│  算法读取 signals.json → 每日开盘后按 execution_date 执行 BUY/SELL          │
+│  → 平台输出绩效报告（收益、回撤、夏普等）                                     │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
 
-### 架构设计说明
-
-**图内 vs 图外**：
-- **Pre-Open 图（LangGraph）**：纯决策逻辑，使用 LangGraph 管理复杂的状态流转
-- **Market Open / Post Close（Python 函数）**：执行和结算逻辑，需要直接操作 `PortfolioManager`，不适合放在图中
-- **状态传递**：Pre-Open 图通过 `AgentState` 输出决策，Market Open 通过 `state.get()` 读取决策
-
-**数据流**：
-```
-Analyst 报告 → analyst_reports 表
-    ↓
-Pre-Open 图读取 → 生成决策（AgentState）
-    ↓
-Market Open 执行交易 → PortfolioManager
-    ↓
-Post Close 计算收益 → daily_trading_summaries 表
-    ↓
-History Maintainer → analyst_summaries 表（7 日滚动摘要）→ 下一交易日使用
-```
-
-### 周期级流程（周/月）
+### Pre-Open 决策图（内部）
 
 ```text
-周期开始
-    │
-    ▼
-┌─────────────────┐
-│  选股与再平衡    │  ← StockSelector 选股 + PortfolioManager 调仓
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  每日交易循环    │  ← 对每个选中标的执行 Pre-Open → Market Open → Post Close
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────┐
-│  Reflector      │  ← 周期结束：总结错误模式、成功模式、策略适用条件
-│  Agent          │    更新长期记忆（ChromaDB）
-└─────────────────┘
+Summary（market/news/sentiment/fundamentals）→ Research 子图 → Trader → Risk 子图
+→ 输出 trader_investment_plan, risk_summary
 ```
 
-## 核心模块
+### 信号解析器
+
+`tradingagents/agents/market_open/signal_resolver.py` 从 Pre-Open 输出解析出 `action`（BUY/SELL/HOLD）、`target_pct`、`entry_type`、`entry_price`、`execution_date` 等，供 QuantConnect 使用。
+
+### 数据边界说明
+
+除极简信号 JSON 外，**所有文本数据（报告、摘要、LLM 输出）均保留在本地**。
+
+| 环节 | 位置 | 数据内容 | 是否上传/外传 |
+|------|------|----------|---------------|
+| 分析师报告 | 本地 `memory.db` | market/news/sentiment/fundamentals 原始报告 | 否 |
+| 7 日摘要 | 本地 `memory.db` | `analyst_summaries` 表 | 否 |
+| LLM 调用 | 本地 | Research/Trader/Risk 辩论与决策 | 否 |
+| 交易结论 | 本地 `qc_signals/signals.json` | `action`, `target_pct`, `entry_type`, `entry_price`, `execution_date` 等 | 是，传入 QuantConnect |
+| 行情数据 | QuantConnect | 由平台提供 | 否，仅平台内部使用 |
+| 绩效报告 | QuantConnect | 收益、回撤、夏普等 | 平台生成并返回 |
+
+QuantConnect 仅接收信号 JSON（操作类型、仓位比例、入场方式与价格、标的、执行日期），不包含任何分析原文或 LLM 输出。
+
+---
+
+## 核心模块（速查）
 
 | 模块 | 说明 | 位置 |
 |------|------|------|
-| **Analyst** | 4 类分析师（技术/新闻/情绪/基本面），图外并行执行 | `tradingagents/agents/analysts/` |
-| **Pre-Open 图** | LangGraph 决策流程（Summary → Research → Trader → Strategy Selector → Risk） | `tradingagents/graph/trading_graph.py` |
-| **Market Open** | 交易执行逻辑，读取决策并执行交易 | `tradingagents/agents/market_open/node.py` |
-| **Post Close** | 收益计算逻辑，更新持仓和计算收益 | `tradingagents/agents/post_close/node.py` |
-| **History Maintainer** | 维护 7 日滚动摘要 | `tradingagents/agents/post_close/history_maintainer.py` |
-| **Memory** | SQLite（结构化数据）+ ChromaDB（向量记忆） | `tradingagents/agents/utils/memory_db_helper.py` |
-| **Portfolio** | 组合管理、交易执行、再平衡 | `tradingagents/core/portfolio/portfolio_manager.py` |
-| **Stock Selector** | 多因子选股（IC 动态权重/市场状态权重） | `tradingagents/core/selection/stock_selector.py` |
-| **Reflector** | 周期反思，总结交易经验 | `tradingagents/agents/post_close/reflector.py` |
+| **Analyst** | 4 类分析师 | `tradingagents/agents/analysts/` |
+| **Pre-Open 图** | LangGraph 决策流程 | `tradingagents/graph/trading_graph.py` |
+| **信号解析器** | 解析可执行信号 | `tradingagents/agents/market_open/signal_resolver.py` |
+| **History Maintainer** | 7 日滚动摘要 | `tradingagents/agents/post_close/history_maintainer.py` |
+| **Memory** | SQLite + ChromaDB | `tradingagents/agents/utils/memory_db_helper.py` |
+| **QuantConnect 算法** | 读取信号回测 | `quantconnect/main.py` |
 
-## 技术栈
-
-- **Python 3.12+**
-- **LangGraph 1.2.0** + LangChain：工作流编排
-- **SQLite** + **ChromaDB**：数据持久化
-- **yfinance** + **Alpha Vantage**：数据源
-
-## 运行脚本
-
-```bash
-# 单标的回测
-python run_single_symbol_backtest.py --symbol NVDA --start 2026-01-13 --end 2026-02-13
-
-# 指定初始持仓（例如首日持有 50 股 NVDA）
-python run_single_symbol_backtest.py --symbol NVDA --start 2026-01-13 --end 2026-01-19 --initial-shares 200
-
-# 使用预构建报告快速回测（不调用 Analyst LLM）
-python run_single_symbol_backtest.py --symbol NVDA --start 2026-01-13 --end 2026-01-19 --use-db-reports-only --initial-shares 200
-
-# 显示 Pre-Open 各节点进度（便于定位卡住位置，每个 LLM 节点约 1–2 分钟）
-python run_single_symbol_backtest.py --symbol NVDA --start 2026-01-13 --end 2026-01-19 --use-db-reports-only --verbose
-
-# 多标的、多周期回测
-python run_multi_symbol_backtest.py --start_date 2024-01-01 --end_date 2024-01-31 --cycle_type monthly
-
-# 周期反思
-python run_reflector_cycle.py --cycle_type weekly --start_date 2024-01-01 --end_date 2024-01-07
-```
-
-## 数据构建与维护
-
-```bash
-# 构建 Analyst 报告到 memory.db（指定日期或最近 N 个交易日）
-python build_analyst_dataset.py --symbol NVDA --dates 2026-02-12 --db memory.db --use-silicon --no-export
-python build_analyst_dataset.py --symbol NVDA --end 2026-02-12 --trading-days 7 --db memory.db --use-silicon
-
-# 仅补全失败/缺失的报告，节省 API
-python build_analyst_dataset.py --symbol NVDA --dates 2026-02-12 --only-missing --db memory.db --use-silicon --no-export
-
-# 批量补全 API 失败报告（从后往前，每日期间隔 5 分钟）
-python rebuild_failed_reports.py
-
-# 检查失败报告
-python check_api_failures.py   # 输出到 api_failures_report.txt
-```
-
-## 数据查看
-
-```bash
-# 命令行查看报告
-python view_report.py --list                    # 列出 NVDA 可用日期
-python view_report.py 2026-02-12 fundamentals  # 查看指定报告
-
-# Web 界面查看（http://127.0.0.1:5555）
-python -m db_viewer.app
-```
+**技术栈**：Python 3.12+ · LangGraph / LangChain · SQLite · ChromaDB · yfinance / Alpha Vantage · QuantConnect / Lean
 
 ## 项目结构
 
 ```
 TradeSwarm/
-├── tradingagents/          # 核心代码
-│   ├── agents/            # Agent 实现
-│   ├── graph/            # LangGraph 图定义
-│   └── core/             # 核心模块（portfolio, selection 等）
-├── datasources/           # 数据源模块
-├── db_viewer/             # memory.db Web 查看器
-├── config/                # 配置文件
-├── docs/                  # 文档
-├── run_*.py               # 运行脚本
-├── build_analyst_dataset.py  # 构建 Analyst 数据集
-├── rebuild_failed_reports.py # 补全 API 失败报告
-├── check_api_failures.py    # 检查失败报告
-├── view_report.py           # 查看单条报告
+├── tradingagents/          # 核心代码（agents / graph / core）
+├── quantconnect/           # QC 算法与 signals/
+├── qc_signals/             # 信号导出输出
+├── scripts/
+│   ├── runtime/            # 信号导出、自动回测、daily→signals、周期反思
+│   ├── experimental/       # 造数据、检查、db_viewer、辅助脚本
+│   └── *.ps1               # 如 run_lean_no_proxy.ps1
+├── docs/                   # HANDOVER、DATA_LAB 等
+├── db_viewer/              # Web 查看器包
+├── run_*.py / build_*.py   # 根目录薄封装（转发到 scripts/）
 └── requirements.txt
 ```
 
 ## 关键代码位置
 
-| 功能 | 文件路径 | 说明 |
-|------|---------|------|
-| **回测驱动器** | `run_single_symbol_backtest.py` | 单标的多日回测，包含完整日级流程 |
-| **Pre-Open 图定义** | `tradingagents/graph/trading_graph.py` | 主交易决策图（LangGraph） |
-| **Research 子图** | `tradingagents/graph/subgraphs/research_subgraph.py` | Bull/Bear 辩论子图 |
-| **Risk 子图** | `tradingagents/graph/subgraphs/risk_subgraph.py` | 风险辩论子图 |
-| **Market Open 节点** | `tradingagents/agents/market_open/node.py` | 交易执行逻辑 |
-| **Post Close 节点** | `tradingagents/agents/post_close/node.py` | 收益计算逻辑 |
-| **组合管理** | `tradingagents/core/portfolio/portfolio_manager.py` | 持仓、现金、交易管理 |
-| **数据适配器** | `tradingagents/core/data_adapter.py` | 数据源统一接口 |
-| **数据库操作** | `tradingagents/agents/utils/memory_db_helper.py` | SQLite 数据库操作 |
+| 功能 | 路径 |
+|------|------|
+| 信号导出 | `scripts/runtime/run_signal_export.py` |
+| 信号解析 | `tradingagents/agents/market_open/signal_resolver.py` |
+| Pre-Open 图 | `tradingagents/graph/trading_graph.py` |
+| 数据适配器 | `tradingagents/core/data_adapter.py` |
 
 ## 文档索引
 
 | 文档 | 说明 |
 |------|------|
-| `docs/HANDOVER.md` | 项目交接文档（架构、模块、状态总览） |
-| `docs/开发日志.md` | HOLD 修复、数据构建、Bug 修复、功能增强记录 |
-| `KNOWN_ISSUES.md` | 已知问题与限制 |
-| `Project_TODOs.md` | 项目待办与规划 |
+| [`docs/DATA_LAB.md`](docs/DATA_LAB.md) | 造数据、参数表、db_viewer、维护脚本 |
+| `quantconnect/README.md` | QuantConnect / Lean 回测 |
+| `docs/HANDOVER.md` | 项目交接 |
+| `docs/IMPLEMENTATION_IDEAS.md` | 实现想法 |
+| `KNOWN_ISSUES.md` | 已知问题 |
+| `Project_TODOs.md` | 待办 |
 
 ## 注意事项
 
-1. **API 限制**：Alpha Vantage 免费版 5 次/分钟，500 次/天，系统已实现多 Key 轮询和缓存；数据构建时建议使用 `--only-missing` 仅补失败报告
-2. **数据库**：首次运行自动创建 SQLite 数据库（`memory.db`）
-3. **配置**：需要创建 `config/config.yaml`，参考模板或 README 中的配置示例
-4. **图内 vs 图外**：Pre-Open 图只包含决策逻辑，Market Open 和 Post Close 在图外执行
-5. **已知问题**：详见 `KNOWN_ISSUES.md`；开发记录与修复历史见 `docs/开发日志.md`
+1. Alpha Vantage 免费版限流；造数据建议 `--only-missing`（见 DATA_LAB）。
+2. 需 `config/config.yaml`；首次运行会创建 `memory.db`。
+3. **LLM 仅 Silicon Flow**：`.env` 中配置 `Silicon_API_KEY`（及可选 `base_url_silicon`、`SILICON_MODEL`）；代理与数据拉取/LLM 分离见 [docs/DATA_LAB.md](docs/DATA_LAB.md)。
 
 ---
 
-**最后更新**: 2026-02-27

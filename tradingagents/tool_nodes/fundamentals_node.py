@@ -2,7 +2,6 @@
 
 提供基本面分析相关的工具节点和工具集合。
 """
-from langgraph.prebuilt import ToolNode
 from .utils.fundamentals_tools import (
     get_company_info,
     get_financial_statements,
@@ -31,6 +30,8 @@ def create_fundamentals_tool_node():
         >>> graph = StateGraph(AgentState)
         >>> graph.add_node("fundamentals_tools", create_fundamentals_tool_node())
     """
+    from langgraph.prebuilt import ToolNode
+
     tools = [
         get_company_info,
         get_financial_statements,

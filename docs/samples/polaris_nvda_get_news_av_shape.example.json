@@ -1,0 +1,90 @@
+{
+  "success": true,
+  "message": "Polaris-only：映射为 get_news.data 行（标的 NVDA），字段与 AV 一致",
+  "format": "json",
+  "data": [
+    {
+      "title": "Mixed Q4 Earnings Reports and Nuclear Energy Stock Analysis Drive Market Activity",
+      "url": "",
+      "time_published": "20260314T005851",
+      "summary": "Ollie's Bargain Outlet and BK Technologies report Q4 results while nuclear stocks Oklo and NuScale face investor scrutiny.\n\n[Counter-argument] Limited content availability makes it difficult to assess actual financial performance or market impact of these earnings reports, potentially overstating their significance to broader market movements.",
+      "source": "Polaris Report",
+      "overall_sentiment_score": 0.0,
+      "overall_sentiment_label": "Mixed"
+    },
+    {
+      "title": "Citi Warns of Continued Market Volatility as Mixed Corporate Actions Hit Stocks",
+      "url": "",
+      "time_published": "20260306T232225",
+      "summary": "Banking giant predicts ongoing market turbulence while ICON gets upgrade and Fidelis announces $163M buyback.\n\n[Counter-argument] Despite Citi's volatility warning, selective corporate actions like upgrades and buybacks could indicate underlying strength in specific sectors, suggesting the market may be differentiating between quality companies and broader economic concerns.",
+      "source": "Polaris Report",
+      "overall_sentiment_score": 0.0,
+      "overall_sentiment_label": "Mixed"
+    },
+    {
+      "title": "Delta, United, and Carnival Report Mixed Q4 Earnings; Travel Recovery Momentum Questioned",
+      "url": "",
+      "time_published": "20260312T140258",
+      "summary": "Transportation sector earnings reveal divergent recovery paths as airlines show strength while cruise operations face headwinds, creating volatility in travel stock valuations.\n\n[Counter-argument] The earnings reports actually demonstrate robust recovery fundamentals, with Delta and United's load factors near 85% of pre-pandemic levels proving sustainable travel demand despite economic headwinds. Airlines have successfully implemented dynamic pricing strategies that maintain profitability even with elevated fuel costs, while Carnival's challenges are temporary operational issues rather than structural problems. Historical precedent from previous travel downturns (2008 financial crisis, 9/11) shows the sector consistently rebounds strongly once operational capacity normalizes, and current pent-up demand for experiential spending remains historically high.",
+      "source": "Polaris Report",
+      "overall_sentiment_score": 0.0,
+      "overall_sentiment_label": "Mixed"
+    },
+    {
+      "title": "Dividend Stocks Close Earnings Gap with Tech as China Eases BHP Iron Ore Restrictions",
+      "url": "",
+      "time_published": "20260313T182224",
+      "summary": "Dividend stocks match tech earnings growth while commodity markets react to China policy shifts.\n\n[Counter-argument] The brief's claim that dividend stocks are 'narrowing the earnings growth gap' lacks quantified comparison data—no specific growth rate differentials, time periods, or indices are provided to substantiate this central thesis. Historically, tech earnings growth has outpaced dividend-paying sectors through multiple cycles; a temporary market rotation during a single quarter or earnings season does not constitute a structural convergence. Moreover, the brief conflates three separate phenomena (dividend stock performance, China's iron ore policy, and EU sugar duties) without establishing causal links, suggesting the narrative is constructed backward from a desired conclusion rather than emerging from integrated market data. Finally, 'defensive positions' typically underperform during bull markets, and if these dividend stocks are gaining primarily due to valuation compression in tech rather ",
+      "source": "Polaris Report",
+      "overall_sentiment_score": 0.0,
+      "overall_sentiment_label": "Mixed"
+    },
+    {
+      "title": "Market Analysis: Mixed Corporate Activity as Executives Signal Confidence",
+      "url": "",
+      "time_published": "20260306T232225",
+      "summary": "CEO stock purchases and corporate buyback programs highlight varied investor sentiment across sectors.\n\n[Counter-argument] CEO stock purchases can sometimes indicate desperation rather than confidence, as executives attempt to prop up declining share prices, and buyback programs may signal a lack of better investment opportunities for excess cash.",
+      "source": "Polaris Report",
+      "overall_sentiment_score": 0.0,
+      "overall_sentiment_label": "Mixed"
+    },
+    {
+      "title": "Earnings Reports and Oil Market Analysis Highlight Market Uncertainty",
+      "url": "",
+      "time_published": "20260314T005851",
+      "summary": "Corporate earnings calls from MindWalk Holdings and Ballard Power Systems coincide with strategist views on oil-driven inflation risks.\n\n[Counter-argument] Without access to the actual earnings details and specific strategist commentary, the significance of these particular earnings calls and their relationship to oil market concerns cannot be fully assessed.",
+      "source": "Polaris Report",
+      "overall_sentiment_score": 0.0,
+      "overall_sentiment_label": "Neutral"
+    },
+    {
+      "title": "Mixed Market Day as Oracle Surges While Boeing Declines, Analysts Weigh REIT and Tech Stocks",
+      "url": "",
+      "time_published": "20260311T161716",
+      "summary": "The Nasdaq led gains amid rising oil prices, with Oracle jumping on strong results while Boeing faced headwinds and analysts issued mixed calls on REITs and Nvidia.\n\n[Counter-argument] Limited source content makes it difficult to verify specific performance numbers or the magnitude of individual stock movements, potentially overstating the significance of these market developments.",
+      "source": "Polaris Report",
+      "overall_sentiment_score": 0.0,
+      "overall_sentiment_label": "Neutral"
+    },
+    {
+      "title": "Oracle Q3 Earnings Focus on AI Spending Amid Market Volatility",
+      "url": "",
+      "time_published": "20260310T161315",
+      "summary": "Oracle reports third-quarter results today with investors watching AI infrastructure investments and cloud growth amid broader market uncertainty.\n\n[Counter-argument] Some analysts question whether Oracle's AI investments will generate sufficient returns given intense competition from hyperscale cloud providers and the high capital requirements for AI infrastructure.",
+      "source": "Polaris Report",
+      "overall_sentiment_score": 0.8,
+      "overall_sentiment_label": "Bullish"
+    }
+  ],
+  "summary": {
+    "total_records": 8,
+    "data_source": "polaris_report_only_preview",
+    "date_range_note": "Polaris brief 使用 published_at；与 AV time_from/time_to 非同一过滤语义",
+    "polaris": {
+      "query": "NVDA stock NVIDIA earnings guidance US market",
+      "api_total": 5086,
+      "took_ms": 2169,
+      "resolved_ticker_hint": "Nvidia"
+    }
+  }
+}

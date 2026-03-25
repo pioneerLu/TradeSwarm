@@ -1,7 +1,9 @@
-import os
 import chromadb
 from chromadb.config import Settings
 from openai import OpenAI
+
+from tradingagents.llm_env_compat import env_silicon_key_and_base
+
 
 class FinancialSituationMemory:
     def __init__(self, name="test", config=None):
@@ -11,10 +13,18 @@ class FinancialSituationMemory:
         # 默认使用 text-embedding-v4
         self.embedding = "text-embedding-v4"
         
-        # 初始化 OpenAI 客户端
-        # 优先使用 config 中的配置，否则回退到默认值或环境变量
-        api_key = config.get("api_key") or os.getenv("DASHSCOPE_API_KEY")
-        base_url = config.get("backend_url") or "https://dashscope.aliyuncs.com/compatible-mode/v1"
+        api_key = config.get("api_key")
+        base_url = config.get("backend_url")
+        if not api_key or not base_url:
+            sk = env_silicon_key_and_base()
+            if sk:
+                api_key = api_key or sk[0]
+                base_url = base_url or sk[1]
+        if not api_key or not base_url:
+            raise ValueError(
+                "FinancialSituationMemory 需要 Silicon：请配置 Silicon_API_KEY（及 base_url_silicon），"
+                "或传入 config 含 api_key/backend_url"
+            )
         
         self.client = OpenAI(
             api_key=api_key,

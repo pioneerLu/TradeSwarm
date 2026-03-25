@@ -13,6 +13,7 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from datetime import datetime
+import time
 from typing import Any, Dict, List, Optional, Protocol
 
 from langchain_core.language_models import BaseChatModel
@@ -87,12 +88,24 @@ class BaseAnalystMemoryManager(ABC):
         高层流程：
         1. 计算窗口期（交易日维度）
         2. 从 analyst_reports 中读取窗口内的原始报告
-        3. 如果没有足够数据，可以选择：
+        3. 若 analyst_summaries 中已存在同一 (analyst_type, symbol, trade_date) 的记录，则跳过，
+           避免重复调用 LLM（返回 False 表示本次无更新）
+        4. 如果没有足够数据，可以选择：
            - 仍然生成（标记 source_reports_count < window_size）
            - 或直接跳过（由子类决定）
-        4. 调用子类实现的 `build_summary_prompt` / `parse_summary_output`
-        5. 将结果写入 analyst_summaries
+        5. 调用子类实现的 `build_summary_prompt` / `parse_summary_output`
+        6. 将结果写入 analyst_summaries
         """
+        # 0. 若当前日期已有 summary，则直接跳过，避免重复生成
+        existing = self.db_helper.query_summary(
+            analyst_type=self.analyst_type,
+            symbol=symbol,
+            trade_date=trade_date,
+        )
+        if existing is not None:
+            # 返回 False 表示这次没有执行更新（调用方可据此统计 skipped 数量）
+            return False
+
         # 1. 计算窗口日期（这里先简单使用日期减法，后续可接 DateResolver）
         window_start_date, window_end_date = self._resolve_window(trade_date, window_size)
 
@@ -118,9 +131,19 @@ class BaseAnalystMemoryManager(ABC):
         )
 
         # 3. 由子类构建 Prompt 并调用 LLM（这里只定义结构，具体 Prompt 后续讨论）
+        start_ts = time.time()
+        print(
+            f"[HistoryMaintainer][{self.analyst_type}] {symbol} {trade_date} "
+            f"开始生成 7 日窗口 summary ({window_start_date} ~ {window_end_date}, 报告数={source_reports_count})"
+        )
         summary_content, llm_model, token_usage = self._generate_summary_with_llm(
             llm=llm,
             context=context,
+        )
+        elapsed = time.time() - start_ts
+        print(
+            f"[HistoryMaintainer][{self.analyst_type}] {symbol} {trade_date} "
+            f"LLM 调用完成，用时 {elapsed:.1f}s"
         )
 
         # 4. 写入 analyst_summaries 表

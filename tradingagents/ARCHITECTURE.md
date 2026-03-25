@@ -8,17 +8,15 @@ tradingagents/
 │   ├── pre_open/          # 开盘前分析阶段
 │   │   ├── trader/        # 交易员节点（可访问仓位信息）
 │   │   ├── managers/
-│   │   │   ├── risk_manager/  # 风险经理（可访问仓位信息）
-│   │   │   └── strategy_selector/  # 策略选择器
+│   │   │   ├── research_manager/  # 研究侧辩论收口（对齐上游 Research Manager）
+│   │   │   └── risk_manager/      # 风险辩论终审（对齐上游 Portfolio Manager）
 │   │   └── ...
-│   ├── market_open/       # 市场开盘交易执行阶段
-│   │   └── node.py        # 交易执行器
-│   └── post_close/        # 收盘后收益整理阶段
-│       └── node.py         # 收益整理节点
+│   ├── market_open/       # 信号解析（如 signal_resolver → QuantConnect）
+│   └── post_close/        # 收盘后：历史维护、反思等
+│       ├── history_maintainer.py
+│       └── reflector.py
 │
 ├── core/                   # 核心模块
-│   ├── portfolio/          # 组合管理
-│   │   └── portfolio_manager.py
 │   ├── selection/          # 选股服务
 │   │   └── stock_selector.py
 │   └── data_adapter.py     # 数据适配器
@@ -33,36 +31,35 @@ tradingagents/
 
 **节点顺序**：
 ```
-Summary Nodes → Research Subgraph → Trader → Strategy Selector → Risk Subgraph
+Summary Nodes → Research Subgraph → Trader → Risk Subgraph
 ```
 
 **关键特性**：
 - `Trader` 节点可以访问 `current_position` 和 `portfolio_state`
 - `Risk Manager` 节点可以访问 `current_position` 和 `portfolio_state`
-- 生成交易决策和策略选择，但不执行交易
+- 生成可执行交易决策（action/target_pct/entry_type/entry_price），但不执行交易
 
-### 2. Market Open（市场开盘交易执行）
+### 与上游 [TradingAgents](https://github.com/TauricResearch/TradingAgents) 的对应关系
 
-**节点**：`market_open/node.py`
+| 上游（TauricResearch） | 本仓库（TradeSwarm） | 说明 |
+|------------------------|----------------------|------|
+| Research Manager | `research_manager` | 牛熊辩论后收口研究结论；本仓库要求 **结构化 JSON**（`decision` / `rationale` / `action_plan` 等），而非上游仓库中的纯自然语言段落。 |
+| Portfolio Manager | `risk_manager` | 风险辩论后给出终审与仓位/风控约束；本仓库用 **`final_decision`（BUY/SELL/HOLD）+ `position_size` 等** 与 `signal_resolver` 合并，便于 QuantConnect 与单测。 |
+| Trader | `trader` | 本仓库由 Trader 直接产出可执行字段，再经 Risk 层约束。 |
 
-**职责**：
-- 读取 `pre_open` 阶段的决策（`strategy_selection`, `trader_investment_plan`, `risk_summary`）
-- 检查风险决策（如果被否定，不执行）
-- 执行策略（调用 `trading_sys` 的策略库）
-- 根据信号和 Trader 建议决定是否下单
-- 获取 T+1 日开盘价（实际执行价格）
-- 执行交易（考虑目标仓位分配）
-- 更新仓位状态
+保留 **JSON + [`signal_resolver`](agents/market_open/signal_resolver.py)** 的原因：下游回测与导出脚本需要稳定字段与可校验输出；上游的 `SignalProcessor` 解析自然语言的路径与本仓库目标不一致，故不照搬。
 
-### 3. Post-Close（收盘后收益整理）
+### 2. Market Open（执行侧）
 
-**节点**：`post_close/node.py`
+实盘/回测下单由 **QuantConnect**（或外部执行器）消费导出信号；Python 侧通过 `signal_resolver` 从 `trader_investment_plan` 与 `risk_summary` 合并出结构化信号。
 
-**职责**：
-- 更新所有持仓的当前价格（使用收盘价）
-- 计算每日收益
-- 更新组合状态
-- 记录交易日志
+**职责（概念上）**：
+- 读取 Pre-Open 的 `trader_investment_plan`、`risk_summary`
+- 按 `entry_type` / `entry_price` 等字段执行或回测下单
+
+### 3. Post-Close（收盘后）
+
+主要模块：`history_maintainer`、`reflector` 等，用于维护分析脉络与反思记录；组合级收盘核算可能在外部回测/实盘系统中完成。
 
 ## AgentState 扩展
 
@@ -73,17 +70,7 @@ current_position: Optional[Dict[str, Any]]  # 当前持仓信息
 portfolio_state: Optional[Dict[str, Any]]   # 组合状态
 ```
 
-## 组合管理
-
-### PortfolioManager
-
-位置：`tradingagents/core/portfolio/portfolio_manager.py`
-
-功能：
-- 管理多股票投资组合
-- 执行买入/卖出
-- 再平衡逻辑
-- 跟踪仓位、资金、交易记录
+## 组合与选股（core）
 
 ### StockSelectorService
 
@@ -96,35 +83,7 @@ portfolio_state: Optional[Dict[str, Any]]   # 组合状态
 
 ## 使用方式
 
-### 1. 初始化组合管理器
-
-```python
-from tradingagents.core.portfolio import PortfolioManager
-from tradingagents.core.data_adapter import DataAdapter
-
-portfolio_manager = PortfolioManager(initial_cash=100000.0, max_positions=5)
-data_adapter = DataAdapter(use_cache=True)
-```
-
-### 2. 创建 market_open 节点
-
-```python
-from tradingagents.agents.market_open.node import create_market_open_executor
-
-market_open_node = create_market_open_executor(portfolio_manager, data_adapter)
-```
-
-### 3. 创建 post_close 节点
-
-```python
-from tradingagents.agents.post_close.node import create_post_close_node
-
-post_close_node = create_post_close_node(portfolio_manager, data_adapter)
-```
-
-### 4. 在 Graph 中集成
-
-需要在 Graph 中添加 `market_open` 和 `post_close` 节点，根据 `trading_session` 字段路由到相应的节点。
+Pre-Open 决策图入口：[`graph/trading_graph.py`](graph/trading_graph.py) 的 `create_trading_graph`；信号导出见仓库根目录脚本 `scripts/runtime/run_signal_export.py` 与 `quantconnect/`。
 
 ## 关键设计
 

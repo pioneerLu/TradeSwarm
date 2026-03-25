@@ -1,18 +1,25 @@
-import os
 from openai import OpenAI
 import chromadb
 from chromadb.config import Settings
 from openai import OpenAI
 from dotenv import load_dotenv
 
+from tradingagents.llm_env_compat import env_silicon_key_and_base
+
 load_dotenv()
 
 
+def _default_openai_client() -> OpenAI:
+    sk = env_silicon_key_and_base()
+    if not sk:
+        raise RuntimeError(
+            "未配置 Silicon_API_KEY（及 base_url_silicon）；项目 LLM/Embedding 客户端仅支持 Silicon。"
+        )
+    ak, bu = sk
+    return OpenAI(api_key=ak, base_url=bu)
 
-client = OpenAI(
-    api_key=os.getenv("DASHSCOPE_API_KEY"),  # 如果您没有配置环境变量，请在此处用您的API Key进行替换
-    base_url="https://dashscope.aliyuncs.com/compatible-mode/v1"  # 百炼服务的base_url
-)
+
+client = _default_openai_client()
 
 
 import chromadb
@@ -89,7 +96,7 @@ class FinancialSituationMemory:
 if __name__ == "__main__":
     # Example usage
     config = {
-    "backend_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+    "backend_url": "https://api.siliconflow.cn/v1",
     "embedding_model": "text-embedding-v4"
     }
 

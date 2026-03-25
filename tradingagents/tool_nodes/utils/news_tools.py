@@ -6,6 +6,8 @@ from datetime import datetime, timedelta
 import pandas as pd
 from langchain_core.tools import tool
 from datasources.data_sources.alphavantage_provider import AlphaVantageProvider
+from datasources.polaris_report_client import get_polaris_token, polaris_search, polaris_agent_feed
+from datasources.polaris_av_news_adapter import polaris_brief_to_av_news_row
 from utils.data_utils import normalize_stock_code, format_date
 from utils.config_loader import load_config
 
@@ -125,6 +127,89 @@ def _get_alphavantage_provider() -> AlphaVantageProvider:
     return _alphavantage_provider
 
 
+POLARIS_NEWS_CAP = 6
+
+
+def _av_ticker(symbol: str) -> str:
+    return symbol.split(".")[0] if "." in symbol else symbol
+
+
+def _polaris_brief_matches_symbol(brief: Dict, av_sym: str) -> bool:
+    sym = av_sym.upper()
+    for e in brief.get("entities_enriched") or []:
+        if not isinstance(e, dict):
+            continue
+        t = e.get("ticker")
+        if t and str(t).upper().split(".")[0] == sym:
+            return True
+    blob = ((brief.get("headline") or "") + " " + (brief.get("summary") or "")).upper()
+    if sym in blob:
+        return True
+    if sym == "NVDA" and "NVIDIA" in blob:
+        return True
+    return False
+
+
+def _fetch_polaris_news_rows(symbol: str, fetch_limit: int) -> tuple[List[Dict], Dict]:
+    meta: Dict = {"enabled": False}
+    if not get_polaris_token():
+        return [], meta
+    meta["enabled"] = True
+    av_sym = _av_ticker(symbol)
+    if av_sym.upper() == "NVDA":
+        q = f"{av_sym} NVIDIA stock company earnings guidance"
+    else:
+        q = f"{av_sym} stock company earnings news"
+    meta["query"] = q
+    try:
+        res = polaris_search(q, limit=max(fetch_limit, 10), min_confidence=0.35)
+    except Exception as exc:
+        return [], {**meta, "ok": False, "error": str(exc)}
+    if not res.get("success"):
+        return [], {**meta, "ok": False, "error": res.get("error") or res.get("detail")}
+
+    briefs = [b for b in (res.get("briefs") or []) if isinstance(b, dict)]
+    filtered = [b for b in briefs if _polaris_brief_matches_symbol(b, av_sym)]
+    used = filtered if filtered else briefs
+    rows = [polaris_brief_to_av_news_row(b, av_sym) for b in used[:POLARIS_NEWS_CAP]]
+    return rows, {
+        **meta,
+        "ok": True,
+        "raw_brief_count": len(briefs),
+        "used_brief_count": len(rows),
+        "symbol_filter_relaxed": len(filtered) == 0 and len(briefs) > 0,
+    }
+
+
+def _polaris_agent_feed_markdown(max_items: int) -> tuple[str, Dict]:
+    meta: Dict = {"enabled": bool(get_polaris_token())}
+    if not meta["enabled"]:
+        return "", meta
+    try:
+        res = polaris_agent_feed(
+            limit=max(1, min(max_items, 12)), category="markets", min_confidence=0.4
+        )
+    except Exception as exc:
+        return "", {**meta, "ok": False, "error": str(exc)}
+    if not res.get("success"):
+        return "", {**meta, "ok": False, "error": res.get("error") or res.get("detail")}
+    briefs = [b for b in (res.get("briefs") or []) if isinstance(b, dict)]
+    lines: List[str] = ["\n\n---\n\n## Polaris agent-feed（补充）\n\n"]
+    for i, b in enumerate(briefs[:max_items], 1):
+        h = b.get("headline") or ""
+        summ = (b.get("summary") or "")[:400]
+        conf = b.get("confidence")
+        if conf is None and isinstance(b.get("provenance"), dict):
+            conf = b["provenance"].get("confidence_score")
+        lines.append(f"### {i}. {h}\n\n")
+        if summ:
+            lines.append(f"- 摘要: {summ}\n")
+        if conf is not None:
+            lines.append(f"- confidence: {conf}\n")
+        lines.append("\n")
+    return "".join(lines), {**meta, "ok": True, "count": min(len(briefs), max_items)}
+
+
 @tool
 def get_news(
     symbol: str,
@@ -134,7 +219,7 @@ def get_news(
     limit: Optional[int] = 10
 ) -> str:
     """
-    获取股票相关的新闻信息（使用 Alpha Vantage API）
+    获取股票相关的新闻信息（主数据源 Alpha Vantage；Polaris 仅当 AV 无数据或异常时 fallback）
     
     此工具用于获取指定股票在指定日期范围内的新闻信息。
     包括公司公告、新闻资讯等可能影响股价的信息。
@@ -184,52 +269,99 @@ def get_news(
             end_date = end_date_obj.strftime('%Y%m%d')
         
         av_provider = _get_alphavantage_provider()
-        # 使用 Alpha Vantage NEWS_SENTIMENT API 获取新闻（支持历史日期过滤）
         df = av_provider.get_news(symbol, limit=limit or 10, start_date=start_date, end_date=end_date)
-        
+
         if df is not None and not df.empty:
-            # 转换为字典列表
-            data_list = df.to_dict('records')
-            
+            data_list = df.to_dict("records")
             summary = {
                 "total_records": len(data_list),
                 "data_source": "alphavantage",
-                "date_range": {
-                    "start": start_date,
-                    "end": end_date
-                },
-                "note": "数据以 JSON 列表格式返回，便于程序处理和 LLM 理解。"
+                "date_range": {"start": start_date, "end": end_date},
+                "note": "来自 Alpha Vantage；Polaris 仅在 AV 无数据或异常时作为 fallback。",
             }
-            
             result = {
                 "success": True,
                 "message": f"成功从 Alpha Vantage 获取股票 {symbol} 的新闻",
-                "format": "json",  # 添加格式说明
+                "format": "json",
                 "data": data_list,
-                "summary": summary
+                "summary": summary,
             }
-            
             return json.dumps(result, ensure_ascii=False, indent=2, default=str)
-        else:
-            return json.dumps({
+
+        polaris_fetch = max(8, min((limit or 10) + 4, 16))
+        polaris_rows, polaris_meta = _fetch_polaris_news_rows(symbol, polaris_fetch)
+
+        if polaris_rows:
+            summary = {
+                "total_records": len(polaris_rows),
+                "data_source": "polaris_report",
+                "date_range": {"start": start_date, "end": end_date},
+                "note": "Alpha Vantage 无数据；已 fallback 至 Polaris。",
+                "polaris": {**polaris_meta, "fallback": True},
+            }
+            result = {
+                "success": True,
+                "message": f"Alpha Vantage 无数据；已使用 Polaris fallback（{symbol}）",
+                "format": "json",
+                "data": polaris_rows,
+                "summary": summary,
+            }
+            return json.dumps(result, ensure_ascii=False, indent=2, default=str)
+
+        return json.dumps(
+            {
                 "success": False,
-                "message": f"Alpha Vantage 返回空数据，可能该股票在指定日期范围内暂无新闻",
+                "message": f"Alpha Vantage 与 Polaris 均无可用新闻（{symbol}）",
                 "data": [],
                 "summary": {
                     "total_records": 0,
-                    "data_source": "alphavantage",
+                    "data_source": "alphavantage+polaris_report",
                     "date_range": {"start": start_date, "end": end_date},
-                    "note": "已使用 time_from 和 time_to 参数请求指定日期范围的新闻"
-                }
-            }, ensure_ascii=False, indent=2)
+                    "note": "已请求两侧数据源",
+                    "polaris": polaris_meta,
+                },
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
         
     except Exception as e:
-        return json.dumps({
-            "success": False,
-            "message": f"获取新闻数据时发生错误: {str(e)}",
-            "data": [],
-            "summary": {}
-        }, ensure_ascii=False, indent=2)
+        polaris_fetch = max(8, min((limit or 10) + 4, 16))
+        polaris_rows, polaris_meta = _fetch_polaris_news_rows(symbol, polaris_fetch)
+        if polaris_rows:
+            dr = {
+                "start": locals().get("start_date", ""),
+                "end": locals().get("end_date", ""),
+            }
+            summary = {
+                "total_records": len(polaris_rows),
+                "data_source": "polaris_report",
+                "date_range": dr,
+                "note": f"Alpha Vantage 失败（{str(e)[:180]}）；已 fallback 至 Polaris。",
+                "polaris": {**polaris_meta, "fallback": True, "av_error": str(e)[:500]},
+            }
+            return json.dumps(
+                {
+                    "success": True,
+                    "message": f"Alpha Vantage 异常；已使用 Polaris fallback（{symbol}）",
+                    "format": "json",
+                    "data": polaris_rows,
+                    "summary": summary,
+                },
+                ensure_ascii=False,
+                indent=2,
+                default=str,
+            )
+        return json.dumps(
+            {
+                "success": False,
+                "message": f"获取新闻数据时发生错误: {str(e)}",
+                "data": [],
+                "summary": {"polaris": polaris_meta},
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
 
 
 @tool
@@ -240,7 +372,7 @@ def get_global_news(
     limit: Optional[int] = 10
 ) -> str:
     """
-    获取宏观经济新闻和全球市场新闻
+    获取宏观经济新闻和全球市场新闻（主数据源 Alpha Vantage；Polaris 仅当 AV 无数据或异常时 fallback）
     
     此工具用于获取指定日期范围内的宏观经济新闻、政策新闻、市场信号等
     可能影响 A 股市场的全球性新闻信息。使用 Alpha Vantage API 获取数据。
@@ -276,32 +408,29 @@ def get_global_news(
             start_date = start_date_obj.strftime('%Y%m%d')
             end_date = end_date_obj.strftime('%Y%m%d')
         
-        # 使用 Alpha Vantage 获取宏观新闻（支持历史日期过滤）
         av_provider = _get_alphavantage_provider()
         df = av_provider.get_macro_news(limit=limit or 10, start_date=start_date, end_date=end_date)
-        
+
         if df is not None and not df.empty:
-            # 转换为 Markdown 格式
             markdown = f"# 宏观市场全景简报\n\n"
             markdown += f"**更新时间**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n"
             markdown += "---\n\n"
-            
-            # 格式化新闻数据
+
             markdown += f"## 📰 宏观新闻 ({len(df)}条)\n\n"
             for idx, (_, row) in enumerate(df.iterrows(), 1):
-                title = row.get('title', '无标题')
-                url = row.get('url', '')
-                time_pub = row.get('time_published', '')
-                summary = row.get('summary', '')
-                source = row.get('source', '')
-                sentiment = row.get('overall_sentiment_score', 0)
-                
+                title = row.get("title", "无标题")
+                url = row.get("url", "")
+                time_pub = row.get("time_published", "")
+                summary = row.get("summary", "")
+                source = row.get("source", "")
+                sentiment = row.get("overall_sentiment_score", 0)
+
                 markdown += f"### {idx}. "
                 if url:
                     markdown += f"[{title}]({url})\n\n"
                 else:
                     markdown += f"{title}\n\n"
-            
+
                 if time_pub:
                     markdown += f"- **时间**: {time_pub}\n"
                 if source:
@@ -312,44 +441,101 @@ def get_global_news(
                     summary_short = summary[:150] + "..." if len(summary) > 150 else summary
                     markdown += f"- **摘要**: {summary_short}\n"
                 markdown += "\n"
-            
-            markdown += f"*数据来源: Alpha Vantage*\n"
-            
+
+            markdown += "*数据来源: Alpha Vantage*\n"
+
             result = {
                 "success": True,
-                "message": f"成功从 Alpha Vantage 获取宏观新闻",
+                "message": "成功从 Alpha Vantage 获取宏观新闻",
                 "format": "markdown",
                 "content": markdown,
                 "summary": {
                     "data_source": "alphavantage",
-                    "date_range": {
-                        "start": start_date,
-                        "end": end_date
-                    },
-                    "total_records": len(df),
-                    "note": "数据以 Markdown 格式返回，便于 LLM 理解和处理"
-                }
-            }
-            
-            return json.dumps(result, ensure_ascii=False, indent=2, default=str)
-        else:
-            return json.dumps({
-                "success": False,
-                "message": f"Alpha Vantage 返回空数据，可能暂无宏观新闻",
-                "format": "markdown",
-                "content": f"# 宏观市场全景简报\n\n## ⚠️ 暂无数据\n\n当前时间段内暂无宏观新闻数据。",
-                "summary": {
-                    "data_source": "alphavantage",
                     "date_range": {"start": start_date, "end": end_date},
-                    "total_records": 0
-                }
-            }, ensure_ascii=False, indent=2)
+                    "total_records": len(df),
+                    "note": "来自 Alpha Vantage；Polaris 仅在 AV 无数据或异常时 fallback。",
+                },
+            }
+            return json.dumps(result, ensure_ascii=False, indent=2, default=str)
+
+        polaris_md, polaris_g_meta = _polaris_agent_feed_markdown(min(8, (limit or 10) + 2))
+
+        if polaris_md.strip():
+            markdown = f"# 宏观市场全景简报\n\n"
+            markdown += f"**更新时间**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n---\n\n"
+            markdown += "## ⚠️ Alpha Vantage 本区间无宏观新闻\n\n"
+            markdown += polaris_md
+            result = {
+                "success": True,
+                "message": "Alpha Vantage 无数据；已 fallback 至 Polaris agent-feed",
+                "format": "markdown",
+                "content": markdown,
+                "summary": {
+                    "data_source": "polaris_report",
+                    "date_range": {"start": start_date, "end": end_date},
+                    "total_records": 0,
+                    "note": "AV 无数据；Polaris fallback。",
+                    "polaris": {**polaris_g_meta, "fallback": True},
+                },
+            }
+            return json.dumps(result, ensure_ascii=False, indent=2, default=str)
+
+        return json.dumps(
+            {
+                "success": False,
+                "message": "Alpha Vantage 与 Polaris 均无可用宏观素材",
+                "format": "markdown",
+                "content": "# 宏观市场全景简报\n\n## ⚠️ 暂无数据\n\n当前时间段内暂无宏观新闻数据。",
+                "summary": {
+                    "data_source": "alphavantage+polaris_report",
+                    "date_range": {"start": start_date, "end": end_date},
+                    "total_records": 0,
+                    "polaris": polaris_g_meta,
+                },
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
         
     except Exception as e:
-        return json.dumps({
-            "success": False,
-            "message": f"获取宏观经济新闻时发生错误: {str(e)}",
-            "data": [],
-            "summary": {}
-        }, ensure_ascii=False, indent=2)
+        try:
+            polaris_md, polaris_g_meta = _polaris_agent_feed_markdown(min(8, (limit or 10) + 2))
+        except Exception:
+            polaris_md, polaris_g_meta = "", {"enabled": bool(get_polaris_token())}
+        if polaris_md.strip():
+            markdown = f"# 宏观市场全景简报\n\n"
+            markdown += f"**更新时间**: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n\n---\n\n"
+            markdown += f"## ⚠️ Alpha Vantage 失败: {str(e)[:200]}\n\n"
+            markdown += polaris_md
+            return json.dumps(
+                {
+                    "success": True,
+                    "message": "Alpha Vantage 异常；已 fallback 至 Polaris agent-feed",
+                    "format": "markdown",
+                    "content": markdown,
+                    "summary": {
+                        "data_source": "polaris_report",
+                        "date_range": {
+                            "start": locals().get("start_date", ""),
+                            "end": locals().get("end_date", ""),
+                        },
+                        "total_records": 0,
+                        "polaris": {**polaris_g_meta, "fallback": True, "av_error": str(e)[:500]},
+                    },
+                },
+                ensure_ascii=False,
+                indent=2,
+                default=str,
+            )
+        return json.dumps(
+            {
+                "success": False,
+                "message": f"获取宏观经济新闻时发生错误: {str(e)}",
+                "format": "markdown",
+                "content": "",
+                "summary": {"polaris": polaris_g_meta},
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
 

@@ -784,7 +784,11 @@ class AlphaVantageProvider(BaseDataProvider):
         try:
             data = self._make_request(params)
             
-            if not data or 'Symbol' not in data:
+            # EARNINGS 接口返回小写 symbol；OVERVIEW 等接口为大写 Symbol。仅检查 Symbol 会误判为空。
+            if (
+                not data
+                or ('Symbol' not in data and 'symbol' not in data)
+            ):
                 return {
                     'annualEarnings': [],
                     'quarterlyEarnings': [],

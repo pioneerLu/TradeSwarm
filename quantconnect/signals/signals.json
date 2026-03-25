@@ -1,0 +1,16 @@
+{
+  "symbol": "NVDA",
+  "start_date": "2025-01-01",
+  "end_date": "2025-01-02",
+  "signals": {
+    "2025-01-01": {
+      "action": "HOLD",
+      "reason": "缺少报告: ['market', 'news', 'fundamentals', 'sentiment']"
+    },
+    "2025-01-02": {
+      "action": "HOLD",
+      "reason": "缺少报告: ['fundamentals']"
+    }
+  },
+  "by_execution_date": {}
+}

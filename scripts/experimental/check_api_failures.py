@@ -2,7 +2,7 @@
 """
 检查 memory.db 中因 API 限制未能成功获取数据的报告。
 
-- 按 symbol 区分标的，输出中带 symbol，便于与 rebuild_failed_reports 对应。
+- 按 symbol 区分标的，输出中带 symbol；报告可用于人工按日期调用 `build_analyst_dataset --dates ... --only-missing` 补全。
 - 「受限于」仅在与 API/数据/访问 等词同时出现时计为失败，减少误报。
 
 用法:
@@ -14,6 +14,8 @@ import argparse
 import sqlite3
 from pathlib import Path
 
+REPO_ROOT = Path(__file__).resolve().parents[2]
+
 # 明确表示 API/数据获取失败的表述
 KEYWORDS_STRONG = [
     "未能获取",
@@ -22,11 +24,14 @@ KEYWORDS_STRONG = [
     "限频",
     "访问中断",
     "API访问中断",
+    "API访问限制",
+    "数据源限制",
     "API密钥耗尽",
     "密钥耗尽",
     "Rate limited",
-    "数据源限制",
     "数据获取失败",
+    "数据获取暂时不可用",
+    "暂时不可用",
     "无法获取",
     "无法提供",  # 如「本报告无法提供...的详细财务指标」
 ]
@@ -47,6 +52,11 @@ def _is_api_failure(content: str) -> tuple[bool, str]:
         for sub in WEAK_REQUIRED_SUBSTRINGS:
             if sub in content:
                 return True, KEYWORD_WEAK
+    # Market Analyst 等输出 JSON，data_points_analyzed 为 0 表示未获取实际数据
+    if '"data_points_analyzed": 0' in content or "'data_points_analyzed': 0" in content:
+        return True, "data_points_analyzed:0"
+    if "data_limitation_note" in content and ("API" in content or "限制" in content):
+        return True, "data_limitation_note"
     return False, ""
 
 
@@ -99,9 +109,10 @@ def main():
         lines.append("")
 
     out = "\n".join(lines)
-    with open("api_failures_report.txt", "w", encoding="utf-8") as f:
+    report_path = REPO_ROOT / "api_failures_report.txt"
+    with open(report_path, "w", encoding="utf-8") as f:
         f.write(out)
-    print(f"共 {len(unique)} 条报告可能受 API 限制影响，详情已写入 api_failures_report.txt")
+    print(f"共 {len(unique)} 条报告可能受 API 限制影响，详情已写入 {report_path}")
 
 
 if __name__ == "__main__":

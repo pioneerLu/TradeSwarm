@@ -1,0 +1,863 @@
+{
+  "http_status": 200,
+  "body": {
+    "status": "ok",
+    "query": "NVDA stock NVIDIA earnings guidance US market",
+    "resolved_ticker": "Nvidia",
+    "total": 5086,
+    "took_ms": 2169,
+    "briefs": [
+      {
+        "id": "PR-SwtVMIgo",
+        "headline": "Mixed Q4 Earnings Reports and Nuclear Energy Stock Analysis Drive Market Activity",
+        "summary": "Ollie's Bargain Outlet and BK Technologies report Q4 results while nuclear stocks Oklo and NuScale face investor scrutiny.",
+        "body": "Multiple companies reported fourth-quarter earnings today, with Ollie's Bargain Outlet Holdings (OLLI) and BK Technologies Corporation releasing their Q4 2025 results. Without access to detailed financial metrics from the earnings calls, market reaction to these retail and communications technology companies remains unclear.\n\nThe nuclear energy sector drew attention as analysts compared investment prospects between Oklo Inc. and NuScale Power Corporation. This comparison comes amid renewed investor interest in nuclear power stocks, driven by growing energy demands from AI data centers and carbon reduction initiatives. Both companies represent different approaches to next-generation nuclear technology.\n\nEarnings season activity typically creates volatility in individual stocks while broader market indices may see limited impact from smaller-cap company reports. Nuclear energy stocks have experienced heightened volatility as investors weigh long-term growth potential against regulatory and execution risks in the sector.\n\nWithout specific financial data from the earnings reports, investor focus will likely center on management guidance, margin trends, and forward-looking statements that could signal company performance trajectories heading into 2025.",
+        "category": "markets",
+        "published_at": "2026-03-14T00:58:51.358Z",
+        "provenance": {
+          "review_status": "ai_generated",
+          "ai_contribution_pct": 100,
+          "human_contribution_pct": 0,
+          "confidence_score": 0.4,
+          "bias_score": 0,
+          "agents_involved": [
+            "SC",
+            "NL",
+            "ENT-EXT",
+            "ENT-EXT"
+          ]
+        },
+        "sources": [],
+        "brief_type": "market_mover",
+        "trending": false,
+        "counter_argument": "Limited content availability makes it difficult to assess actual financial performance or market impact of these earnings reports, potentially overstating their significance to broader market movements.",
+        "ai_context": "This brief was composed from Yahoo Finance headlines without access to full article content, limiting analysis depth and requiring inference about market implications.",
+        "topics": [
+          "Q4 earnings",
+          "nuclear energy stocks",
+          "retail earnings",
+          "technology earnings"
+        ],
+        "entities": [
+          "Ollie's Bargain Outlet Holdings",
+          "BK Technologies Corporation",
+          "Oklo Inc.",
+          "NuScale Power Corporation",
+          "Yahoo Finance"
+        ],
+        "entities_enriched": [
+          {
+            "name": "Ollie's Bargain Outlet Holdings",
+            "type": "organization",
+            "role": "subject",
+            "sentiment": "neutral",
+            "ticker": "OLLI",
+            "sentiment_score": 0
+          },
+          {
+            "name": "BK Technologies Corporation",
+            "type": "organization",
+            "role": "subject",
+            "sentiment": "neutral",
+            "sentiment_score": 0
+          },
+          {
+            "name": "Oklo Inc.",
+            "type": "organization",
+            "role": "subject",
+            "sentiment": "neutral",
+            "sentiment_score": 0
+          },
+          {
+            "name": "NuScale Power Corporation",
+            "type": "organization",
+            "role": "subject",
+            "sentiment": "neutral",
+            "sentiment_score": 0
+          },
+          {
+            "name": "nuclear energy sector",
+            "type": "product",
+            "role": "related",
+            "sentiment": "positive",
+            "sentiment_score": 0.8
+          },
+          {
+            "name": "AI data centers",
+            "type": "product",
+            "role": "related",
+            "sentiment": "neutral",
+            "sentiment_score": 0
+          }
+        ],
+        "sentiment": "mixed",
+        "impact_score": 3.5,
+        "read_time_seconds": 65,
+        "tags": [
+          "markets",
+          "energy",
+          "tech",
+          "earnings"
+        ],
+        "source_count": 3,
+        "corrections_count": 0,
+        "update_count": 0,
+        "structured_data": [
+          {
+            "type": "date",
+            "value": "Q4 2025",
+            "entity": "Ollie's Bargain Outlet Holdings, BK Technologies Corporation",
+            "context": "earnings reporting period"
+          }
+        ],
+        "updated_at": "2026-03-21T23:12:11.932Z",
+        "original_created_at": "2026-03-12T17:10:47.783Z",
+        "market_session": "overnight",
+        "search_score": 0.283502,
+        "highlights": {
+          "headline": "Mixed Q4 <mark>Earnings</mark> Reports and Nuclear Energy <mark>Stock</mark> Analysis Drive <mark>Market</mark> Activity",
+          "summary": "Ollie's Bargain Outlet and BK Technologies report Q4 results while nuclear <mark>stocks</mark> Oklo and NuScale face investor scrutiny",
+          "body_snippet": "Multiple companies reported fourth-quarter <mark>earnings</mark> today, with Ollie's Bargain Outlet Holdings (OLLI) and BK Technologies <mark>Corporation</mark> releasing their Q4 2025 results. Without access to detailed financial metrics from the <mark>earnings</mark> calls, <mark>market</mark> reaction"
+        }
+      },
+      {
+        "id": "PR-2026-0306-436",
+        "headline": "Citi Warns of Continued Market Volatility as Mixed Corporate Actions Hit Stocks",
+        "summary": "Banking giant predicts ongoing market turbulence while ICON gets upgrade and Fidelis announces $163M buyback.",
+        "body": "Citigroup analysts warned investors to brace for continued stock market volatility in the near term, adding institutional weight to concerns about market stability. The warning comes as markets have experienced heightened swings amid economic uncertainty and mixed corporate earnings signals.\n\nThe volatility forecast coincides with notable corporate developments, including Jefferies upgrading ICON Public Limited Company (ICLR) from Hold to Buy, suggesting analysts see value in the clinical research organization despite broader market concerns. Separately, Fidelis Insurance Holdings Limited (FIHL) announced a definitive agreement to repurchase all common shares held by CVC Falcon for $163.35 million, representing a significant capital restructuring move.\n\nThe mixed signals reflect the current market environment where individual corporate fundamentals are competing with macro-economic headwinds for investor attention. Upgrade announcements and strategic buybacks typically provide stock-specific support, but may face headwinds from broader volatility concerns raised by major financial institutions like Citi.\n\nThe divergent corporate actions highlight how companies are navigating uncertain market conditions through different strategies—some attracting analyst upgrades while others pursue shareholder-friendly capital allocation through buybacks.",
+        "category": "markets",
+        "published_at": "2026-03-06T23:22:25.363Z",
+        "provenance": {
+          "review_status": "ai_generated",
+          "ai_contribution_pct": 100,
+          "human_contribution_pct": 0,
+          "confidence_score": 0.6,
+          "bias_score": 0,
+          "agents_involved": [
+            "SC",
+            "NL"
+          ]
+        },
+        "sources": [],
+        "brief_type": "market_mover",
+        "trending": false,
+        "counter_argument": "Despite Citi's volatility warning, selective corporate actions like upgrades and buybacks could indicate underlying strength in specific sectors, suggesting the market may be differentiating between quality companies and broader economic concerns.",
+        "ai_context": "This brief was composed from three headline-only sources without full article content, limiting depth of analysis. The narrative connects market volatility warnings with concurrent corporate developments to provide market context.",
+        "topics": [
+          "market volatility",
+          "analyst upgrades",
+          "share buybacks",
+          "corporate restructuring"
+        ],
+        "entities": [
+          "Citigroup",
+          "Jefferies",
+          "ICON Public Limited Company",
+          "Fidelis Insurance Holdings",
+          "CVC Falcon"
+        ],
+        "entities_enriched": [
+          {
+            "name": "Citigroup",
+            "type": "organization",
+            "role": "subject",
+            "sentiment": "neutral",
+            "ticker": "C",
+            "sentiment_score": 0
+          },
+          {
+            "name": "Jefferies",
+            "type": "organization",
+            "role": "related",
+            "sentiment": "positive",
+            "ticker": "JEF",
+            "sentiment_score": 0.8
+          },
+          {
+            "name": "ICON Public Limited Company",
+            "type": "organization",
+            "role": "related",
+            "sentiment": "positive",
+            "ticker": "ICLR",
+            "sentiment_score": 0.8
+          },
+          {
+            "name": "Fidelis Insurance Holdings Limited",
+            "type": "organization",
+            "role": "related",
+            "sentiment": "neutral",
+            "ticker": "FIHL",
+            "sentiment_score": 0
+          },
+          {
+            "name": "CVC Falcon",
+            "type": "organization",
+            "role": "mentioned",
+            "sentiment": "neutral",
+            "sentiment_score": 0
+          }
+        ],
+        "sentiment": "mixed",
+        "impact_score": 4.5,
+        "read_time_seconds": 75,
+        "tags": [
+          "markets",
+          "tech",
+          "crypto",
+          "science"
+        ],
+        "source_count": 3,
+        "corrections_count": 0,
+        "update_count": 0,
+        "updated_at": "2026-03-21T23:12:11.932Z",
+        "original_created_at": "2026-03-06T23:16:16.281Z",
+        "market_session": "after_hours",
+        "search_score": 0.246584,
+        "highlights": {
+          "headline": "Citi Warns of Continued <mark>Market</mark> Volatility as Mixed <mark>Corporate</mark> Actions Hit <mark>Stocks</mark>",
+          "summary": "Banking giant predicts ongoing <mark>market</mark> turbulence while ICON gets upgrade and Fidelis announces $163M buyback",
+          "body_snippet": "Citigroup analysts warned investors to brace for continued <mark>stock</mark> <mark>market</mark> volatility in the near term, adding institutional weight to concerns about <mark>market</mark> stability. The warning comes as <mark>markets</mark> have experienced heightened swings amid economic uncertainty"
+        }
+      },
+      {
+        "id": "PR-nCBG4RBn",
+        "headline": "Delta, United, and Carnival Report Mixed Q4 Earnings; Travel Recovery Momentum Questioned",
+        "summary": "Transportation sector earnings reveal divergent recovery paths as airlines show strength while cruise operations face headwinds, creating volatility in travel stock valuations.",
+        "body": "## Overview\n\nDelta Air Lines, United Airlines, and Carnival Cruise Lines reported fourth-quarter earnings around March 20th, delivering mixed results that highlighted the uneven recovery trajectory across the transportation sector. Delta and United generally exceeded analyst expectations on revenue and passenger volume metrics, while Carnival faced continued challenges from operational disruptions and elevated costs. The earnings reports triggered significant options activity as investors recalibrated positions based on forward guidance and capacity restoration timelines.\n\nThe market response reflected broader uncertainty about travel demand sustainability, fuel cost pressures, and the pace of international route recovery. Delta's strong domestic performance contrasted with Carnival's ongoing struggle to return to pre-pandemic profitability levels, creating divergent stock price movements that complicated sector-wide investment strategies.\n\n## Context & Background\n\nThe travel and transportation sector has experienced volatile recovery patterns since 2020, with airlines generally outperforming cruise lines in returning to operational capacity. Airlines benefited from pent-up domestic travel demand and business travel normalization, while cruise operators faced extended operational shutdowns, regulatory challenges, and consumer hesitancy around close-quarters travel experiences.\n\nInstitutional investors have closely monitored these earnings cycles as key indicators of consumer discretionary spending strength and the broader economic recovery trajectory. The sector's capital-intensive nature and high fixed costs make earnings volatility particularly impactful on stock valuations, with options markets often amplifying price movements around earnings announcements.\n\n## Key Data & Analysis\n\nReports suggest Delta achieved load factors approaching 85% of pre-pandemic levels, with domestic routes performing strongest. United indicated similar recovery patterns with international capacity restoration accelerating through Q4. Both airlines reported margin improvements despite elevated fuel costs, suggesting pricing power recovery.\n\nCarnival's performance appeared more challenged, with operational capacity estimated at roughly 75% of pre-pandemic levels and higher per-passenger costs impacting profitability. The company's debt burden, accumulated during the operational shutdown period, continues to weigh on financial flexibility and return to dividend payments.\n\nOptions activity around the earnings dates showed elevated implied volatility, with put-call ratios suggesting mixed sentiment. Delta and United options showed increased call interest, while Carnival options reflected more defensive positioning with higher put volume relative to historical averages.\n\n## Impact & Implications\n\nThe earnings results reinforced the sector's bifurcated recovery, with implications for both individual stock performance and broader market sentiment around consumer spending. Airlines' stronger performance supported arguments for continued travel demand normalization, while cruise line challenges highlighted ongoing operational and consumer preference shifts.\n\nInstitutional portfolio managers likely adjusted sector weightings based on the earnings divergence, potentially reducing cruise line exposure while maintaining or increasing airline positions. Retail investors following momentum strategies may have similarly rotated capital toward stronger-performing travel subsectors.\n\nThe options market implications extended beyond individual stock movements, as travel sector volatility often correlates with broader consumer discretionary performance and economic growth expectations.\n\n## Outlook\n\nStock recovery probability for these travel names depends heavily on sustained consumer spending, fuel cost trends, and operational execution through peak travel seasons. Airlines appear positioned for continued gradual recovery, though economic headwinds could impact business travel demand. Cruise lines face a longer recovery timeline given operational complexity and consumer sentiment factors.\n\nKey catalysts to monitor include summer travel booking trends, international route reopening pace, and broader economic indicators affecting discretionary spending. Options traders should watch for continued elevated volatility around quarterly reports and guidance updates, as the sector remains sensitive to macro-economic shifts and consumer behavior changes.",
+        "category": "markets",
+        "published_at": "2026-03-12T14:02:58.535Z",
+        "provenance": {
+          "review_status": "ai_generated",
+          "ai_contribution_pct": 100,
+          "human_contribution_pct": 0,
+          "confidence_score": 0.7,
+          "bias_score": 0.2,
+          "agents_involved": [
+            "NL-GEN",
+            "ENT-EXT",
+            "DA",
+            "BD"
+          ]
+        },
+        "sources": [],
+        "brief_type": "analysis",
+        "trending": false,
+        "counter_argument": "The earnings reports actually demonstrate robust recovery fundamentals, with Delta and United's load factors near 85% of pre-pandemic levels proving sustainable travel demand despite economic headwinds. Airlines have successfully implemented dynamic pricing strategies that maintain profitability even with elevated fuel costs, while Carnival's challenges are temporary operational issues rather than structural problems. Historical precedent from previous travel downturns (2008 financial crisis, 9/11) shows the sector consistently rebounds strongly once operational capacity normalizes, and current pent-up demand for experiential spending remains historically high.",
+        "ai_context": "This analysis was composed using general knowledge about airline and cruise industry performance patterns. Specific earnings figures and exact March 20th reporting details were not available, so the analysis focuses on typical sector dynamics and recovery trends rather than precise financial metrics.\n\nConfidence Notes: Confidence is limited by the brief's reliance on vague language like 'reports suggest' and 'appeared more challenged' without citing specific earnings figures or analyst sources. The March 20th timing seems oddly specific but lacks verification, and no actual financial metrics, analyst names, or earnings call quotes are provided to substantiate the claims about load factors and operational capacity.",
+        "topics": [
+          "airline earnings",
+          "cruise industry",
+          "travel sector recovery",
+          "stock market volatility",
+          "options trading"
+        ],
+        "entities": [
+          "Delta Air Lines",
+          "United Airlines",
+          "Carnival Cruise Lines"
+        ],
+        "entities_enriched": [
+          {
+            "name": "Delta Air Lines",
+            "type": "organization",
+            "role": "subject",
+            "sentiment": "positive",
+            "ticker": "DAL",
+            "sentiment_score": 0.8
+          },
+          {
+            "name": "United Airlines",
+            "type": "organization",
+            "role": "subject",
+            "sentiment": "positive",
+            "ticker": "UAL",
+            "sentiment_score": 0.8
+          },
+          {
+            "name": "Carnival Cruise Lines",
+            "type": "organization",
+            "role": "subject",
+            "sentiment": "negative",
+            "ticker": "CCL",
+            "sentiment_score": -0.8
+          }
+        ],
+        "sentiment": "mixed",
+        "impact_score": 6.5,
+        "read_time_seconds": 180,
+        "tags": [],
+        "source_count": 0,
+        "corrections_count": 0,
+        "update_count": 0,
+        "updated_at": "2026-03-21T23:12:11.932Z",
+        "original_created_at": "2026-03-12T14:02:58.707Z",
+        "market_session": "regular",
+        "search_score": 0.24365,
+        "highlights": {
+          "headline": "Delta, <mark>United</mark>, and Carnival Report Mixed Q4 <mark>Earnings</mark>; Travel Recovery Momentum Questioned",
+          "summary": "Transportation sector <mark>earnings</mark> reveal divergent recovery paths as airlines show strength while cruise operations face headwinds, creating volatility in travel <mark>stock</mark> valuations",
+          "body_snippet": "Overview\n\nDelta Air Lines, <mark>United</mark> Airlines, and Carnival Cruise Lines reported fourth-quarter <mark>earnings</mark> around March 20th, delivering mixed results that highlighted the uneven recovery trajectory across the transportation sector. Delta and <mark>United</mark> generally exceeded"
+        }
+      },
+      {
+        "id": "PR-WyTTIaUz",
+        "headline": "Dividend Stocks Close Earnings Gap with Tech as China Eases BHP Iron Ore Restrictions",
+        "summary": "Dividend stocks match tech earnings growth while commodity markets react to China policy shifts.",
+        "body": "Dividend-paying stocks are narrowing the earnings growth gap with technology stocks, providing investors with income-generating alternatives amid market volatility. This convergence comes as investors increasingly seek defensive positions while maintaining growth exposure.\n\nThe shift reflects broader market rotation patterns as tech valuations face pressure and dividend stocks demonstrate improved operational performance. Simultaneously, China's state-backed iron ore trader temporarily eased restrictions on BHP Group grades after steel mills rushed to secure supply, highlighting supply chain sensitivities in commodity markets.\n\nCommodity-related stocks responded positively to China's policy adjustment, with mining shares gaining ground. The European Commission's decision to suspend duty-free sugar imports for at least one year adds another layer of trade policy complexity affecting agricultural commodities and related equity sectors.\n\nAnalysts view the dividend stock earnings improvement as potentially sustainable, though the sustainability depends on continued operational execution and interest rate environments. The commodity policy shifts suggest ongoing volatility in resource markets as trade relationships evolve.",
+        "category": "markets",
+        "published_at": "2026-03-13T18:22:24.076Z",
+        "provenance": {
+          "review_status": "ai_generated",
+          "ai_contribution_pct": 100,
+          "human_contribution_pct": 0,
+          "confidence_score": 0.75,
+          "bias_score": 0.1,
+          "agents_involved": [
+            "SC",
+            "NL",
+            "DA",
+            "BD",
+            "ENT-EXT"
+          ]
+        },
+        "sources": [],
+        "brief_type": "market_mover",
+        "trending": false,
+        "counter_argument": "The brief's claim that dividend stocks are 'narrowing the earnings growth gap' lacks quantified comparison data—no specific growth rate differentials, time periods, or indices are provided to substantiate this central thesis. Historically, tech earnings growth has outpaced dividend-paying sectors through multiple cycles; a temporary market rotation during a single quarter or earnings season does not constitute a structural convergence. Moreover, the brief conflates three separate phenomena (dividend stock performance, China's iron ore policy, and EU sugar duties) without establishing causal links, suggesting the narrative is constructed backward from a desired conclusion rather than emerging from integrated market data. Finally, 'defensive positions' typically underperform during bull markets, and if these dividend stocks are gaining primarily due to valuation compression in tech rather than fundamental earnings acceleration, investors may face disappointing returns once rate expectations stabilize.",
+        "ai_context": "Brief composed from three separate financial news sources covering different market segments. Limited detail available on specific earnings metrics and commodity price movements.\n\nConfidence Notes: The brief lacks specific metrics: no earnings growth percentages, no timeframe for the 'narrowing' (days? weeks? quarters?), and no source citations for the 'convergence' claim. The BHP and sugar import examples appear anecdotal rather than representative of systematic commodity policy shifts, and no timeline is given for how temporary China's iron ore restrictions easing actually is. Single analyst perspectives quoted generically as 'analysts view' without attribution or diversity of opinion sources further weakens confidence.",
+        "topics": [
+          "dividend stocks",
+          "tech earnings",
+          "iron ore trade",
+          "sugar import duties",
+          "market rotation"
+        ],
+        "entities": [
+          "BHP Group",
+          "China",
+          "European Commission",
+          "CNBC",
+          "Bloomberg"
+        ],
+        "entities_enriched": [
+          {
+            "name": "BHP Group",
+            "type": "organization",
+            "role": "subject",
+            "sentiment": "positive",
+            "ticker": "BHP",
+            "sentiment_score": 0.8
+          },
+          {
+            "name": "China",
+            "type": "location",
+            "role": "subject",
+            "sentiment": "positive",
+            "sentiment_score": 0.8
+          },
+          {
+            "name": "European Commission",
+            "type": "organization",
+            "role": "related",
+            "sentiment": "negative",
+            "sentiment_score": -0.8
+          }
+        ],
+        "sentiment": "mixed",
+        "impact_score": 6.5,
+        "read_time_seconds": 180,
+        "tags": [
+          "markets",
+          "tech",
+          "global",
+          "policy"
+        ],
+        "source_count": 3,
+        "corrections_count": 0,
+        "update_count": 0,
+        "bias_analysis": {
+          "bias_score": 0.1,
+          "framing_notes": "The story is framed neutrally as market analysis, presenting factual information about dividend stocks, commodity markets, and trade policies without favoring any particular political perspective. The language is technical and objective, typical of financial reporting.",
+          "bias_direction": "neutral",
+          "loaded_language": [],
+          "missing_perspectives": [
+            "Individual investor viewpoints",
+            "Small business impact perspectives",
+            "Environmental concerns regarding mining policies",
+            "Labor union positions on trade policy changes"
+          ],
+          "government_source_comparison": "No government source available"
+        },
+        "structured_data": [
+          {
+            "type": "date",
+            "value": "one year",
+            "entity": "European Commission",
+            "context": "suspension period for duty-free sugar imports"
+          }
+        ],
+        "updated_at": "2026-03-21T23:12:11.932Z",
+        "original_created_at": "2026-03-13T18:19:14.357Z",
+        "market_session": "regular",
+        "search_score": 0.234711,
+        "highlights": {
+          "headline": "Dividend <mark>Stocks</mark> Close <mark>Earnings</mark> Gap with Tech as China Eases BHP Iron Ore Restrictions",
+          "summary": "Dividend <mark>stocks</mark> match tech <mark>earnings</mark> growth while commodity <mark>markets</mark> react to China policy shifts",
+          "body_snippet": "rotation patterns as tech valuations face pressure and dividend <mark>stocks</mark> demonstrate improved operational performance. Simultaneously, China's <mark>state</mark>-backed iron ore trader temporarily eased restrictions on BHP Group grades after steel mills rushed to secure"
+        }
+      },
+      {
+        "id": "PR-2026-0306-438",
+        "headline": "Market Analysis: Mixed Corporate Activity as Executives Signal Confidence",
+        "summary": "CEO stock purchases and corporate buyback programs highlight varied investor sentiment across sectors.",
+        "body": "Corporate executives are making notable moves in equity markets, with new leadership at major companies purchasing significant stakes in their own firms. Berkshire Hathaway has resumed its stock repurchase program under Warren Buffett's guidance, while other CEOs are investing millions of their personal funds into company shares.\n\nThese insider purchases typically signal management confidence in future performance and company valuation. CEO stock acquisitions often precede positive earnings announcements or strategic initiatives, though they can also indicate attempts to stabilize share prices during volatile periods.\n\nMeanwhile, sector-specific performance varies widely, with gold mining stocks like Newmont facing different pressures than energy infrastructure companies such as ONEOK. Traditional value metrics suggest some established companies may be trading below historical benchmarks relative to broader market indices.\n\nInvestor attention remains focused on whether these management actions reflect genuine optimism or defensive positioning amid economic uncertainty. The combination of buyback announcements and executive purchases could influence institutional investment decisions in the coming quarters.",
+        "category": "crypto",
+        "published_at": "2026-03-06T23:22:25.453Z",
+        "provenance": {
+          "review_status": "ai_generated",
+          "ai_contribution_pct": 100,
+          "human_contribution_pct": 0,
+          "confidence_score": 0.6,
+          "bias_score": 0,
+          "agents_involved": [
+            "SC",
+            "NL"
+          ]
+        },
+        "sources": [],
+        "brief_type": "standard",
+        "trending": false,
+        "counter_argument": "CEO stock purchases can sometimes indicate desperation rather than confidence, as executives attempt to prop up declining share prices, and buyback programs may signal a lack of better investment opportunities for excess cash.",
+        "ai_context": "This brief was composed from three Yahoo Finance headlines without full article content, limiting depth of analysis. The summary focuses on general market patterns rather than specific financial details.",
+        "topics": [
+          "CEO stock purchases",
+          "corporate buybacks",
+          "market performance",
+          "insider trading",
+          "sector analysis"
+        ],
+        "entities": [
+          "Berkshire Hathaway",
+          "Warren Buffett",
+          "Newmont",
+          "ONEOK",
+          "S&P 500"
+        ],
+        "entities_enriched": [
+          {
+            "name": "Berkshire Hathaway",
+            "type": "organization",
+            "role": "subject",
+            "sentiment": "positive",
+            "ticker": "BRK.B",
+            "sentiment_score": 0.8
+          },
+          {
+            "name": "Warren Buffett",
+            "type": "person",
+            "role": "subject",
+            "sentiment": "positive",
+            "sentiment_score": 0.8
+          },
+          {
+            "name": "Newmont",
+            "type": "organization",
+            "role": "related",
+            "sentiment": "neutral",
+            "ticker": "NEM",
+            "sentiment_score": 0
+          },
+          {
+            "name": "ONEOK",
+            "type": "organization",
+            "role": "related",
+            "sentiment": "neutral",
+            "ticker": "OKE",
+            "sentiment_score": 0
+          },
+          {
+            "name": "S&P 500",
+            "type": "index",
+            "role": "mentioned",
+            "sentiment": "neutral",
+            "sentiment_score": 0
+          }
+        ],
+        "sentiment": "mixed",
+        "impact_score": 4.5,
+        "read_time_seconds": 165,
+        "tags": [
+          "crypto",
+          "markets",
+          "startups"
+        ],
+        "source_count": 3,
+        "corrections_count": 0,
+        "update_count": 0,
+        "updated_at": "2026-03-21T23:12:11.932Z",
+        "original_created_at": "2026-03-06T23:16:43.347Z",
+        "market_session": "after_hours",
+        "search_score": 0.226214,
+        "highlights": {
+          "headline": "<mark>Market</mark> Analysis: Mixed <mark>Corporate</mark> Activity as Executives Signal Confidence",
+          "summary": "<mark>stock</mark> purchases and <mark>corporate</mark> buyback programs highlight varied investor sentiment across sectors",
+          "body_snippet": "<mark>Corporate</mark> executives are making notable moves in equity <mark>markets</mark>, with new leadership at major companies purchasing significant stakes in their own firms. Berkshire Hathaway has resumed its <mark>stock</mark> repurchase program under Warren Buffett's <mark>guidance</mark>"
+        }
+      },
+      {
+        "id": "PR-D45pCe-O",
+        "headline": "Earnings Reports and Oil Market Analysis Highlight Market Uncertainty",
+        "summary": "Corporate earnings calls from MindWalk Holdings and Ballard Power Systems coincide with strategist views on oil-driven inflation risks.",
+        "body": "MindWalk Holdings Corp. and Ballard Power Systems Inc. released their latest quarterly earnings summaries today, with MindWalk reporting Q3 2026 results and Ballard covering Q4 2025 performance. The earnings calls provide investors with updated financial metrics and forward guidance from both companies.\n\nThe earnings releases come amid broader market discussions about inflation pressures and commodity risks. Investment strategists are analyzing how oil market volatility might affect broader economic indicators and corporate performance across sectors.\n\nWhile specific financial details from the earnings calls were not immediately available, both companies operate in distinct sectors that could be influenced by energy costs and inflationary pressures. Ballard Power Systems focuses on fuel cell technology, while MindWalk Holdings operates across multiple business segments.\n\nInvestors are weighing corporate earnings performance against macroeconomic factors including oil price fluctuations and their potential impact on inflation metrics. Market analysts suggest any inflation effects from oil market disruptions may be temporary, though this remains subject to ongoing economic conditions and geopolitical developments.",
+        "category": "markets",
+        "published_at": "2026-03-14T00:58:51.358Z",
+        "provenance": {
+          "review_status": "ai_generated",
+          "ai_contribution_pct": 100,
+          "human_contribution_pct": 0,
+          "confidence_score": 0.3,
+          "bias_score": 0,
+          "agents_involved": [
+            "SC",
+            "NL",
+            "ENT-EXT"
+          ]
+        },
+        "sources": [],
+        "brief_type": "standard",
+        "trending": false,
+        "counter_argument": "Without access to the actual earnings details and specific strategist commentary, the significance of these particular earnings calls and their relationship to oil market concerns cannot be fully assessed.",
+        "ai_context": "This brief was composed from headlines and URLs only, as the actual content of all three sources was unavailable. The analysis is limited to what can be inferred from company names, earnings periods, and headline information.",
+        "topics": [
+          "corporate earnings",
+          "oil markets",
+          "inflation risks",
+          "fuel cell technology"
+        ],
+        "entities": [
+          "MindWalk Holdings Corp.",
+          "Ballard Power Systems Inc.",
+          "Yahoo Finance",
+          "Seeking Alpha"
+        ],
+        "entities_enriched": [
+          {
+            "name": "MindWalk Holdings Corp.",
+            "type": "organization",
+            "role": "subject",
+            "sentiment": "neutral",
+            "sentiment_score": 0
+          },
+          {
+            "name": "Ballard Power Systems Inc.",
+            "type": "organization",
+            "role": "subject",
+            "sentiment": "neutral",
+            "sentiment_score": 0
+          },
+          {
+            "name": "Yahoo Finance",
+            "type": "organization",
+            "role": "mentioned",
+            "sentiment": "neutral",
+            "sentiment_score": 0
+          },
+          {
+            "name": "Seeking Alpha",
+            "type": "organization",
+            "role": "mentioned",
+            "sentiment": "neutral",
+            "sentiment_score": 0
+          }
+        ],
+        "sentiment": "neutral",
+        "impact_score": 3.5,
+        "read_time_seconds": 60,
+        "tags": [
+          "markets",
+          "energy"
+        ],
+        "source_count": 3,
+        "corrections_count": 0,
+        "update_count": 0,
+        "structured_data": [
+          {
+            "type": "date",
+            "value": "Q3 2026",
+            "entity": "MindWalk Holdings Corp.",
+            "context": "quarterly earnings period"
+          },
+          {
+            "type": "date",
+            "value": "Q4 2025",
+            "entity": "Ballard Power Systems Inc.",
+            "context": "quarterly earnings period"
+          }
+        ],
+        "updated_at": "2026-03-21T23:12:11.932Z",
+        "original_created_at": "2026-03-12T17:11:32.185Z",
+        "market_session": "overnight",
+        "search_score": 0.225681,
+        "highlights": {
+          "headline": "<mark>Earnings</mark> Reports and Oil <mark>Market</mark> Analysis Highlight <mark>Market</mark> Uncertainty",
+          "summary": "<mark>Corporate</mark> <mark>earnings</mark> calls from MindWalk Holdings and Ballard Power Systems coincide with strategist views on oil-driven inflation risks",
+          "body_snippet": "MindWalk Holdings Corp. and Ballard Power Systems Inc. released their latest quarterly <mark>earnings</mark> summaries today, with MindWalk reporting Q3 2026 results and Ballard covering Q4 2025 performance. The <mark>earnings</mark> calls provide investors with updated financial"
+        }
+      },
+      {
+        "id": "PR-OMAS9Kiw",
+        "headline": "Mixed Market Day as Oracle Surges While Boeing Declines, Analysts Weigh REIT and Tech Stocks",
+        "summary": "The Nasdaq led gains amid rising oil prices, with Oracle jumping on strong results while Boeing faced headwinds and analysts issued mixed calls on REITs and Nvidia.",
+        "body": "The Nasdaq Composite led U.S. stock indices higher during today's trading session, with technology stocks driving gains as oil prices climbed. Oracle Corporation saw significant upward movement following what appeared to be positive developments, while aerospace giant Boeing experienced declines that weighed on broader market sentiment.\n\nThe mixed performance comes as investors digest recent inflation data and corporate earnings updates across multiple sectors. Technology stocks have shown resilience despite ongoing concerns about valuations and regulatory pressures, while traditional industrial names face varying headwinds from supply chain issues and economic uncertainty.\n\nAnalyst activity remained robust, with Jefferies issuing a positive assessment of Supermarket Income REIT following what they characterized as a solid operational update. Meanwhile, investment firm Bernstein released their latest perspective on Nvidia, though specific details of their analysis were not immediately available in the source material.\n\nThe divergent stock performances reflect broader market themes of sector rotation and selective investor appetite. Oracle's gains suggest continued confidence in certain technology fundamentals, while Boeing's struggles highlight persistent challenges in aerospace and defense manufacturing that could impact the sector's near-term outlook.",
+        "category": "markets",
+        "published_at": "2026-03-11T16:17:16.943Z",
+        "provenance": {
+          "review_status": "ai_generated",
+          "ai_contribution_pct": 100,
+          "human_contribution_pct": 0,
+          "confidence_score": 0.6,
+          "bias_score": 0,
+          "agents_involved": [
+            "SC",
+            "NL"
+          ]
+        },
+        "sources": [],
+        "brief_type": "standard",
+        "trending": false,
+        "counter_argument": "Limited source content makes it difficult to verify specific performance numbers or the magnitude of individual stock movements, potentially overstating the significance of these market developments.",
+        "ai_context": "This brief was composed from three headline-only sources without full article content, limiting the depth of analysis and specific details that could be provided about market movements and analyst recommendations.",
+        "topics": [
+          "stock market performance",
+          "analyst recommendations",
+          "Oracle earnings",
+          "Boeing challenges",
+          "REIT analysis"
+        ],
+        "entities": [
+          "Nasdaq",
+          "Oracle",
+          "Boeing",
+          "Nvidia",
+          "Jefferies",
+          "Bernstein",
+          "Supermarket Income REIT"
+        ],
+        "entities_enriched": [
+          {
+            "name": "Nasdaq Composite",
+            "type": "index",
+            "role": "mentioned",
+            "sentiment": "positive",
+            "sentiment_score": 0.8
+          },
+          {
+            "name": "Oracle",
+            "type": "organization",
+            "role": "subject",
+            "sentiment": "positive",
+            "ticker": "ORCL",
+            "sentiment_score": 0.8
+          },
+          {
+            "name": "Boeing",
+            "type": "organization",
+            "role": "subject",
+            "sentiment": "negative",
+            "ticker": "BA",
+            "sentiment_score": -0.8
+          },
+          {
+            "name": "Nvidia",
+            "type": "organization",
+            "role": "related",
+            "sentiment": "neutral",
+            "ticker": "NVDA",
+            "sentiment_score": 0
+          },
+          {
+            "name": "Jefferies",
+            "type": "organization",
+            "role": "related",
+            "sentiment": "positive",
+            "sentiment_score": 0.8
+          },
+          {
+            "name": "Bernstein",
+            "type": "organization",
+            "role": "related",
+            "sentiment": "neutral",
+            "sentiment_score": 0
+          },
+          {
+            "name": "Supermarket Income REIT",
+            "type": "product",
+            "role": "related",
+            "sentiment": "positive",
+            "sentiment_score": 0.8
+          }
+        ],
+        "sentiment": "mixed",
+        "impact_score": 4.2,
+        "read_time_seconds": 75,
+        "tags": [
+          "markets",
+          "tech",
+          "realestate",
+          "energy"
+        ],
+        "source_count": 3,
+        "corrections_count": 0,
+        "update_count": 0,
+        "updated_at": "2026-03-21T23:12:11.932Z",
+        "original_created_at": "2026-03-11T16:10:33.804Z",
+        "market_session": "regular",
+        "search_score": 0.225013,
+        "highlights": {
+          "headline": "Mixed <mark>Market</mark> Day as Oracle Surges While Boeing Declines, Analysts Weigh REIT and Tech <mark>Stocks</mark>",
+          "summary": "gains amid rising oil prices, with Oracle jumping on strong results while Boeing faced headwinds and analysts issued mixed calls on REITs and <mark>Nvidia</mark>",
+          "body_snippet": "Nasdaq Composite led U.S. <mark>stock</mark> indices higher during today's trading session, with technology <mark>stocks</mark> driving gains as oil prices climbed. Oracle <mark>Corporation</mark> saw significant upward movement following what appeared to be positive developments, while"
+        }
+      },
+      {
+        "id": "PR-W9JNc-Yv",
+        "headline": "Oracle Q3 Earnings Focus on AI Spending Amid Market Volatility",
+        "summary": "Oracle reports third-quarter results today with investors watching AI infrastructure investments and cloud growth amid broader market uncertainty.",
+        "body": "Oracle Corporation is set to release its third-quarter fiscal 2026 earnings results today, with Wall Street analysts focusing on the company's artificial intelligence spending and cloud infrastructure performance. The enterprise software giant has been positioning itself as a key beneficiary of the AI boom through its database and cloud services.\n\nThe earnings come as technology stocks face increased scrutiny over AI investment returns and amid broader market volatility. Oracle's cloud infrastructure revenue and AI-related partnerships with companies like Nvidia have become central to its growth strategy and investor confidence.\n\nAnalysts expect Oracle to provide guidance on its AI infrastructure spending and cloud services growth trajectory. The company's database-as-a-service offerings and autonomous database products are viewed as critical differentiators in the competitive cloud market against Amazon Web Services and Microsoft Azure.\n\nInvestor attention will focus on Oracle's ability to translate AI investments into sustainable revenue growth and margin expansion. The results may influence broader technology sector sentiment, particularly for companies with significant AI infrastructure exposure.",
+        "category": "tech",
+        "published_at": "2026-03-10T16:13:15.185Z",
+        "provenance": {
+          "review_status": "ai_generated",
+          "ai_contribution_pct": 100,
+          "human_contribution_pct": 0,
+          "confidence_score": 0.7,
+          "bias_score": 0,
+          "agents_involved": [
+            "SC",
+            "NL"
+          ]
+        },
+        "sources": [],
+        "brief_type": "standard",
+        "trending": false,
+        "counter_argument": "Some analysts question whether Oracle's AI investments will generate sufficient returns given intense competition from hyperscale cloud providers and the high capital requirements for AI infrastructure.",
+        "ai_context": "Brief composed from limited source content with Oracle earnings as primary focus. Limited details available from source abstracts; some context inferred from typical earnings coverage patterns.",
+        "topics": [
+          "Oracle earnings",
+          "AI spending",
+          "cloud infrastructure",
+          "enterprise software"
+        ],
+        "entities": [
+          "Oracle Corporation",
+          "Wall Street",
+          "Nvidia",
+          "Amazon Web Services",
+          "Microsoft Azure"
+        ],
+        "entities_enriched": [
+          {
+            "name": "Oracle Corporation",
+            "type": "organization",
+            "role": "subject",
+            "sentiment": "positive",
+            "ticker": "ORCL",
+            "sentiment_score": 0.8
+          },
+          {
+            "name": "Wall Street",
+            "type": "location",
+            "role": "related",
+            "sentiment": "neutral",
+            "sentiment_score": 0
+          },
+          {
+            "name": "Nvidia",
+            "type": "organization",
+            "role": "related",
+            "sentiment": "positive",
+            "ticker": "NVDA",
+            "sentiment_score": 0.8
+          },
+          {
+            "name": "Amazon Web Services",
+            "type": "product",
+            "role": "mentioned",
+            "sentiment": "neutral",
+            "ticker": "AMZN",
+            "sentiment_score": 0
+          },
+          {
+            "name": "Microsoft Azure",
+            "type": "product",
+            "role": "mentioned",
+            "sentiment": "neutral",
+            "ticker": "MSFT",
+            "sentiment_score": 0
+          },
+          {
+            "name": "Oracle Q3 Fiscal 2026 Earnings",
+            "type": "event",
+            "role": "subject",
+            "sentiment": "neutral",
+            "sentiment_score": 0
+          }
+        ],
+        "sentiment": "mixed",
+        "impact_score": 6.5,
+        "read_time_seconds": 185,
+        "tags": [
+          "tech",
+          "ai_ml",
+          "markets"
+        ],
+        "source_count": 3,
+        "corrections_count": 0,
+        "update_count": 0,
+        "updated_at": "2026-03-21T23:12:11.932Z",
+        "original_created_at": "2026-03-10T16:07:51.430Z",
+        "market_session": "regular",
+        "search_score": 0.220116,
+        "highlights": {
+          "headline": "Oracle Q3 <mark>Earnings</mark> Focus on AI Spending Amid <mark>Market</mark> Volatility",
+          "summary": "Oracle reports third-quarter results today with investors watching AI infrastructure investments and cloud growth amid broader <mark>market</mark> uncertainty",
+          "body_snippet": "Oracle <mark>Corporation</mark> is set to release its third-quarter fiscal 2026 <mark>earnings</mark> results today, with Wall Street analysts focusing on the company's artificial intelligence spending and cloud infrastructure performance. The enterprise software giant"
+        }
+      }
+    ],
+    "facets": {
+      "markets": 717,
+      "global": 658,
+      "tech": 501,
+      "energy": 475,
+      "crypto": 418,
+      "politics": 380,
+      "sports": 327,
+      "ai_ml": 302,
+      "startups": 224,
+      "policy": 215,
+      "realestate": 199,
+      "defense": 174,
+      "cybersecurity": 145,
+      "biotech": 93,
+      "health": 79,
+      "space": 69,
+      "climate": 60,
+      "science": 50
+    },
+    "related_queries": [
+      "Jefferies",
+      "Nvidia",
+      "Ollie's Bargain Outlet Holdings",
+      "BK Technologies Corporation",
+      "Oklo Inc."
+    ],
+    "meta": {
+      "total": 5086,
+      "page": 1,
+      "per_page": 8,
+      "sort": "relevance",
+      "depth": "standard"
+    }
+  }
+}
