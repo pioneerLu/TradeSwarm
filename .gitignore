@@ -223,6 +223,10 @@ market_data/
 # Lean CLI workspace (lean init 输出，含下载数据)
 lean_workspace/
 
+# 本地信号导出（run_signal_export 输出；勿提交）
+qc_signals/
+quantconnect/signals/
+
 # Backtest results
 backtest_results/
 backtest_results_*/
