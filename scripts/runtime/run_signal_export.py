@@ -19,6 +19,7 @@
 - **默认 --use-db-reports-only**：不现场调用四个 Analyst 写库；Pre-Open 图（Summary→Research→Trader→Risk）**仍会多次调用 LLM**。
 - **记忆（DatabaseMemory）**：仅从 DB 表 cycle_reflections 读周期反思，且当前固定 weekly；若无记录则 get_memories 为空，属正常。
 - **推荐**以此脚本为「从 Summary 跑全图并导出」的唯一 CLI；单日可用 --dates。
+- **人工评判 / 调试**：`--graph-dump DIR` 在每个交易日写入 `DIR/{symbol}_{trade_date}/`（LangGraph `subgraphs=True`，子图内每一步落盘为 `step_NNNN__{命名空间}__{节点}_output.json/.txt`，另含 `full_state_snapshot.json` 与 `final_state_*`）。
 """
 
 from __future__ import annotations
@@ -44,6 +45,11 @@ from tradingagents.agents.analysts.market_analyst.agent import create_market_ana
 from tradingagents.agents.analysts.news_analyst.agent import create_news_analyst
 from tradingagents.agents.analysts.fundamentals_analyst.agent import create_fundamentals_analyst
 from tradingagents.agents.analysts.social_media_analyst.agent import create_social_media_analyst
+from tradingagents.graph.node_dump import (
+    save_full_state_snapshot,
+    save_node_output,
+    stream_graph_updates_with_dump,
+)
 
 
 class DatabaseMemory:
@@ -193,6 +199,7 @@ def run_signal_export(
     simulate_portfolio: bool = False,
     initial_cash: float = 100_000.0,
     trading_dates_override: Optional[List[str]] = None,
+    graph_dump_dir: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     导出信号或评级 JSON。
@@ -209,6 +216,7 @@ def run_signal_export(
         simulate_portfolio: 仅 ``backtest`` 有效；多日循环用轻量模拟仓注入 Trader/Risk，并与 resolve 的 is_holding 对齐
         initial_cash: 模拟仓初始现金
         trading_dates_override: 若提供，仅处理这些交易日（已排序去重），忽略由 start/end 推算的日历
+        graph_dump_dir: 若提供，每个交易日写入 ``{graph_dump_dir}/{symbol}_{trade_date}/``：逐节点输出 + ``full_state_snapshot.json``
     """
     if export_mode not in ("backtest", "rating"):
         raise ValueError("export_mode 须为 backtest 或 rating")
@@ -336,20 +344,23 @@ def run_signal_export(
                 "portfolio_state": ps,
             }
             final_state = None
-            if verbose:
-                for chunk in graph.stream(initial_state, stream_mode=["updates", "values"]):
-                    if isinstance(chunk, (list, tuple)) and len(chunk) >= 2:
-                        mode, data = chunk[0], chunk[1]
-                        if mode == "updates" and isinstance(data, dict):
-                            for node_name in data:
-                                print(f"  [Pre-Open] 完成: {node_name}")
-                        elif mode == "values":
-                            final_state = data
-                    else:
-                        final_state = chunk
-            else:
-                for state in graph.stream(initial_state, stream_mode="values"):
-                    final_state = state
+            day_dump: Optional[Path] = None
+            if graph_dump_dir:
+                day_dump = Path(graph_dump_dir) / f"{symbol}_{trade_date}"
+                day_dump.mkdir(parents=True, exist_ok=True)
+
+            final_state = stream_graph_updates_with_dump(
+                graph,
+                initial_state,
+                dump_dir=day_dump,
+                verbose=verbose,
+                log_prefix="Pre-Open",
+            )
+
+            if day_dump is not None and final_state:
+                save_full_state_snapshot(final_state, day_dump / "full_state_snapshot.json")
+                save_node_output("final_state", final_state, day_dump)
+                print(f"  [DUMP] Pre-Open 输出已写入 {day_dump.resolve()}")
 
             if not final_state:
                 all_signals[trade_date] = {"action": "HOLD", "reason": "Pre-Open 未返回状态"}
@@ -494,6 +505,13 @@ def main() -> None:
         help="backtest 模式下用轻量模拟仓注入 current_position/portfolio_state（多日）",
     )
     parser.add_argument("--initial-cash", type=float, default=100_000.0, help="模拟仓初始现金")
+    parser.add_argument(
+        "--graph-dump",
+        type=str,
+        default=None,
+        metavar="DIR",
+        help="将每日 Pre-Open 逐节点输出与 full_state_snapshot.json 写入 DIR/{symbol}_{trade_date}/",
+    )
     args = parser.parse_args()
 
     dates_override = None
@@ -514,6 +532,7 @@ def main() -> None:
         simulate_portfolio=args.simulate_portfolio,
         initial_cash=args.initial_cash,
         trading_dates_override=dates_override,
+        graph_dump_dir=args.graph_dump,
     )
 
 

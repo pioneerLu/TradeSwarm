@@ -5,13 +5,11 @@
 功能：
 1. 从 memory.db 读取 Analyst 报告
 2. 从 Summary 节点开始运行完整 Graph
-3. 保存每个 Agent 的中间输出
+3. 保存每一步输出（含 research / risk 子图内各节点，文件名带 step 序号与命名空间）
 """
 
-import json
 import sys
 from pathlib import Path
-from datetime import date
 from typing import Any, Dict
 
 # 添加项目根目录到路径
@@ -19,10 +17,15 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT))
 
 from tradingagents.graph.trading_graph import create_trading_graph
+from tradingagents.graph.node_dump import (
+    save_full_state_snapshot,
+    save_node_output,
+    stream_graph_updates_with_dump,
+)
 from tradingagents.graph.utils import load_llm_from_config
 from tradingagents.agents.utils.memory_db_helper import MemoryDBHelper
 from tradingagents.agents.utils.agentstate.agent_states import AgentState
-from typing import Any, List, Dict
+from typing import Any, Dict, List
 
 
 class DatabaseMemory:
@@ -110,146 +113,6 @@ class DatabaseMemory:
         self.db_helper.close()
 
 
-def save_node_output(
-    node_name: str,
-    state: Dict[str, Any],
-    output_dir: Path
-) -> None:
-    """
-    保存节点输出到文件
-    
-    Args:
-        node_name: 节点名称
-        state: 节点执行后的状态
-        output_dir: 输出目录
-    """
-    output_dir.mkdir(parents=True, exist_ok=True)
-    
-    # 保存 JSON 格式
-    json_file = output_dir / f"{node_name}_output.json"
-    with open(json_file, "w", encoding="utf-8") as f:
-        json.dump(state, f, ensure_ascii=False, indent=2, default=str)
-    
-    # 保存文本格式（简化版）
-    txt_file = output_dir / f"{node_name}_output.txt"
-    with open(txt_file, "w", encoding="utf-8") as f:
-        f.write(f"节点: {node_name}\n")
-        f.write(f"时间: {date.today().strftime('%Y-%m-%d %H:%M:%S')}\n")
-        f.write("="*80 + "\n\n")
-        
-        # 提取关键字段（完整内容，不截断）
-        if "messages" in state:
-            messages = state["messages"]
-            if messages:
-                last_msg = messages[-1]
-                if hasattr(last_msg, "content"):
-                    f.write("最后一条消息:\n")
-                    f.write(str(last_msg.content) + "\n\n")
-        
-        # 保存各个 summary（完整内容，不截断）
-        for key in ["market_analyst_summary", "news_analyst_summary", 
-                    "sentiment_analyst_summary", "fundamentals_analyst_summary"]:
-            if key in state and state[key]:
-                summary = state[key]
-                f.write(f"\n{key}:\n")
-                if isinstance(summary, dict):
-                    if "today_report" in summary:
-                        f.write(f"今日报告: {str(summary['today_report'])}\n\n")
-                    if "history_report" in summary:
-                        f.write(f"历史报告: {str(summary['history_report'])}\n\n")
-        
-        # 保存 research_summary 的完整内容（包括 raw output）
-        if "research_summary" in state and state["research_summary"]:
-            f.write(f"\nresearch_summary:\n")
-            f.write("="*80 + "\n")
-            research_summary = state["research_summary"]
-            if isinstance(research_summary, dict):
-                # 保存 investment_debate_state 的完整内容（包括所有 raw output）
-                if "investment_debate_state" in research_summary:
-                    debate_state = research_summary["investment_debate_state"]
-                    f.write(f"\ninvestment_debate_state (完整辩论历史):\n")
-                    f.write("-"*80 + "\n")
-                    if isinstance(debate_state, dict):
-                        # 保存所有字段，包括 raw_response, current_response, history, bull_history, bear_history 等
-                        for k, v in debate_state.items():
-                            f.write(f"\n{k}:\n")
-                            f.write("-"*40 + "\n")
-                            if isinstance(v, str):
-                                # 如果是 JSON 字符串，尝试格式化
-                                try:
-                                    parsed = json.loads(v)
-                                    f.write(json.dumps(parsed, ensure_ascii=False, indent=2) + "\n")
-                                except:
-                                    # 如果不是 JSON，直接写入（可能是多行文本）
-                                    f.write(str(v) + "\n")
-                            else:
-                                f.write(str(v) + "\n")
-                # 保存其他字段（包括 raw_response, investment_plan 等）
-                for k, v in research_summary.items():
-                    if k != "investment_debate_state":
-                        f.write(f"\n{k}:\n")
-                        f.write("-"*80 + "\n")
-                        if isinstance(v, str):
-                            try:
-                                parsed = json.loads(v)
-                                f.write(json.dumps(parsed, ensure_ascii=False, indent=2) + "\n")
-                            except:
-                                f.write(str(v) + "\n")
-                        else:
-                            f.write(str(v) + "\n")
-        
-        # 保存 risk_subgraph 的完整内容（包括 raw output）
-        if "risk_summary" in state and state["risk_summary"]:
-            f.write(f"\nrisk_summary (完整风险辩论历史):\n")
-            f.write("="*80 + "\n")
-            risk_summary = state["risk_summary"]
-            if isinstance(risk_summary, dict):
-                # 保存所有字段，包括 raw_response, risk_debate_state 等
-                for k, v in risk_summary.items():
-                    f.write(f"\n{k}:\n")
-                    f.write("-"*80 + "\n")
-                    if isinstance(v, str):
-                        try:
-                            parsed = json.loads(v)
-                            f.write(json.dumps(parsed, ensure_ascii=False, indent=2) + "\n")
-                        except:
-                            # 如果不是 JSON，直接写入（可能是多行文本）
-                            f.write(str(v) + "\n")
-                    else:
-                        f.write(str(v) + "\n")
-        
-        # 保存 trader 的输出（完整内容）
-        if "trader_investment_plan" in state and state["trader_investment_plan"]:
-            f.write(f"\ntrader_investment_plan:\n")
-            f.write("="*80 + "\n")
-            trader_output = state["trader_investment_plan"]
-            if isinstance(trader_output, str):
-                try:
-                    parsed = json.loads(trader_output)
-                    f.write(json.dumps(parsed, ensure_ascii=False, indent=2) + "\n")
-                except:
-                    f.write(str(trader_output) + "\n")
-            else:
-                f.write(str(trader_output) + "\n")
-        
-        # 保存其他关键字段（完整内容，不截断）
-        for key in ["research_result", "investment_plan", "final_trade_decision", 
-                    "trading_strategy", "trading_strategy_status"]:
-            if key in state and state[key]:
-                f.write(f"\n{key}:\n")
-                f.write("="*80 + "\n")
-                value = state[key]
-                if isinstance(value, str):
-                    # 如果是 JSON 字符串，尝试格式化
-                    try:
-                        parsed = json.loads(value)
-                        f.write(json.dumps(parsed, ensure_ascii=False, indent=2) + "\n")
-                    except:
-                        f.write(str(value) + "\n")
-                else:
-                    f.write(str(value) + "\n")
-
-
 def run_full_graph(
     symbol: str,
     trade_date: str,
@@ -309,36 +172,28 @@ def run_full_graph(
     print(f"  交易时段: pre_open")
     print(f"  数据库: {db_path}\n")
     
-    executed_nodes = set()
-    current_state = initial_state
-    
+    current_state = dict(initial_state)
+    executed_nodes: set[str] = set()
+
     try:
-        # 使用 stream_mode="updates" 来捕获每个节点的更新
-        # 注意：子图内部节点（如 bull_researcher, bear_researcher）不会单独触发事件
-        # 但它们的输出会保存在子图的 state 中（如 research_summary.investment_debate_state）
-        for event in graph.stream(initial_state, stream_mode="updates"):
-            for node_name, node_state in event.items():
-                if node_name not in executed_nodes:
-                    executed_nodes.add(node_name)
-                    print(f"  [执行] {node_name}...")
-                    
-                    # 更新当前状态
-                    current_state.update(node_state)
-                    
-                    # 保存节点输出（包括子图内部节点的原始输出，它们保存在 state 中）
-                    save_node_output(node_name, node_state, output_path)
-                    print(f"    [OK] 输出已保存到 {output_path / f'{node_name}_output.json'}")
-        
-        # 获取最终完整状态
-        print(f"\n[获取] 最终状态...")
-        final_state = None
-        for state in graph.stream(initial_state, stream_mode="values"):
-            final_state = state
-        
+        print("\n[运行] 流式执行（含子图内每一步）并落盘...")
+        final_state = stream_graph_updates_with_dump(
+            graph,
+            initial_state,
+            dump_dir=output_path,
+            verbose=True,
+            log_prefix="执行",
+        )
         if final_state:
             current_state.update(final_state)
+            save_full_state_snapshot(final_state, output_path / "full_state_snapshot.json")
             save_node_output("final_state", final_state, output_path)
-            print(f"  [OK] 最终状态已保存")
+            print(f"  [OK] 最终状态与 full_state_snapshot.json 已保存")
+        else:
+            print("  [WARN] 未收到根图终态 values，跳过 final_state / full_state_snapshot")
+        # 用于统计：统计 step_*_output.json 数量即可；保留集合兼容旧日志字段
+        for p in sorted(output_path.glob("step_*_output.json")):
+            executed_nodes.add(p.stem)
         
     except Exception as e:
         print(f"\n[ERROR] Graph 执行失败: {e}")
@@ -350,7 +205,7 @@ def run_full_graph(
         db_helper.close()
     
     print(f"\n[完成] Graph 执行完成")
-    print(f"  执行节点数: {len(executed_nodes)}")
+    print(f"  落盘步数（step_* 文件）: {len(executed_nodes)}")
     print(f"  输出目录: {output_path.absolute()}")
     
     return current_state

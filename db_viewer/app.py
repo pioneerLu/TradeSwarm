@@ -42,6 +42,9 @@ def api_overview():
         if t == "analyst_reports" and cnt > 0:
             cur.execute("SELECT symbol, COUNT(*) as n FROM analyst_reports GROUP BY symbol")
             info["by_symbol"] = [{"symbol": r["symbol"], "count": r["n"]} for r in cur.fetchall()]
+        if t == "analyst_summaries" and cnt > 0:
+            cur.execute("SELECT symbol, COUNT(*) as n FROM analyst_summaries GROUP BY symbol")
+            info["by_symbol"] = [{"symbol": r["symbol"], "count": r["n"]} for r in cur.fetchall()]
         result.append(info)
     conn.close()
     return jsonify({"tables": result, "db": str(DB_PATH)})
@@ -54,6 +57,21 @@ def api_dates():
     cur = conn.cursor()
     cur.execute(
         "SELECT DISTINCT trade_date FROM analyst_reports WHERE symbol=? ORDER BY trade_date DESC",
+        (symbol,),
+    )
+    dates = [r["trade_date"] for r in cur.fetchall()]
+    conn.close()
+    return jsonify({"symbol": symbol, "dates": dates})
+
+
+@app.route("/api/summary_dates")
+def api_summary_dates():
+    """analyst_summaries 可选日期列表（与 analyst_reports 的 /api/dates 对称）"""
+    symbol = request.args.get("symbol", "NVDA")
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT DISTINCT trade_date FROM analyst_summaries WHERE symbol=? ORDER BY trade_date DESC",
         (symbol,),
     )
     dates = [r["trade_date"] for r in cur.fetchall()]
@@ -87,6 +105,41 @@ def api_report():
     )
 
 
+@app.route("/api/summary")
+def api_summary():
+    """单条 analyst_summaries：与 /api/report 相同的 JSON 形状，额外返回窗口元数据"""
+    symbol = request.args.get("symbol", "NVDA")
+    date = request.args.get("date")
+    atype = request.args.get("type", "market")
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute(
+        """SELECT id, summary_content, created_at, window_start_date, window_end_date,
+                  source_reports_count, llm_model, token_usage, updated_at
+           FROM analyst_summaries
+           WHERE symbol=? AND trade_date=? AND analyst_type=?
+           ORDER BY id DESC LIMIT 1""",
+        (symbol, date, atype),
+    )
+    row = cur.fetchone()
+    conn.close()
+    if not row:
+        return jsonify({"error": "未找到 summary"}), 404
+    return jsonify(
+        {
+            "id": row["id"],
+            "content": row["summary_content"],
+            "created_at": row["created_at"],
+            "window_start_date": row["window_start_date"],
+            "window_end_date": row["window_end_date"],
+            "source_reports_count": row["source_reports_count"],
+            "llm_model": row["llm_model"],
+            "token_usage": row["token_usage"],
+            "updated_at": row["updated_at"],
+        }
+    )
+
+
 @app.route("/api/delete_report", methods=["POST"])
 def api_delete_report():
     """按 symbol + trade_date + analyst_type 删除 analyst_reports（可删多条重复）"""
@@ -103,6 +156,30 @@ def api_delete_report():
     cur = conn.cursor()
     cur.execute(
         "DELETE FROM analyst_reports WHERE symbol=? AND trade_date=? AND analyst_type=?",
+        (symbol, date, atype),
+    )
+    deleted = cur.rowcount
+    conn.commit()
+    conn.close()
+    return jsonify({"ok": True, "deleted": deleted})
+
+
+@app.route("/api/delete_summary", methods=["POST"])
+def api_delete_summary():
+    """按 symbol + trade_date + analyst_type 删除 analyst_summaries"""
+    data = request.get_json() or {}
+    symbol = (data.get("symbol") or "NVDA").strip().upper()
+    date = data.get("date")
+    atype = (data.get("type") or "market").strip().lower()
+    if not date:
+        return jsonify({"error": "缺少 date"}), 400
+    valid_types = {"market", "news", "fundamentals", "sentiment"}
+    if atype not in valid_types:
+        return jsonify({"error": f"type 须为 {valid_types}"}), 400
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute(
+        "DELETE FROM analyst_summaries WHERE symbol=? AND trade_date=? AND analyst_type=?",
         (symbol, date, atype),
     )
     deleted = cur.rowcount
@@ -276,6 +353,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     <div class="tabs">
       <span class="tab active" data-panel="overview">概览</span>
       <span class="tab" data-panel="reports">Analyst 报告</span>
+      <span class="tab" data-panel="summaries">Summary（7日）</span>
       <span class="tab" data-panel="tables">数据表</span>
     </div>
 
@@ -307,6 +385,27 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       </div>
     </div>
 
+    <div id="panel-summaries" class="panel">
+      <div class="card">
+        <h3>选择 7 日滚动 Summary（analyst_summaries）</h3>
+        <div class="report-selector">
+          <select id="selSummarySymbol"><option value="NVDA">NVDA</option><option value="AAPL">AAPL</option></select>
+          <select id="selSummaryDate"><option value="">选择日期</option></select>
+          <select id="selSummaryType">
+            <option value="market">Market</option>
+            <option value="news">News</option>
+            <option value="fundamentals">Fundamentals</option>
+            <option value="sentiment">Sentiment</option>
+          </select>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn btn-danger" id="btnDeleteSummary">删除当前 Summary</button>
+          <span class="meta" id="summaryMeta"></span>
+        </div>
+        <div id="summaryContent" class="report-content">选择日期和类型查看 summary 内容</div>
+      </div>
+    </div>
+
     <div id="panel-tables" class="panel">
       <div class="card">
         <h3>选择表</h3>
@@ -322,6 +421,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     const API = '';
     let overview = null;
     let currentReportId = null;
+    let currentSummaryId = null;
 
     document.querySelectorAll('.tab').forEach(t => {
       t.onclick = () => {
@@ -330,6 +430,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         t.classList.add('active');
         document.getElementById('panel-' + t.dataset.panel).classList.add('active');
         if (t.dataset.panel === 'reports') loadDates();
+        if (t.dataset.panel === 'summaries') loadSummaryDates();
         if (t.dataset.panel === 'tables') loadTableList();
       };
     });
@@ -384,6 +485,67 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       } catch (e) { el.textContent = '加载失败: ' + e.message; }
       document.getElementById('selType').onchange = loadReport;
     }
+
+    async function loadSummaryDates() {
+      const symbol = document.getElementById('selSummarySymbol').value;
+      const r = await fetch(API + '/api/summary_dates?symbol=' + encodeURIComponent(symbol));
+      const d = await r.json();
+      const sel = document.getElementById('selSummaryDate');
+      sel.innerHTML = '<option value="">选择日期</option>' + d.dates.map(x => `<option value="${x}">${x}</option>`).join('');
+      sel.onchange = loadSummary;
+    }
+
+    async function loadSummary() {
+      const symbol = document.getElementById('selSummarySymbol').value;
+      const date = document.getElementById('selSummaryDate').value;
+      const type = document.getElementById('selSummaryType').value;
+      const el = document.getElementById('summaryContent');
+      const meta = document.getElementById('summaryMeta');
+      currentSummaryId = null;
+      meta.textContent = '';
+      if (!date) { el.textContent = '请选择日期'; return; }
+      el.textContent = '加载中...';
+      try {
+        const r = await fetch(API + `/api/summary?symbol=${encodeURIComponent(symbol)}&date=${encodeURIComponent(date)}&type=${encodeURIComponent(type)}`);
+        const j = await r.json();
+        if (j.error) { el.textContent = j.error; return; }
+        currentSummaryId = j.id != null ? j.id : null;
+        el.textContent = j.content || '(空)';
+        const parts = [];
+        if (j.id != null) parts.push('id=' + j.id);
+        if (j.created_at) parts.push(String(j.created_at));
+        if (j.window_start_date && j.window_end_date) {
+          parts.push('窗口 ' + j.window_start_date + ' ~ ' + j.window_end_date);
+        }
+        if (j.source_reports_count != null) parts.push('源报告数=' + j.source_reports_count);
+        if (j.llm_model) parts.push('model=' + j.llm_model);
+        if (j.token_usage != null) parts.push('tokens=' + j.token_usage);
+        meta.textContent = parts.join('  ·  ');
+      } catch (e) { el.textContent = '加载失败: ' + e.message; }
+      document.getElementById('selSummaryType').onchange = loadSummary;
+    }
+
+    document.getElementById('btnDeleteSummary').onclick = async () => {
+      const symbol = document.getElementById('selSummarySymbol').value;
+      const date = document.getElementById('selSummaryDate').value;
+      const type = document.getElementById('selSummaryType').value;
+      if (!date) { alert('请先选择日期'); return; }
+      if (!confirm('确定删除「' + symbol + ' / ' + date + ' / ' + type + '」这条 Summary？不可恢复。')) return;
+      try {
+        const r = await fetch(API + '/api/delete_summary', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ symbol, date, type })
+        });
+        const j = await r.json();
+        if (j.error) { alert(j.error); return; }
+        alert('已删除 ' + (j.deleted || 0) + ' 条');
+        document.getElementById('summaryContent').textContent = '已删除，请重新选择或刷新日期列表';
+        document.getElementById('summaryMeta').textContent = '';
+        currentSummaryId = null;
+        loadSummaryDates();
+      } catch (e) { alert('删除失败: ' + e.message); }
+    };
 
     document.getElementById('btnDeleteReport').onclick = async () => {
       const symbol = document.getElementById('selSymbol').value;
@@ -466,9 +628,12 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
     document.getElementById('selSymbol').onchange = () => { loadDates(); loadReport(); };
     document.getElementById('selType').onchange = loadReport;
+    document.getElementById('selSummarySymbol').onchange = () => { loadSummaryDates(); loadSummary(); };
+    document.getElementById('selSummaryType').onchange = loadSummary;
 
     loadOverview().then(() => {
       loadDates();
+      loadSummaryDates();
     });
   </script>
 </body>

@@ -21,7 +21,7 @@
 **完整参数样例（仅构建 market，实验区间）**：
 
 ```bash
-python scripts/experimental/build_analyst_dataset.py --symbol NVDA --start 2025-01-01 --end 2025-03-01 --types market --db memory.db --only-missing --skip-existing --output analyst_dataset_NVDA_2025Q1_market_temp.json
+python scripts/experimental/build_analyst_dataset.py --symbol NVDA --start 2025-01-01 --end 2025-02-01 --types sentiment --db memory.db --only-missing --skip-existing --output analyst_dataset_NVDA_2025Q1_market_temp.json
 ```
 
 | 参数 | 说明 |
@@ -102,6 +102,7 @@ Silicon_API_KEY=sk-key-1,sk-key-2
 | 指定交易日 | 加 `--dates 2025-01-02,2025-01-03` | 同上 | 可与 `--export-mode` / `--simulate-portfolio` 组合 |
 | 分析评级 | 同上，加 `--export-mode rating` | `qc_signals/ratings.json` | **不注入** `current_position` / `portfolio_state`，**不调用** `resolve_signal`；仅抽取 `research_decision` 与 Risk 的 `fine_rating` / `final_decision` / `risk_level` |
 | 回测 + 模拟仓 | 加 `--simulate-portfolio`（可选 `--initial-cash`） | 仍为 `signals.json` | 多日循环用 [`tradingagents/core/portfolio_simulator.py`](e:/agent_proj/TradeSwarm/tradingagents/core/portfolio_simulator.py) 注入组合状态，使 Trader / risk_manager 与 `is_holding` 对齐；**research_manager 仍不接持仓** |
+| Pre-Open 落盘（人读） | 加 `--graph-dump graph_outputs` | `graph_outputs/{symbol}_{date}/` | **含子图内每一步**：`step_NNNN__root__market_summary_output.*`、`step_…__research_subgraph__{task}__bull_researcher_output.*` 等 + `full_state_snapshot.json` + `final_state_*`；目录见 [.gitignore](e:/agent_proj/TradeSwarm/.gitignore) 已忽略 `graph_outputs/` |
 
 **记忆**：脚本中 `DatabaseMemory` 仅从 `cycle_reflections`（周报）注入反思；表空时无记忆，不影响导出。
 

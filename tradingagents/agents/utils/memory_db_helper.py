@@ -12,6 +12,7 @@ Memory DB 交互工具模块
 from typing import Any, Callable, Dict, List, Optional
 from datetime import datetime, timedelta
 import sqlite3
+import threading
 from pathlib import Path
 
 
@@ -36,7 +37,8 @@ class MemoryDBHelper:
                 若提供，query_history_reports 将按交易日而非自然日回溯；否则回退到 date(?, '-n days')。
         """
         self.db_path = Path(db_path)
-        self.conn: Optional[sqlite3.Connection] = None
+        # LangGraph 等会在工作线程中执行节点；sqlite3 默认连接不可跨线程使用，故每线程独占连接。
+        self._conn_local = threading.local()
         self.trading_dates_resolver = trading_dates_resolver
         self._ensure_table_exists()
     
@@ -156,16 +158,28 @@ class MemoryDBHelper:
         conn.close()
     
     def _get_connection(self) -> sqlite3.Connection:
-        """获取数据库连接（单例模式）。"""
-        if self.conn is None:
-            self.conn = sqlite3.connect(self.db_path)
-        return self.conn
-    
+        """获取当前线程的数据库连接（每线程最多一个）。"""
+        conn = getattr(self._conn_local, "conn", None)
+        if conn is None:
+            conn = sqlite3.connect(self.db_path)
+            self._conn_local.conn = conn
+        return conn
+
+    def _rollback_current_thread(self) -> None:
+        conn = getattr(self._conn_local, "conn", None)
+        if conn is None:
+            return
+        try:
+            conn.rollback()
+        except Exception:
+            pass
+
     def close(self) -> None:
-        """关闭数据库连接。"""
-        if self.conn:
-            self.conn.close()
-            self.conn = None
+        """关闭当前线程持有的数据库连接。"""
+        conn = getattr(self._conn_local, "conn", None)
+        if conn is not None:
+            conn.close()
+            self._conn_local.conn = None
     
     def insert_report(
         self,
@@ -207,8 +221,7 @@ class MemoryDBHelper:
             
         except Exception as e:
             print(f"[ERROR] 插入报告失败: {e}")
-            if self.conn:
-                self.conn.rollback()
+            self._rollback_current_thread()
             return False
 
     def insert_report_or_update(
@@ -250,8 +263,7 @@ class MemoryDBHelper:
             return self.insert_report(analyst_type, symbol, trade_date, report_content)
         except Exception as e:
             print(f"[ERROR] 插入/更新报告失败: {e}")
-            if self.conn:
-                self.conn.rollback()
+            self._rollback_current_thread()
             return False
 
     def query_today_report(
@@ -447,8 +459,7 @@ class MemoryDBHelper:
 
         except Exception as e:
             print(f"[ERROR] 更新 summary 失败: {e}")
-            if self.conn:
-                self.conn.rollback()
+            self._rollback_current_thread()
             return False
 
     def query_summary(
@@ -609,8 +620,7 @@ class MemoryDBHelper:
             
         except Exception as e:
             print(f"[ERROR] 更新报告失败: {e}")
-            if self.conn:
-                self.conn.rollback()
+            self._rollback_current_thread()
             return False
     
     def delete_report(self, report_id: int) -> bool:
@@ -637,8 +647,7 @@ class MemoryDBHelper:
             
         except Exception as e:
             print(f"[ERROR] 删除报告失败: {e}")
-            if self.conn:
-                self.conn.rollback()
+            self._rollback_current_thread()
             return False
     
     def get_statistics(
@@ -801,8 +810,7 @@ class MemoryDBHelper:
 
         except Exception as e:
             print(f"[ERROR] 更新 daily trading summary 失败: {e}")
-            if self.conn:
-                self.conn.rollback()
+            self._rollback_current_thread()
             return False
 
     def query_daily_trading_summary(

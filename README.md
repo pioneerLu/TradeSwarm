@@ -38,9 +38,7 @@ export FINANCIALDATA_API_KEY="your-financialdata-key"
 功能与 CLI **已完备**（`scripts/experimental/build_analyst_dataset.py`）。
 
 ```bash
-python scripts/experimental/build_analyst_dataset.py \
-  --symbol NVDA --start 2025-01-01 --end 2025-01-06 --db memory.db \
-  --only-missing --skip-existing
+python scripts/experimental/build_analyst_dataset.py --symbol NVDA --start 2025-01-01 --end 2025-01-06 --db memory.db --only-missing --skip-existing
 ```
 
 - 代理、LLM（仅 Silicon）、`--dates` / `--types` 等见 [docs/DATA_LAB.md](docs/DATA_LAB.md)。
@@ -50,8 +48,7 @@ python scripts/experimental/build_analyst_dataset.py \
 功能与 CLI **已完备**（`scripts/experimental/run_history_maintainer_batch.py`）。**不跑本步时 Pre-Open 仍可运行**，仅历史部分会改用原始报告拼接。
 
 ```bash
-python scripts/experimental/run_history_maintainer_batch.py \
-  --db memory.db --symbol NVDA --start 2025-01-01 --end 2025-01-10 --sleep-ms 500
+python scripts/experimental/run_history_maintainer_batch.py --db memory.db --symbol NVDA --start 2025-01-01 --end 2025-01-10 --sleep-ms 500
 ```
 
 ### 3. 从 Summary 起跑完整 Pre-Open（Research / Trader / Risk）并导出信号
@@ -60,12 +57,9 @@ python scripts/experimental/run_history_maintainer_batch.py \
 
 ```bash
 # 按区间（日历由 SPY 交易日推算）
-python scripts/runtime/run_signal_export.py \
-  --symbol NVDA --start 2025-01-01 --end 2025-01-10 --db memory.db --output qc_signals
-
-# 仅指定若干交易日（等价于替代原 run_graph_from_summary 单日/多日调试）
-python scripts/runtime/run_signal_export.py \
-  --symbol NVDA --dates 2025-01-02,2025-01-03 --db memory.db --output qc_signals
+python scripts/runtime/run_signal_export.py --symbol NVDA --start 2025-01-01 --end 2025-01-10 --db memory.db --output qc_signals
+# 指定交易日并落盘 Pre-Open 节点输出（graph_outputs/ 已 gitignore）
+python scripts/runtime/run_signal_export.py --symbol NVDA --dates 2025-01-13 --db memory.db --output qc_signals --graph-dump graph_outputs
 ```
 
 - 仅导出评级、不要可执行信号：`--export-mode rating` → `ratings.json`。
@@ -80,9 +74,7 @@ python scripts/runtime/run_signal_export.py \
 **脚本逻辑已完备**（先导出/复制 `signals.json` 再 `lean backtest`），**前提是本机 Lean + Docker（或文档中的工作区布局）已按 [quantconnect/README.md](quantconnect/README.md) 配好**。
 
 ```bash
-python scripts/runtime/run_automated_backtest.py \
-  --source export --symbol NVDA --db memory.db \
-  --start 2025-01-01 --end 2025-01-10
+python scripts/runtime/run_automated_backtest.py --source export --symbol NVDA --db memory.db --start 2025-01-01 --end 2025-01-10
 # 仅生成信号并复制到 quantconnect/signals/，不跑 lean：加 --skip-backtest
 ```
 
