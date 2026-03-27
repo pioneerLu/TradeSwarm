@@ -2,10 +2,43 @@
 # Algorithm Lab 云端无法读项目文件，需将信号嵌入下方 EMBEDDED_SIGNALS
 
 from AlgorithmImports import *
+import os
+import json
+from datetime import datetime, timedelta
 
 # 嵌入信号（Algorithm Lab 必填）：将 qc_signals/signals.json 的 by_execution_date 部分粘贴到下面；
 # 实验区间 2025-01-01~2025-03-01，运行 run_signal_export 后粘贴对应内容
 EMBEDDED_SIGNALS = {}
+
+
+class LocalDailyBar(PythonData):
+    """读取本地 CSV 日线：date,open,high,low,close,volume"""
+
+    def GetSource(self, config, date, isLiveMode):
+        source = os.path.join(Globals.DataFolder, "custom", "nvda_daily.csv")
+        return SubscriptionDataSource(
+            source,
+            SubscriptionTransportMedium.LocalFile,
+            FileFormat.Csv
+        )
+
+    def Reader(self, config, line, date, isLiveMode):
+        if not line or line.startswith("date,"):
+            return None
+        parts = line.split(",")
+        if len(parts) < 6:
+            return None
+        bar = LocalDailyBar()
+        bar.Symbol = config.Symbol
+        bar.Time = datetime.strptime(parts[0], "%Y-%m-%d")
+        bar.EndTime = bar.Time + timedelta(days=1)
+        bar["open"] = float(parts[1])
+        bar["high"] = float(parts[2])
+        bar["low"] = float(parts[3])
+        bar["close"] = float(parts[4])
+        bar["volume"] = float(parts[5])
+        bar.Value = bar["close"]
+        return bar
 
 
 class TradeSwarmSignalAlgorithm(QCAlgorithm):
@@ -14,28 +47,36 @@ class TradeSwarmSignalAlgorithm(QCAlgorithm):
         self.set_start_date(2025, 1, 1)
         self.set_end_date(2025, 3, 1)
         self.set_cash(100000)
+        self.SetBenchmark(lambda _: 0)
 
         self.symbol_str = "NVDA"
-        self.equity = self.add_equity(self.symbol_str, Resolution.DAILY)
-        self.symbol = self.equity.symbol
+        self._last_processed_date = None
+        self.symbol = None
+        self._init_symbol()
 
         self.signals = self._load_signals()
         if not self.signals:
             self.error("未加载到信号，请确保 signals/signals.json 存在且格式正确")
 
-        self.schedule.on(
-            self.date_rules.every_day(self.symbol_str),
-            self.time_rules.after_market_open(self.symbol_str, 1),
-            self.process_daily_signal
-        )
+    def _init_symbol(self):
+        use_local = (os.environ.get("TS_LOCAL_DATA", "1").strip() != "0")
+        if use_local:
+            try:
+                custom = self.AddData(LocalDailyBar, "NVDA_LOCAL", Resolution.DAILY)
+                self.symbol = custom.Symbol
+                self.SetBrokerageModel(BrokerageName.Default, AccountType.Cash)
+                self.Debug("使用本地数据 custom/nvda_daily.csv")
+                return
+            except Exception as e:
+                self.Debug(f"本地数据初始化失败，回退 add_equity: {e}")
+        self.equity = self.add_equity(self.symbol_str, Resolution.DAILY)
+        self.symbol = self.equity.symbol
 
     def _load_signals(self):
         """优先使用 EMBEDDED_SIGNALS（Algorithm Lab），否则尝试读文件（本地/Lean CLI）"""
         if EMBEDDED_SIGNALS:
             self.debug("使用嵌入信号 EMBEDDED_SIGNALS")
             return EMBEDDED_SIGNALS
-        import os
-        import json
         try:
             base = os.path.dirname(os.path.abspath(__file__))
         except Exception:
@@ -54,9 +95,14 @@ class TradeSwarmSignalAlgorithm(QCAlgorithm):
                     self.error(f"加载信号失败 {path}: {e}")
         return {}
 
-    def process_daily_signal(self):
-        """每日开盘后执行：按当日 execution_date 查找信号并执行"""
+    def on_data(self, data: Slice):
+        # 每个交易日仅处理一次信号
+        if self.symbol is None or not data.ContainsKey(self.symbol):
+            return
         today = self.time.date().isoformat()
+        if today == self._last_processed_date:
+            return
+        self._last_processed_date = today
         signal = self.signals.get(today) if isinstance(self.signals, dict) else None
 
         if not signal:
