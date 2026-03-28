@@ -192,8 +192,11 @@ class AgentState(MessagesState):
     company_of_interest: Annotated[str, "目标股票代码"]
     trade_date: Annotated[str, "交易日期 YYYY-MM-DD"]
     trade_timestamp: Annotated[Optional[str], "精确时间戳"]
+    enabled_analysts: Annotated[Optional[List[str]], "本次运行启用的 analyst 集合"]
+    experiment_id: Annotated[Optional[str], "实验配置标识"]
 
     # ========== Analyst Memory（只读，由 Fusion 节点填充） ==========
+    analyst_summaries: Annotated[Optional[Dict[str, AnalystMemorySummary]], "按 analyst_type 动态装配的 summary 映射"]
     market_analyst_summary: Annotated[AnalystMemorySummary, "Market Analyst 的 Memory Summary"]
     news_analyst_summary: Annotated[AnalystMemorySummary, "News Analyst 的 Memory Summary"]
     sentiment_analyst_summary: Annotated[AnalystMemorySummary, "Social Media Analyst 的 Memory Summary"]
@@ -219,4 +222,3 @@ class AgentState(MessagesState):
     trading_strategy: Annotated[Optional[TradingStrategy], "交易策略"]
     trading_strategy_status: Annotated[Literal["active", "inactive", "expired"], "交易策略状态"]
     execution_log: Annotated[Optional[List[ExecutionLog]], "执行日志"]
-

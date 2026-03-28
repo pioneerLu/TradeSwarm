@@ -1,14 +1,81 @@
-"""
-Agent State 辅助函数
+"""Helpers for reading analyst summaries from AgentState."""
 
-提供用于处理 AgentState 的公共工具函数。
-"""
+from __future__ import annotations
 
-from typing import Optional
-from tradingagents.agents.utils.agentstate.agent_states import (
-    AgentState,
-    AnalystMemorySummary,
-)
+from typing import Dict, List, Optional
+
+from tradingagents.agents.utils.agentstate.agent_states import AgentState, AnalystMemorySummary
+
+DEFAULT_ANALYST_ORDER = ["market", "news", "sentiment", "fundamentals"]
+COMPAT_SUMMARY_KEYS = {
+    "market": "market_analyst_summary",
+    "news": "news_analyst_summary",
+    "sentiment": "sentiment_analyst_summary",
+    "fundamentals": "fundamentals_analyst_summary",
+}
+
+
+def get_enabled_analysts(state: AgentState) -> List[str]:
+    enabled = state.get("enabled_analysts") or []
+    if enabled:
+        return [str(item).strip().lower() for item in enabled if str(item).strip()]
+    summaries = state.get("analyst_summaries") or {}
+    if summaries:
+        ordered = [name for name in DEFAULT_ANALYST_ORDER if name in summaries]
+        extras = [name for name in summaries.keys() if name not in DEFAULT_ANALYST_ORDER]
+        return ordered + extras
+    return list(DEFAULT_ANALYST_ORDER)
+
+
+def get_analyst_summary(state: AgentState, analyst_type: str) -> AnalystMemorySummary:
+    analyst_type = str(analyst_type).strip().lower()
+    summaries: Dict[str, AnalystMemorySummary] = state.get("analyst_summaries") or {}
+    if analyst_type in summaries:
+        return summaries[analyst_type] or {}
+    compat_key = COMPAT_SUMMARY_KEYS.get(analyst_type)
+    if compat_key:
+        return state.get(compat_key, {}) or {}
+    return {}
+
+
+def get_analyst_summaries_map(state: AgentState) -> Dict[str, AnalystMemorySummary]:
+    return {analyst: get_analyst_summary(state, analyst) for analyst in get_enabled_analysts(state)}
+
+
+def get_prompt_context_from_summaries(state: AgentState) -> Dict[str, str]:
+    summaries = {
+        "market": get_analyst_summary(state, "market"),
+        "news": get_analyst_summary(state, "news"),
+        "sentiment": get_analyst_summary(state, "sentiment"),
+        "fundamentals": get_analyst_summary(state, "fundamentals"),
+    }
+    enabled = get_enabled_analysts(state)
+    analyst_blocks = []
+    for analyst_name in enabled:
+        summary = get_analyst_summary(state, analyst_name)
+        today_report = summary.get("today_report", "") if summary else ""
+        history_report = summary.get("history_report", "") if summary else ""
+        block = f"[{analyst_name}]\n{today_report}".strip()
+        if history_report:
+            block += f"\n\nHistory:\n{history_report}"
+        analyst_blocks.append(block)
+
+    return {
+        "market_research_report": summaries["market"].get("today_report", ""),
+        "market_today_report": summaries["market"].get("today_report", ""),
+        "market_history_summary": summaries["market"].get("history_report", ""),
+        "news_report": summaries["news"].get("today_report", ""),
+        "news_today_report": summaries["news"].get("today_report", ""),
+        "news_history_summary": summaries["news"].get("history_report", ""),
+        "sentiment_report": summaries["sentiment"].get("today_report", ""),
+        "sentiment_today_report": summaries["sentiment"].get("today_report", ""),
+        "sentiment_history_summary": summaries["sentiment"].get("history_report", ""),
+        "fundamentals_report": summaries["fundamentals"].get("today_report", ""),
+        "fundamentals_today_report": summaries["fundamentals"].get("today_report", ""),
+        "fundamentals_history_summary": summaries["fundamentals"].get("history_report", ""),
+        "enabled_analysts_text": ", ".join(enabled),
+        "active_analyst_blocks": "\n\n".join(block for block in analyst_blocks if block).strip(),
+    }
 
 
 def build_curr_situation_from_summaries(
@@ -16,74 +83,18 @@ def build_curr_situation_from_summaries(
     max_length: Optional[int] = None,
     include_history: bool = False,
 ) -> str:
-    """
-    从四个 Analyst 的 MemorySummary 中构造当前情境描述。
-    
-    该函数统一了从 AgentState 中提取分析师报告的逻辑，确保所有节点使用
-    相同的数据格式和顺序。
-    
-    Args:
-        state: 当前的 AgentState
-        max_length: 可选的最大长度限制（字符数）。如果提供，会截断超长内容。
-        include_history: 是否包含历史报告。如果为 True，会同时包含 today_report
-            和 history_report；如果为 False，只包含 today_report。
-    
-    Returns:
-        拼接后的情境描述字符串，格式为：
-        "{market_report}\n\n{sentiment_report}\n\n{news_report}\n\n{fundamentals_report}"
-        
-        如果 include_history=True，每个报告会包含 today_report 和 history_report。
-    
-    Examples:
-        >>> state = {...}  # AgentState
-        >>> situation = build_curr_situation_from_summaries(state)
-        >>> # 返回包含四个分析师报告的字符串
-        
-        >>> # 限制长度
-        >>> situation = build_curr_situation_from_summaries(state, max_length=5000)
-        
-        >>> # 包含历史报告
-        >>> situation = build_curr_situation_from_summaries(state, include_history=True)
-    """
-    # 提取四个 Analyst 的 MemorySummary
-    market_summary: AnalystMemorySummary = state.get("market_analyst_summary", {})
-    news_summary: AnalystMemorySummary = state.get("news_analyst_summary", {})
-    sentiment_summary: AnalystMemorySummary = state.get("sentiment_analyst_summary", {})
-    fundamentals_summary: AnalystMemorySummary = state.get("fundamentals_analyst_summary", {})
-    
-    # 提取 today_report
-    market_report = market_summary.get("today_report", "") if market_summary else ""
-    news_report = news_summary.get("today_report", "") if news_summary else ""
-    sentiment_report = sentiment_summary.get("today_report", "") if sentiment_summary else ""
-    fundamentals_report = fundamentals_summary.get("today_report", "") if fundamentals_summary else ""
-    
-    # 如果包含历史报告，追加 history_report
-    if include_history:
-        market_history = market_summary.get("history_report", "") if market_summary else ""
-        news_history = news_summary.get("history_report", "") if news_summary else ""
-        sentiment_history = sentiment_summary.get("history_report", "") if sentiment_summary else ""
-        fundamentals_history = fundamentals_summary.get("history_report", "") if fundamentals_summary else ""
-        
-        if market_history:
-            market_report = f"{market_report}\n\n{market_history}" if market_report else market_history
-        if news_history:
-            news_report = f"{news_report}\n\n{news_history}" if news_report else news_history
-        if sentiment_history:
-            sentiment_report = f"{sentiment_report}\n\n{sentiment_history}" if sentiment_report else sentiment_history
-        if fundamentals_history:
-            fundamentals_report = f"{fundamentals_report}\n\n{fundamentals_history}" if fundamentals_report else fundamentals_history
-    
-    # 顺序拼接：market -> sentiment -> news -> fundamentals
-    result = (
-        f"{market_report}\n\n"
-        f"{sentiment_report}\n\n"
-        f"{news_report}\n\n"
-        f"{fundamentals_report}"
-    )
-    
-    # 如果提供了最大长度限制，进行截断
+    sections = []
+    for analyst_name in get_enabled_analysts(state):
+        summary = get_analyst_summary(state, analyst_name)
+        report = summary.get("today_report", "") if summary else ""
+        if include_history:
+            history = summary.get("history_report", "") if summary else ""
+            if history:
+                report = f"{report}\n\n{history}" if report else history
+        if report:
+            sections.append(report)
+
+    result = "\n\n".join(sections).strip()
     if max_length is not None and len(result) > max_length:
         result = result[:max_length] + "\n\n[内容已截断...]"
-    
-    return result.strip()
-
+    return result

@@ -1,23 +1,11 @@
-"""
-Summary 节点模块
+"""Summary loading entrypoints."""
 
-从数据库读取 Analyst 的报告摘要并填充到 AgentState。
-
-主要导出:
-    - create_market_summary_node: 创建 market summary 节点
-    - create_news_summary_node: 创建 news summary 节点
-    - create_sentiment_summary_node: 创建 sentiment summary 节点
-    - create_fundamentals_summary_node: 创建 fundamentals summary 节点
-"""
-
-from tradingagents.agents.pre_open.summary.market_summary import create_market_summary_node
-from tradingagents.agents.pre_open.summary.news_summary import create_news_summary_node
-from tradingagents.agents.pre_open.summary.sentiment_summary import create_sentiment_summary_node
-from tradingagents.agents.pre_open.summary.fundamentals_summary import create_fundamentals_summary_node
+from tradingagents.agents.pre_open.summary.loader import create_summary_loader_node, resolve_enabled_analysts
+from tradingagents.agents.pre_open.summary.registry import DEFAULT_ENABLED_ANALYSTS, get_summary_registry
 
 __all__ = [
-    "create_market_summary_node",
-    "create_news_summary_node",
-    "create_sentiment_summary_node",
-    "create_fundamentals_summary_node",
+    "DEFAULT_ENABLED_ANALYSTS",
+    "create_summary_loader_node",
+    "get_summary_registry",
+    "resolve_enabled_analysts",
 ]

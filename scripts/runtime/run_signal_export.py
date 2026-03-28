@@ -28,6 +28,7 @@ import json
 import sys
 from pathlib import Path
 from datetime import datetime, timedelta
+from textwrap import dedent
 from typing import Dict, Any, List, Optional
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
@@ -37,6 +38,7 @@ from tradingagents.graph.trading_graph import create_trading_graph
 from tradingagents.graph.utils import load_llm_from_config
 from tradingagents.agents.utils.memory_db_helper import MemoryDBHelper
 from tradingagents.agents.utils.agentstate.agent_states import AgentState
+from tradingagents.agents.pre_open.summary import DEFAULT_ENABLED_ANALYSTS, resolve_enabled_analysts
 from tradingagents.core.data_adapter import DataAdapter
 from tradingagents.agents.market_open.signal_resolver import resolve_signal
 from tradingagents.agents.utils.json_parser import extract_json_from_text
@@ -50,6 +52,107 @@ from tradingagents.graph.node_dump import (
     save_node_output,
     stream_graph_updates_with_dump,
 )
+
+ANALYST_FACTORIES = {
+    "market": (create_market_analyst, "market_report"),
+    "news": (create_news_analyst, "news_report"),
+    "fundamentals": (create_fundamentals_analyst, "fundamentals_report"),
+    "sentiment": (create_social_media_analyst, "sentiment_report"),
+}
+
+
+def _normalize_enabled_analysts(enabled_analysts: Optional[List[str]]) -> List[str]:
+    requested = enabled_analysts or list(DEFAULT_ENABLED_ANALYSTS)
+    normalized: List[str] = []
+    for analyst_name in requested:
+        name = str(analyst_name).strip().lower()
+        if name and name in ANALYST_FACTORIES and name not in normalized:
+            normalized.append(name)
+    return normalized or list(DEFAULT_ENABLED_ANALYSTS)
+
+
+def _derive_experiment_id(enabled_analysts: List[str], experiment_id: Optional[str]) -> str:
+    if experiment_id and str(experiment_id).strip():
+        return str(experiment_id).strip()
+    enabled = _normalize_enabled_analysts(enabled_analysts)
+    if enabled == list(DEFAULT_ENABLED_ANALYSTS):
+        return "all_analysts"
+    return "_".join(enabled)
+
+
+def _resolve_output_file(output_dir: str, experiment_id: str, symbol: str, filename: str) -> Path:
+    base = Path(output_dir)
+    if base.name == "qc_signals":
+        base.mkdir(parents=True, exist_ok=True)
+        return base / filename
+    target_dir = base / experiment_id / symbol
+    target_dir.mkdir(parents=True, exist_ok=True)
+    return target_dir / filename
+
+
+def _extract_report_sections(final_state: Dict[str, Any]) -> Dict[str, Any]:
+    research_summary = final_state.get("research_summary") or {}
+    risk_summary = final_state.get("risk_summary") or {}
+    return {
+        "analyst_summaries": final_state.get("analyst_summaries") or {},
+        "research_summary": research_summary,
+        "research_investment_plan": research_summary.get("investment_plan"),
+        "trader_investment_plan": final_state.get("trader_investment_plan"),
+        "risk_summary": risk_summary,
+        "risk_final_trade_decision": risk_summary.get("final_trade_decision"),
+    }
+
+
+def _write_report_artifacts(
+    report_output_root: str,
+    experiment_id: str,
+    symbol: str,
+    trade_date: str,
+    enabled_analysts: List[str],
+    final_state: Dict[str, Any],
+    export_mode: str,
+    execution_payload: Optional[Dict[str, Any]] = None,
+) -> None:
+    base_dir = Path(report_output_root) / experiment_id / symbol / trade_date
+    base_dir.mkdir(parents=True, exist_ok=True)
+
+    payload = {
+        "symbol": symbol,
+        "trade_date": trade_date,
+        "experiment_id": experiment_id,
+        "enabled_analysts": enabled_analysts,
+        "export_mode": export_mode,
+        **_extract_report_sections(final_state),
+        "execution_payload": execution_payload,
+    }
+
+    with open(base_dir / "report.json", "w", encoding="utf-8") as f:
+        json.dump(payload, f, ensure_ascii=False, indent=2, default=str)
+
+    text = dedent(
+        f"""
+        Symbol: {symbol}
+        Trade Date: {trade_date}
+        Experiment ID: {experiment_id}
+        Enabled Analysts: {", ".join(enabled_analysts)}
+        Export Mode: {export_mode}
+
+        [Research Investment Plan]
+        {payload.get("research_investment_plan") or ""}
+
+        [Trader Investment Plan]
+        {payload.get("trader_investment_plan") or ""}
+
+        [Risk Final Trade Decision]
+        {payload.get("risk_final_trade_decision") or ""}
+
+        [Execution Payload]
+        {json.dumps(execution_payload or {}, ensure_ascii=False, indent=2, default=str)}
+        """
+    ).strip()
+
+    with open(base_dir / "report.txt", "w", encoding="utf-8") as f:
+        f.write(text + "\n")
 
 
 class DatabaseMemory:
@@ -200,6 +303,9 @@ def run_signal_export(
     initial_cash: float = 100_000.0,
     trading_dates_override: Optional[List[str]] = None,
     graph_dump_dir: Optional[str] = None,
+    enabled_analysts: Optional[List[str]] = None,
+    experiment_id: Optional[str] = None,
+    report_output_root: Optional[str] = None,
 ) -> Dict[str, Any]:
     """
     导出信号或评级 JSON。
@@ -239,6 +345,11 @@ def run_signal_export(
     )
     print(f"模式: {export_mode}" + (f"  模拟仓: {'开' if simulate_portfolio else '关'}" if export_mode == "backtest" else ""))
 
+    enabled_analysts = _normalize_enabled_analysts(enabled_analysts)
+    experiment_id = _derive_experiment_id(enabled_analysts, experiment_id)
+    print(f"Enabled analysts: {enabled_analysts}")
+    print(f"Experiment ID: {experiment_id}")
+
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
 
@@ -271,7 +382,7 @@ def run_signal_export(
         print(f"\n[{i}/{len(trading_dates)}] {trade_date}")
 
         # Analyst 报告
-        analyst_types = ("market", "news", "fundamentals", "sentiment")
+        analyst_types = enabled_analysts
         if use_db_reports_only:
             missing = []
             for at in analyst_types:
@@ -295,13 +406,8 @@ def run_signal_export(
                     all_signals[trade_date] = {"action": "HOLD", "reason": f"缺少报告: {missing}"}
                 continue
         else:
-            analysts = [
-                ("market", create_market_analyst(llm), "market_report"),
-                ("news", create_news_analyst(llm), "news_report"),
-                ("fundamentals", create_fundamentals_analyst(llm), "fundamentals_report"),
-                ("sentiment", create_social_media_analyst(llm), "sentiment_report"),
-            ]
-            for analyst_type, analyst_func, report_key in analysts:
+            for analyst_type in analyst_types:
+                analyst_factory, report_key = ANALYST_FACTORIES[analyst_type]
                 try:
                     initial_state: AgentState = {
                         "company_of_interest": symbol,
@@ -309,7 +415,7 @@ def run_signal_export(
                         report_key: "",
                         "messages": [],
                     }
-                    result = analyst_func(initial_state)
+                    result = analyst_factory(llm)(initial_state)
                     report_content = result.get(report_key) or ""
                     if not report_content and result.get("messages"):
                         for msg in reversed(result.get("messages", [])):
@@ -342,11 +448,13 @@ def run_signal_export(
                 "messages": [],
                 "current_position": cp,
                 "portfolio_state": ps,
+                "enabled_analysts": enabled_analysts,
+                "experiment_id": experiment_id,
             }
             final_state = None
             day_dump: Optional[Path] = None
             if graph_dump_dir:
-                day_dump = Path(graph_dump_dir) / f"{symbol}_{trade_date}"
+                day_dump = Path(graph_dump_dir) / experiment_id / symbol / trade_date
                 day_dump.mkdir(parents=True, exist_ok=True)
 
             final_state = stream_graph_updates_with_dump(
@@ -372,7 +480,20 @@ def run_signal_export(
 
             if export_mode == "rating":
                 rec = extract_rating_record(final_state, trade_date, symbol)
+                rec["experiment_id"] = experiment_id
+                rec["enabled_analysts"] = enabled_analysts
                 all_signals[trade_date] = rec
+                if report_output_root:
+                    _write_report_artifacts(
+                        report_output_root=report_output_root,
+                        experiment_id=experiment_id,
+                        symbol=symbol,
+                        trade_date=trade_date,
+                        enabled_analysts=enabled_analysts,
+                        final_state=final_state,
+                        export_mode=export_mode,
+                        execution_payload=rec,
+                    )
                 rd = rec.get("research_decision") or "?"
                 fd = rec.get("final_decision") or "?"
                 fr = rec.get("fine_rating") or "-"
@@ -384,7 +505,20 @@ def run_signal_export(
             signal = _validate_signal(signal)
             signal["date"] = trade_date
             signal["symbol"] = symbol
+            signal["experiment_id"] = experiment_id
+            signal["enabled_analysts"] = enabled_analysts
             all_signals[trade_date] = signal
+            if report_output_root:
+                _write_report_artifacts(
+                    report_output_root=report_output_root,
+                    experiment_id=experiment_id,
+                    symbol=symbol,
+                    trade_date=trade_date,
+                    enabled_analysts=enabled_analysts,
+                    final_state=final_state,
+                    export_mode=export_mode,
+                    execution_payload=signal,
+                )
 
             if sim is not None:
                 ed = signal.get("execution_date")
@@ -432,9 +566,11 @@ def run_signal_export(
             "export_mode": "rating",
             "start_date": meta_start,
             "end_date": meta_end,
+            "experiment_id": experiment_id,
+            "enabled_analysts": enabled_analysts,
             "by_date": all_signals,
         }
-        out_file = output_path / "ratings.json"
+        out_file = _resolve_output_file(output_dir, experiment_id, symbol, "ratings.json")
     else:
         by_execution_date = {}
         for ad, sig in all_signals.items():
@@ -447,10 +583,12 @@ def run_signal_export(
             "export_mode": "backtest",
             "start_date": meta_start,
             "end_date": meta_end,
+            "experiment_id": experiment_id,
+            "enabled_analysts": enabled_analysts,
             "signals": all_signals,
             "by_execution_date": by_execution_date,
         }
-        out_file = output_path / "signals.json"
+        out_file = _resolve_output_file(output_dir, experiment_id, symbol, "signals.json")
 
     with open(out_file, "w", encoding="utf-8") as f:
         json.dump(merged, f, ensure_ascii=False, indent=2, default=str)
@@ -480,6 +618,14 @@ def main() -> None:
     )
     parser.add_argument("--db", type=str, default="memory.db")
     parser.add_argument("--output", type=str, default="qc_signals")
+    parser.add_argument(
+        "--enabled-analysts",
+        type=str,
+        default=",".join(DEFAULT_ENABLED_ANALYSTS),
+        help="Comma-separated analyst list, e.g. market,news",
+    )
+    parser.add_argument("--experiment-id", type=str, default=None)
+    parser.add_argument("--report-output-root", type=str, default=None)
     parser.add_argument(
         "--use-db-reports-only",
         action="store_true",
@@ -515,6 +661,7 @@ def main() -> None:
     args = parser.parse_args()
 
     dates_override = None
+    enabled_analysts = [item.strip() for item in args.enabled_analysts.split(",") if item.strip()]
     if args.dates:
         dates_override = sorted({d.strip() for d in args.dates.split(",") if d.strip()})
         if not dates_override:
@@ -533,6 +680,9 @@ def main() -> None:
         initial_cash=args.initial_cash,
         trading_dates_override=dates_override,
         graph_dump_dir=args.graph_dump,
+        enabled_analysts=enabled_analysts,
+        experiment_id=args.experiment_id,
+        report_output_root=args.report_output_root,
     )
 
 

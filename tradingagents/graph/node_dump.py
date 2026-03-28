@@ -116,6 +116,13 @@ def save_node_output(
                     f.write("最后一条消息:\n")
                     f.write(str(last_msg.content) + "\n\n")
 
+        if state.get("enabled_analysts"):
+            f.write(f"enabled_analysts: {state.get('enabled_analysts')}\n\n")
+
+        if state.get("analyst_summaries"):
+            f.write("analyst_summaries:\n")
+            f.write(json.dumps(state["analyst_summaries"], ensure_ascii=False, indent=2, default=str) + "\n\n")
+
         for key in [
             "market_analyst_summary",
             "news_analyst_summary",
@@ -277,6 +284,9 @@ def build_loggable_full_state(final_state: Dict[str, Any]) -> Dict[str, Any]:
         "company_of_interest": final_state.get("company_of_interest"),
         "trade_date": final_state.get("trade_date"),
         "trading_session": final_state.get("trading_session"),
+        "enabled_analysts": final_state.get("enabled_analysts"),
+        "experiment_id": final_state.get("experiment_id"),
+        "analyst_summaries": final_state.get("analyst_summaries"),
         "market_analyst_summary": final_state.get("market_analyst_summary"),
         "news_analyst_summary": final_state.get("news_analyst_summary"),
         "sentiment_analyst_summary": final_state.get("sentiment_analyst_summary"),
