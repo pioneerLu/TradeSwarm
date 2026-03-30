@@ -1,240 +1,338 @@
-# TradeSwarm
+﻿# TradeSwarm
 
-基于多智能体架构的交易决策系统，采用 LangGraph 构建，支持连续自治运行、多智能体协作和长期记忆机制。
+TradeSwarm 是一个基于 LangGraph 的多智能体投研与回测系统。
+
+当前仓库已经按下面的使用模型重组：
+
+- `data_prep`：手动准备本地回测所需数据
+- `reporting`：消费已准备好的数据，产出人读报告和中间 Agent 过程
+- `backtest`：消费同一套决策结果，导出结构化信号并运行 QuantConnect / Lean
+- `experiments`：基于动态 `enabled_analysts` 做消融实验
+
+系统默认支持动态 analyst 集合，例如：
+
+- `market`
+- `market,news`
+- `market,news,sentiment,fundamentals`
 
 ## 快速开始
 
-```bash
-# 1. 环境准备
-conda create -n TradeSwarm python=3.12
-conda activate TradeSwarm
-pip install -r requirements.txt
+建议使用当前的 `langchain` 环境运行：
 
-# 2. 配置环境变量（.env 亦可）
-# LLM：仅 Silicon Flow（见 config/config.yaml 的 llm.silicon；可多 key 见 docs/DATA_LAB.md）
-export Silicon_API_KEY="your-silicon-key"
-export base_url_silicon="https://api.siliconflow.cn/v1"
-# 可选：export SILICON_MODEL="deepseek-ai/DeepSeek-V3.2"
-export ALPHA_VANTAGE_API_KEY="your-alpha-vantage-key"
-export FINANCIALDATA_API_KEY="your-financialdata-key"
-
-# 3. 创建配置文件 config/config.yaml
-
-# 4. 正式运行见下方；造数据与维护见 docs/DATA_LAB.md
+```powershell
+python --version
 ```
 
-**设计原则**：文本数据本地 + Agent 本地决策 + QuantConnect 仅做回测。
+请先确保以下内容已经准备好：
 
-**入口脚本**：主流程在 `scripts/runtime/`；数据集与运维在 `scripts/experimental/`。仓库根目录同名 `.py` 为**薄封装**，与直接运行 `scripts/...` 等价。
+- `config/config.yaml`
+- 仓库根目录下的 `.env`
+- 本地数据库文件
+- QuantConnect / Lean 本地环境
 
-## 核心流程命令（四步）
+说明：
 
-以下四条对应「数据进库 → 摘要进库 → Pre-Open 全图 → 平台回测」。**均在仓库根目录执行**（保证 `config/config.yaml`、`.env`、`memory.db` 路径一致）。
+- 数据抓取阶段会使用代理设置
+- LLM 阶段使用 Silicon Flow
+- 回测执行由 QuantConnect / Lean 消费结构化信号，不直接消费原始分析文本
 
-**「从 Summary 开始」的含义**：`trading_graph` 的入口是四个 Summary 节点（`market_summary` → … → `fundamentals_summary`）。它们从 `analyst_reports` 读**当日**报告；**历史窗口**优先读 `analyst_summaries`（第 2 步），若无则自动回退为拼接过去多日的原始报告。因此第 2 步为**可选但推荐**（上下文更短、更省 token）。
-
-### 1. 构建 Analyst 报告写入 `memory.db`
-
-功能与 CLI **已完备**（`scripts/experimental/build_analyst_dataset.py`）。
-
-```bash
-python scripts/experimental/build_analyst_dataset.py --symbol NVDA --start 2025-01-01 --end 2025-01-06 --db memory.db --only-missing --skip-existing
-```
-
-- 代理、LLM（仅 Silicon）、`--dates` / `--types` 等见 [docs/DATA_LAB.md](docs/DATA_LAB.md)。
-
-### 2. 从已有报告生成 7 日滚动 Summary 写入 `analyst_summaries`
-
-功能与 CLI **已完备**（`scripts/experimental/run_history_maintainer_batch.py`）。**不跑本步时 Pre-Open 仍可运行**，仅历史部分会改用原始报告拼接。
-
-```bash
-python scripts/experimental/run_history_maintainer_batch.py --db memory.db --symbol NVDA --start 2025-01-01 --end 2025-01-10 --sleep-ms 500
-```
-
-### 3. 从 Summary 起跑完整 Pre-Open（Research / Trader / Risk）并导出信号
-
-**唯一推荐 CLI**：`scripts/runtime/run_signal_export.py`。默认 **`--use-db-reports-only`**：**不现场跑四个 Analyst**，仅使用 `analyst_reports` 里已有报告；**Pre-Open（Summary→Research→Trader→Risk）仍会调用 LLM**。最后 `resolve_signal` 写出 `qc_signals/signals.json`。
-
-```bash
-# 按区间（日历由 SPY 交易日推算）
-python scripts/runtime/run_signal_export.py --symbol NVDA --start 2025-01-01 --end 2025-01-10 --db memory.db --output qc_signals
-# 指定交易日并落盘 Pre-Open 节点输出（graph_outputs/ 已 gitignore）
-python scripts/runtime/run_signal_export.py --symbol NVDA --dates 2025-01-13 --db memory.db --output qc_signals --graph-dump graph_outputs
-```
-
-- 仅导出评级、不要可执行信号：`--export-mode rating` → `ratings.json`。
-- 多日注入模拟持仓（Trader/Risk 可见仓位）：`--simulate-portfolio [--initial-cash 100000]`。
-- 需要现场造报告时再跑四分析师：`--no-db-reports-only`（费 API/LLM，一般先用 `build_analyst_dataset`）。
-- **周期反思记忆**：本脚本内 `DatabaseMemory` 只读 `cycle_reflections`（周报）；无数据时记忆为空，属正常。
-
-`scripts/experimental/run_graph_from_summary.py` **不再作为主入口维护**；请统一使用本脚本 `--dates` 或 `--start`/`--end`。
-
-### 4. 在 QuantConnect / Lean 上跑回测（含第 3 步的一键串联）
-
-**脚本逻辑已完备**（先导出/复制 `signals.json` 再 `lean backtest`），**前提是本机 Lean + Docker（或文档中的工作区布局）已按 [quantconnect/README.md](quantconnect/README.md) 配好**。
-
-```bash
-python scripts/runtime/run_automated_backtest.py --source export --symbol NVDA --db memory.db --start 2025-01-01 --end 2025-01-10
-# 仅生成信号并复制到 quantconnect/signals/，不跑 lean：加 --skip-backtest
-```
-
-- 信号已有时也可用 `--source daily --daily-dir backtest_results/daily_results`（见下文「方式 C」）。
-
----
-
-### 其它常用
-
-```bash
-python scripts/experimental/check_api_failures.py --symbol NVDA
-python scripts/experimental/run_db_viewer.py
-python scripts/runtime/run_reflector_cycle.py --symbol AAPL --cycle weekly --start 2024-01-01 --end 2024-01-07
-```
-
-更多参数与场景见 [docs/DATA_LAB.md](docs/DATA_LAB.md) 与 [quantconnect/README.md](quantconnect/README.md)。
-
----
-
-## 一、信号导出与 QuantConnect 回测（方案 A）
-
-Agent 生成交易信号，QuantConnect 执行回测并输出绩效报告。
-
-**方式 A（定时）**：一键导出 + 复制 + `lean backtest`
-
-```bash
-python scripts/runtime/run_automated_backtest.py --source export --start 2025-01-01 --end 2025-03-01
-# 或：python run_automated_backtest.py ...（根目录封装）
-```
-
-**方式 B**：仅导出（需 `memory.db` 含 `analyst_reports`），再复制 `qc_signals/signals.json` → `quantconnect/signals/`
-
-```bash
-python scripts/runtime/run_signal_export.py --symbol NVDA --start 2025-01-01 --end 2025-03-01 --db memory.db --output qc_signals
-# 分析工具（仅评级，无 Portfolio / 无可执行信号）：加 --export-mode rating → 生成 qc_signals/ratings.json
-# 多日导出时注入模拟仓（Trader/Risk 可见持仓）：加 --simulate-portfolio [--initial-cash 100000]
-```
-
-**方式 C**：从已有 `backtest_results/daily_results` 转换（无需 memory.db）
-
-```bash
-python scripts/runtime/run_automated_backtest.py --source daily --daily-dir backtest_results/daily_results
-```
-
-**QuantConnect / Lean**：云上步骤与本地 CLI 详见 [`quantconnect/README.md`](quantconnect/README.md)。
-
----
-
-## 二、数据构建（造数据 / 维护）
-
-构建与维护 `memory.db` 中的 **analyst_reports**、**analyst_summaries**，以及检查、去重、Web 查看等——**命令表与参数说明见 [docs/DATA_LAB.md](docs/DATA_LAB.md)**。
-
----
-
-## 完整系统流程（方案 A）
+## 当前目录结构
 
 ```text
-┌─────────────────────────────────────────────────────────────────────────────┐
-│  1. 数据构建（可选）                                                          │
-│  build_analyst_dataset → analyst_reports                                     │
-│  run_history_maintainer_batch → analyst_summaries                            │
-└─────────────────────────────────────────────────────────────────────────────┘
-                    │
-                    ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│  2. 信号导出 run_signal_export.py                                            │
-│  Analyst（DB/LLM）→ Pre-Open Graph → 信号解析器 → qc_signals/signals.json    │
-└─────────────────────────────────────────────────────────────────────────────┘
-                    │
-                    ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│  3. QuantConnect 回测                                                        │
-│  算法读取 signals.json → 每日开盘后按 execution_date 执行 BUY/SELL          │
-│  → 平台输出绩效报告（收益、回撤、夏普等）                                     │
-└─────────────────────────────────────────────────────────────────────────────┘
-```
-
-### Pre-Open 决策图（内部）
-
-```text
-Summary（market/news/sentiment/fundamentals）→ Research 子图 → Trader → Risk 子图
-→ 输出 trader_investment_plan, risk_summary
-```
-
-### 信号解析器
-
-`tradingagents/agents/market_open/signal_resolver.py` 从 Pre-Open 输出解析出 `action`（BUY/SELL/HOLD）、`target_pct`、`entry_type`、`entry_price`、`execution_date` 等，供 QuantConnect 使用。
-
-### 数据边界说明
-
-除极简信号 JSON 外，**所有文本数据（报告、摘要、LLM 输出）均保留在本地**。
-
-| 环节 | 位置 | 数据内容 | 是否上传/外传 |
-|------|------|----------|---------------|
-| 分析师报告 | 本地 `memory.db` | market/news/sentiment/fundamentals 原始报告 | 否 |
-| 7 日摘要 | 本地 `memory.db` | `analyst_summaries` 表 | 否 |
-| LLM 调用 | 本地 | Research/Trader/Risk 辩论与决策 | 否 |
-| 交易结论 | 本地 `qc_signals/signals.json` | `action`, `target_pct`, `entry_type`, `entry_price`, `execution_date` 等 | 是，传入 QuantConnect |
-| 行情数据 | QuantConnect | 由平台提供 | 否，仅平台内部使用 |
-| 绩效报告 | QuantConnect | 收益、回撤、夏普等 | 平台生成并返回 |
-
-QuantConnect 仅接收信号 JSON（操作类型、仓位比例、入场方式与价格、标的、执行日期），不包含任何分析原文或 LLM 输出。
-
----
-
-## 核心模块（速查）
-
-| 模块 | 说明 | 位置 |
-|------|------|------|
-| **Analyst** | 4 类分析师 | `tradingagents/agents/analysts/` |
-| **Pre-Open 图** | LangGraph 决策流程 | `tradingagents/graph/trading_graph.py` |
-| **信号解析器** | 解析可执行信号 | `tradingagents/agents/market_open/signal_resolver.py` |
-| **History Maintainer** | 7 日滚动摘要 | `tradingagents/agents/post_close/history_maintainer.py` |
-| **Memory** | SQLite + ChromaDB | `tradingagents/agents/utils/memory_db_helper.py` |
-| **QuantConnect 算法** | 读取信号回测 | `quantconnect/main.py` |
-
-**技术栈**：Python 3.12+ · LangGraph / LangChain · SQLite · ChromaDB · yfinance / Alpha Vantage · QuantConnect / Lean
-
-## 项目结构
-
-```
 TradeSwarm/
-├── tradingagents/          # 核心代码（agents / graph / core）
-├── quantconnect/           # QC 算法与 signals/
-├── qc_signals/             # 信号导出输出
-├── scripts/
-│   ├── runtime/            # 信号导出、自动回测、daily→signals、周期反思
-│   ├── experimental/       # 造数据、检查、db_viewer、辅助脚本
-│   └── *.ps1               # 如 run_lean_no_proxy.ps1
-├── docs/                   # HANDOVER、DATA_LAB 等
-├── db_viewer/              # Web 查看器包
-├── run_*.py / build_*.py   # 根目录薄封装（转发到 scripts/）
-└── requirements.txt
+├── apps/
+│   ├── data_prep/
+│   ├── reporting/
+│   ├── backtest/
+│   └── experiments/
+├── tradingagents/
+├── storage/
+│   ├── db/
+│   ├── market_data/
+│   ├── reports/
+│   ├── signals/
+│   ├── backtests/
+│   └── graph_dumps/
+├── quantconnect/
+├── lean_workspace/
+└── scripts/
 ```
 
-## 关键代码位置
+## 正式入口
+
+### 1. Data Prep
+
+这一步是手动执行的，不会自动串联。
+
+#### 1.1 下载本地市场数据
+
+```powershell
+python apps\data_prep\download_market_data.py --help
+```
+
+#### 1.2 构建 `analyst_reports`
+
+```powershell
+python apps\data_prep\build_analyst_reports.py --help
+```
+
+当前该入口会转发到 [scripts/experimental/build_analyst_dataset.py](scripts/experimental/build_analyst_dataset.py)。
+
+单个 analyst，单日：
+
+```powershell
+python apps\data_prep\build_analyst_reports.py --symbol NVDA --dates 2026-02-13 --db storage\db\memory.db --types market --only-missing --no-export
+```
+
+单个 analyst，多日区间：
+
+```powershell
+python apps\data_prep\build_analyst_reports.py --symbol NVDA --start 2025-02-01 --end 2025-03-01 --db storage\db\memory.db --types news --only-missing --no-export
+```
+
+单个 analyst，最近 N 个交易日：
+
+```powershell
+python apps\data_prep\build_analyst_reports.py --symbol NVDA --end 2026-02-13 --trading-days 5 --db storage\db\memory.db --types market --only-missing --no-export
+```
+
+两个 analyst：
+
+```powershell
+python apps\data_prep\build_analyst_reports.py --symbol NVDA --dates 2026-02-13,2026-02-14 --db storage\db\memory.db --types market,news --only-missing --no-export
+```
+
+常用参数：
+
+- `--types`：指定 analyst 类型，支持 `market,news,fundamentals,sentiment`
+- `--only-missing`：只补缺失或失败的报告
+- `--skip-existing`：若指定类型已存在则跳过该交易日
+- `--dates`：按显式日期列表构建
+- `--no-export`：只写数据库，不导出临时 JSON
+
+#### 1.3 构建 `analyst_summaries`
+
+```powershell
+python apps\data_prep\build_analyst_summaries.py --help
+```
+
+当前该入口会转发到 [scripts/experimental/run_history_maintainer_batch.py](scripts/experimental/run_history_maintainer_batch.py)。
+
+单个 analyst，多日区间：
+
+```powershell
+python apps\data_prep\build_analyst_summaries.py --db storage\db\memory.db --symbol NVDA --start 2026-02-01 --end 2026-02-13 --types market --sleep-ms 500
+```
+
+两个 analyst，多日区间：
+
+```powershell
+python apps\data_prep\build_analyst_summaries.py --db storage\db\memory.db --symbol NVDA --start 2026-02-01 --end 2026-02-13 --types market,news --sleep-ms 500
+```
+
+单个 analyst，离散日期：
+
+```powershell
+python apps\data_prep\build_analyst_summaries.py --db storage\db\memory.db --symbol NVDA --dates 2026-02-10,2026-02-13 --types market --sleep-ms 500
+```
+
+行为说明：
+
+- 不传 `--types`：处理全部 analyst summary
+- 传了 `--types`：只处理指定 analyst summary
+- 指定 analyst 缺少对应 report：跳过该 analyst，并继续后续任务
+
+当前日志状态：
+
+- `ok`：summary 已成功更新
+- `skipped_existing`：summary 已存在，跳过
+- `skipped_no_reports`：没有对应 source reports，跳过
+- `error`：执行失败
+
+### 2. Reporting
+
+报告流默认消费已经准备好的 `analyst_reports` 和 `analyst_summaries`，并输出：
+
+- `report.json`
+- `report.txt`
+- graph dump
+
+```powershell
+python apps\reporting\run_reports.py --help
+```
+
+单 analyst：
+
+```powershell
+python apps\reporting\run_reports.py --symbol NVDA --dates 2026-02-13 --db storage\db\memory.db --enabled-analysts market --experiment-id smoke_market_only --report-output-root storage\reports --graph-dump storage\graph_dumps
+```
+
+双 analyst：
+
+```powershell
+python apps\reporting\run_reports.py --symbol NVDA --dates 2026-02-13 --db storage\db\memory.db --enabled-analysts market,news --experiment-id smoke_market_news --report-output-root storage\reports --graph-dump storage\graph_dumps
+```
+
+### 3. Backtest
+
+回测流会跑同一套 pre-open 决策流程，同时产出：
+
+- 回测信号文件
+- 日级报告文件
+- graph dump
+
+回测与 Agent 系统端到端链路：
+
+1. [apps/backtest/run_backtest.py](apps/backtest/run_backtest.py)
+2. [scripts/runtime/run_automated_backtest.py](scripts/runtime/run_automated_backtest.py)
+3. [scripts/runtime/run_signal_export.py](scripts/runtime/run_signal_export.py)
+4. [tradingagents/graph/trading_graph.py](tradingagents/graph/trading_graph.py)
+5. [tradingagents/dataflows/export/signal_resolver.py](tradingagents/dataflows/export/signal_resolver.py)
+6. [quantconnect/main.py](quantconnect/main.py)
+
+其中第 3-5 步是 Agent 决策到可执行信号的关键桥接层。
+
+#### 3.1 只导出信号 / rating
+
+```powershell
+python apps\backtest\export_signals.py --help
+```
+
+底层核心脚本：
+
+```powershell
+python scripts\runtime\run_signal_export.py --help
+```
+
+单 analyst，rating：
+
+```powershell
+python apps\backtest\export_signals.py --symbol NVDA --dates 2026-02-13 --db storage\db\memory.db --output storage\signals --export-mode rating --enabled-analysts market --experiment-id smoke_market_only --report-output-root storage\reports --graph-dump storage\graph_dumps
+```
+
+单 analyst，backtest signal：
+
+```powershell
+python apps\backtest\export_signals.py --symbol NVDA --dates 2026-02-13 --db storage\db\memory.db --output storage\signals --export-mode backtest --enabled-analysts market --experiment-id smoke_market_only --report-output-root storage\reports --graph-dump storage\graph_dumps
+```
+
+为了缩短验证时间，可以临时覆盖辩论轮数：
+
+```powershell
+python apps\backtest\export_signals.py --symbol NVDA --dates 2026-02-13 --db storage\db\memory.db --output storage\signals --export-mode rating --enabled-analysts market --experiment-id smoke_market_only_fast --report-output-root storage\reports --graph-dump storage\graph_dumps --max-research-debate-rounds 1 --max-risk-debate-rounds 1
+```
+
+#### 3.2 一键自动回测
+
+```powershell
+python apps\backtest\run_backtest.py --help
+```
+
+底层脚本：
+
+```powershell
+python scripts\runtime\run_automated_backtest.py --help
+```
+
+示例：
+
+```powershell
+python apps\backtest\run_backtest.py --source export --symbol NVDA --db storage\db\memory.db --start 2026-02-01 --end 2026-02-13 --enabled-analysts market,news --experiment-id ablation_market_news --report-output-root storage\reports --graph-dump storage\graph_dumps
+```
+
+如果只想生成并复制信号，不实际执行 Lean：
+
+```powershell
+python apps\backtest\run_backtest.py --source export --symbol NVDA --db storage\db\memory.db --start 2026-02-01 --end 2026-02-13 --enabled-analysts market,news --experiment-id ablation_market_news --report-output-root storage\reports --graph-dump storage\graph_dumps --skip-backtest
+```
+
+### 4. Experiments
+
+```powershell
+python apps\experiments\run_ablation.py --help
+```
+
+示例：
+
+```powershell
+python apps\experiments\run_ablation.py --symbol NVDA --start 2026-02-01 --end 2026-02-13 --db storage\db\memory.db --enabled-analysts market,news --experiment-id ablation_market_news --max-research-debate-rounds 1 --max-risk-debate-rounds 1
+```
+
+## 运行产物
+
+### 数据资产
+
+- `storage\db\memory.db`
+- `analyst_reports`
+- `analyst_summaries`
+
+### 报告资产
+
+```text
+storage/reports/<experiment_id>/<symbol>/<trade_date>/report.json
+storage/reports/<experiment_id>/<symbol>/<trade_date>/report.txt
+```
+
+### 信号资产
+
+```text
+storage/signals/<experiment_id>/<symbol>/signals.json
+storage/signals/<experiment_id>/<symbol>/ratings.json
+```
+
+### 图执行落盘
+
+```text
+storage/graph_dumps/<experiment_id>/<symbol>/<trade_date>/
+```
+
+### 回测结果
+
+```text
+storage/backtests/
+```
+
+## 动态 Analyst 说明
+
+系统现在按 `enabled_analysts` 动态构造运行上下文，而不是固定四槽位。
+
+这意味着：
+
+- summary loader 按启用集合装配
+- pre-open prompt 按启用集合组织上下文
+- 报告和信号结果都会写入 `enabled_analysts`
+- 消融实验可以直接比较不同 analyst 组合的结果
+
+示例：
+
+- `--enabled-analysts market`
+- `--enabled-analysts market,news`
+- `--enabled-analysts market,news,sentiment,fundamentals`
+
+## Prompt 交付文档
+
+中文版 prompt 工程需求文档：
+
+- [docs/PROMPT_ENGINEERING_REQUIREMENTS.md](docs/PROMPT_ENGINEERING_REQUIREMENTS.md)
+
+## 核心路径
 
 | 功能 | 路径 |
 |------|------|
-| 信号导出 | `scripts/runtime/run_signal_export.py` |
-| 信号解析 | `tradingagents/agents/market_open/signal_resolver.py` |
-| Pre-Open 图 | `tradingagents/graph/trading_graph.py` |
-| 数据适配器 | `tradingagents/core/data_adapter.py` |
+| 报告流入口 | [apps/reporting/run_reports.py](apps/reporting/run_reports.py) |
+| 回测流入口 | [apps/backtest/run_backtest.py](apps/backtest/run_backtest.py) |
+| report 构建入口 | [apps/data_prep/build_analyst_reports.py](apps/data_prep/build_analyst_reports.py) |
+| summary 构建入口 | [apps/data_prep/build_analyst_summaries.py](apps/data_prep/build_analyst_summaries.py) |
+| Summary 装配 | [tradingagents/agents/pre_open/summary/loader.py](tradingagents/agents/pre_open/summary/loader.py) |
+| Summary 注册表 | [tradingagents/agents/pre_open/summary/registry.py](tradingagents/agents/pre_open/summary/registry.py) |
+| 主图 | [tradingagents/graph/trading_graph.py](tradingagents/graph/trading_graph.py) |
+| 信号导出 | [scripts/runtime/run_signal_export.py](scripts/runtime/run_signal_export.py) |
+| 自动回测 | [scripts/runtime/run_automated_backtest.py](scripts/runtime/run_automated_backtest.py) |
 
-## 文档索引
+## 当前注意事项
 
-| 文档 | 说明 |
-|------|------|
-| [`docs/DATA_LAB.md`](docs/DATA_LAB.md) | 造数据、参数表、db_viewer、维护脚本 |
-| `quantconnect/README.md` | QuantConnect / Lean 回测 |
-| `docs/HANDOVER.md` | 项目交接 |
-| `docs/IMPLEMENTATION_IDEAS.md` | 实现想法 |
-| `KNOWN_ISSUES.md` | 已知问题 |
-| `Project_TODOs.md` | 待办 |
-
-## 注意事项
-
-1. Alpha Vantage 免费版限流；造数据建议 `--only-missing`（见 DATA_LAB）。
-2. 需 `config/config.yaml`；首次运行会创建 `memory.db`。
-3. **LLM 仅 Silicon Flow**：`.env` 中配置 `Silicon_API_KEY`（及可选 `base_url_silicon`、`SILICON_MODEL`）；代理与数据拉取/LLM 分离见 [docs/DATA_LAB.md](docs/DATA_LAB.md)。
-
----
-
+1. `apps/data_prep/build_analyst_reports.py` 和 `apps/data_prep/build_analyst_summaries.py` 当前仍是对旧脚本的转发壳，但已经是正式推荐入口。
+2. `analyst_reports` 和 `analyst_summaries` 现在都支持 `--types`，可按单 analyst 或多 analyst 组合构建。
+3. 默认辩论轮数下，完整 pre-open 流程耗时会明显增加；做 smoke test 时建议临时使用 `--max-research-debate-rounds 1 --max-risk-debate-rounds 1`。
+4. 在当前环境里，仓库根目录下的 `memory.db` 可能出现 SQLite 只读问题，建议优先使用 `storage\db\memory.db`。
+5. 所有命令示例均使用 Windows 单行格式。

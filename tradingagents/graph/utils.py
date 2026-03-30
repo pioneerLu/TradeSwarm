@@ -22,6 +22,25 @@ from tradingagents.llm_env_compat import (
 load_dotenv()
 
 
+def _llm_proxy_enabled() -> bool:
+    host = (os.getenv("PROXY_HOST") or "").strip()
+    port = (os.getenv("PROXY_PORT") or "").strip()
+    use_flag = (os.getenv("USE_PROXY") or "").strip().lower() == "true"
+    return bool((host and port) or use_flag or os.getenv("HTTP_PROXY") or os.getenv("HTTPS_PROXY"))
+
+
+def _ensure_proxy_env() -> None:
+    host = (os.getenv("PROXY_HOST") or "").strip()
+    port = (os.getenv("PROXY_PORT") or "").strip()
+    if not (host and port):
+        return
+    proxy_url = f"http://{host}:{port}"
+    os.environ.setdefault("HTTP_PROXY", proxy_url)
+    os.environ.setdefault("HTTPS_PROXY", proxy_url)
+    os.environ.setdefault("http_proxy", proxy_url)
+    os.environ.setdefault("https_proxy", proxy_url)
+
+
 def load_llm_from_config(config_path: str = "config/config.yaml") -> ChatOpenAI:
     """
     从 config.yaml 读取 LLM 配置并初始化 ChatOpenAI 实例（仅 Silicon Flow）。
@@ -64,18 +83,15 @@ def load_llm_from_config(config_path: str = "config/config.yaml") -> ChatOpenAI:
     )
     temperature = silicon_cfg.get("temperature", llm_config.get("temperature", 0.1))
 
-    if "HTTP_PROXY" in os.environ:
-        del os.environ["HTTP_PROXY"]
-    if "HTTPS_PROXY" in os.environ:
-        del os.environ["HTTPS_PROXY"]
-
     import httpx
+    use_proxy = _llm_proxy_enabled()
+    if use_proxy:
+        _ensure_proxy_env()
 
     def _make_chat(key: str) -> ChatOpenAI:
         http_client = httpx.Client(
             verify=True,
-            trust_env=False,
-            proxy=None,
+            trust_env=use_proxy,
             timeout=httpx.Timeout(60.0),
         )
         return ChatOpenAI(

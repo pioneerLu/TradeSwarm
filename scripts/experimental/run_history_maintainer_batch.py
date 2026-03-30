@@ -1,11 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-离线批量构建 History Maintainer summaries 脚本。
+Offline batch builder for analyst_summaries.
 
-分类：数据构建（见 README 三）
-- 针对已有 analyst_reports 的 memory.db，为指定 symbol/日期区间批量生成 7 日窗口 summary，写入 analyst_summaries 表。
-- 不跑交易图；回测前预先跑本脚本可加速「离线测试」且已有 summary 会跳过、不重复调 LLM。
+This script consumes analyst_reports already stored in memory.db and writes
+7-trading-day rolling summaries into analyst_summaries. It now supports:
+
+- date range runs via --start/--end
+- explicit date lists via --dates
+- analyst filtering via --types
+- symbol filtering via --symbol
 """
 
 from __future__ import annotations
@@ -14,23 +18,37 @@ import argparse
 import sys
 import time
 from pathlib import Path
-from typing import List, Tuple
+from typing import Iterable, List, Sequence, Tuple
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT))
 
-from tradingagents.graph.utils import load_llm_from_config
+from tradingagents.agents.post_close.history_maintainer import create_history_maintainer_node
 from tradingagents.agents.utils.memory_db_helper import MemoryDBHelper
-from tradingagents.agents.post_close.history_maintainer import (
-    create_history_maintainer_node,
-)
+from tradingagents.graph.utils import load_llm_from_config
+
+ALL_ANALYST_TYPES: Tuple[str, ...] = ("market", "news", "fundamentals", "sentiment")
+
+
+def parse_analyst_types_arg(types_str: str | None) -> Tuple[str, ...]:
+    """Parse --types into a stable, deduplicated tuple."""
+    if not types_str or not types_str.strip():
+        return ALL_ANALYST_TYPES
+
+    requested = [item.strip().lower() for item in types_str.split(",") if item.strip()]
+    valid = set(ALL_ANALYST_TYPES)
+    for item in requested:
+        if item not in valid:
+            raise ValueError(
+                f"Unknown analyst type: {item}. Valid options: {', '.join(ALL_ANALYST_TYPES)}"
+            )
+
+    return tuple(name for name in ALL_ANALYST_TYPES if name in requested)
 
 
 def get_symbols_and_dates(db: MemoryDBHelper) -> List[Tuple[str, str]]:
-    """
-    从 analyst_reports 表中获取 (symbol, trade_date) 去重列表，按日期排序。
-    """
-    conn = db._get_connection()  # 复用内部连接
+    """Return distinct (symbol, trade_date) pairs from analyst_reports."""
+    conn = db._get_connection()
     cursor = conn.cursor()
     cursor.execute(
         """
@@ -42,15 +60,15 @@ def get_symbols_and_dates(db: MemoryDBHelper) -> List[Tuple[str, str]]:
     )
     rows = cursor.fetchall()
     cursor.close()
-    return [(r[0], r[1]) for r in rows]
+    return [(row[0], row[1]) for row in rows]
 
 
 def filter_by_range(
-    items: List[Tuple[str, str]], start: str | None, end: str | None
+    items: Iterable[Tuple[str, str]],
+    start: str | None,
+    end: str | None,
 ) -> List[Tuple[str, str]]:
-    """
-    按日期区间过滤 (symbol, trade_date) 列表。
-    """
+    """Filter (symbol, trade_date) pairs by date range."""
     result: List[Tuple[str, str]] = []
     for symbol, trade_date in items:
         if start and trade_date < start:
@@ -61,82 +79,130 @@ def filter_by_range(
     return result
 
 
+def filter_by_explicit_dates(
+    items: Iterable[Tuple[str, str]],
+    dates: Sequence[str] | None,
+) -> List[Tuple[str, str]]:
+    """Filter (symbol, trade_date) pairs by explicit date list."""
+    if not dates:
+        return list(items)
+    allowed = set(dates)
+    return [(symbol, trade_date) for symbol, trade_date in items if trade_date in allowed]
+
+
+def _format_dates_for_log(dates: Sequence[str] | None) -> str:
+    if not dates:
+        return "(not set)"
+    return ", ".join(dates)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="离线批量构建 History Maintainer summaries"
+        description="Offline batch builder for analyst_summaries."
     )
     parser.add_argument(
         "--db",
         type=str,
         default="memory.db",
-        help="memory.db 路径（默认当前目录下 memory.db）",
+        help="Path to memory.db.",
     )
     parser.add_argument(
         "--start",
         type=str,
         default=None,
-        help="开始日期 (YYYY-MM-DD)，留空则从最早有报告的日期开始",
+        help="Start date in YYYY-MM-DD format.",
     )
     parser.add_argument(
         "--end",
         type=str,
         default=None,
-        help="结束日期 (YYYY-MM-DD)，留空则到最晚有报告的日期",
+        help="End date in YYYY-MM-DD format.",
+    )
+    parser.add_argument(
+        "--dates",
+        type=str,
+        default=None,
+        help="Comma-separated explicit trade dates. When set, --start/--end are ignored.",
     )
     parser.add_argument(
         "--symbol",
         type=str,
         default=None,
-        help="仅为指定 symbol 构建（留空则对所有 symbol 构建）",
+        help="Only build summaries for the given symbol.",
+    )
+    parser.add_argument(
+        "--types",
+        type=str,
+        default=None,
+        help="Comma-separated analyst list, e.g. market or market,news.",
     )
     parser.add_argument(
         "--sleep-ms",
         type=int,
         default=500,
-        help="每个交易日处理完成后额外等待的毫秒数，用于避免 LLM API 限速（默认 500ms）",
+        help="Extra delay in milliseconds after each (symbol, date) run.",
     )
-
     args = parser.parse_args()
+
+    try:
+        analyst_types = parse_analyst_types_arg(args.types)
+    except ValueError as exc:
+        print(f"[ERROR] {exc}")
+        sys.exit(1)
+
+    explicit_dates = None
+    if args.dates:
+        explicit_dates = sorted({item.strip() for item in args.dates.split(",") if item.strip()})
+        if not explicit_dates:
+            print("[ERROR] --dates resolved to an empty list.")
+            sys.exit(1)
 
     db_path = Path(args.db)
     if not db_path.exists():
-        raise FileNotFoundError(f"数据库不存在: {db_path}")
+        raise FileNotFoundError(f"Database not found: {db_path}")
 
     print("=" * 80)
-    print("离线 History Maintainer 批量构建")
+    print("Offline analyst_summaries batch builder")
     print("=" * 80)
-    print(f"数据库: {db_path}")
-    print(f"日期范围: {args.start or '最早'} ~ {args.end or '最晚'}")
-    print(f"标的: {args.symbol or '全部'}")
+    print(f"DB: {db_path}")
+    if explicit_dates:
+        print(f"Dates: {_format_dates_for_log(explicit_dates)}")
+    else:
+        print(f"Date range: {args.start or '(min)'} ~ {args.end or '(max)'}")
+    print(f"Symbol: {args.symbol or '(all)'}")
+    print(f"Analysts: {', '.join(analyst_types)}")
 
-    # 1. 初始化 DB 和 LLM
     with MemoryDBHelper(str(db_path)) as db:
         llm = load_llm_from_config()
-        node = create_history_maintainer_node(llm=llm, db_helper=db)
+        node = create_history_maintainer_node(
+            llm=llm,
+            db_helper=db,
+            analyst_types=analyst_types,
+        )
 
-        # 2. 获取已有 analyst_reports 的 (symbol, trade_date)
         all_items = get_symbols_and_dates(db)
         if not all_items:
-            print("[WARN] analyst_reports 中没有任何数据，直接退出。")
+            print("[WARN] No analyst_reports found. Nothing to build.")
             return
 
-        # 可选：只保留指定 symbol
         if args.symbol:
-            all_items = [(s, d) for (s, d) in all_items if s == args.symbol]
+            all_items = [(symbol, trade_date) for symbol, trade_date in all_items if symbol == args.symbol]
             if not all_items:
-                print(f"[WARN] 指定 symbol={args.symbol} 在 analyst_reports 中无记录。")
+                print(f"[WARN] No analyst_reports found for symbol={args.symbol}.")
                 return
 
-        # 3. 按日期范围过滤
-        items = filter_by_range(all_items, start=args.start, end=args.end)
+        if explicit_dates:
+            items = filter_by_explicit_dates(all_items, explicit_dates)
+        else:
+            items = filter_by_range(all_items, start=args.start, end=args.end)
+
         if not items:
-            print("[WARN] 在指定日期范围内没有任何 analyst_reports 记录。")
+            print("[WARN] No analyst_reports matched the selected filters.")
             return
 
         total = len(items)
-        print(f"[INFO] 需要处理的 (symbol, date) 组合数量: {total}")
+        print(f"[INFO] Total (symbol, date) pairs to process: {total}")
 
-        # 4. 逐个执行 History Maintainer 节点
         for idx, (symbol, trade_date) in enumerate(items, 1):
             print(f"\n[{idx}/{total}] {symbol} @ {trade_date}")
 
@@ -152,20 +218,26 @@ def main() -> None:
             try:
                 result = node(state)
                 log = result.get("history_maintainer_log", [])
-                ok_count = sum(1 for x in log if x.get("status") == "ok")
-                skipped_count = sum(1 for x in log if x.get("status") == "skipped")
-                error_count = sum(1 for x in log if x.get("status") == "error")
-                print(
-                    f"  [OK] 完成 History Maintainer: ok={ok_count}, skipped={skipped_count}, error={error_count}"
-                )
+                if not log:
+                    print("  [WARN] No analyst summary work was attempted.")
+                else:
+                    for item in log:
+                        analyst = item.get("analyst_type", "?")
+                        status = item.get("status", "?")
+                        if status == "ok":
+                            print(f"  [OK] {analyst}: summary updated")
+                        elif status == "skipped_existing":
+                            print(f"  [SKIP] {analyst}: summary already exists")
+                        elif status == "skipped_no_reports":
+                            print(f"  [SKIP] {analyst}: no source reports found")
+                        else:
+                            print(f"  [ERROR] {analyst}: {item.get('error', status)}")
             except Exception as exc:  # noqa: BLE001
-                print(f"  [ERROR] History Maintainer 执行失败: {exc}")
+                print(f"  [ERROR] History Maintainer failed: {exc}")
 
-            # 简单节流：每个交易日处理完后等待一小段时间，降低 RPM / TPM
             if args.sleep_ms and args.sleep_ms > 0:
                 time.sleep(args.sleep_ms / 1000.0)
 
 
 if __name__ == "__main__":
     main()
-

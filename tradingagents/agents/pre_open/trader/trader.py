@@ -1,129 +1,82 @@
 from __future__ import annotations
 
-from typing import Any, Dict, Callable
+from typing import Any, Callable, Dict
+
 from langchain_core.language_models import BaseChatModel
-import functools
-import time
-import json
 
 from tradingagents.agents.utils.agentstate.agent_states import AgentState
-from tradingagents.agents.utils.state_helpers import build_curr_situation_from_summaries
 from tradingagents.agents.utils.prompt_loader import load_prompt_template
+from tradingagents.agents.utils.state_helpers import build_curr_situation_from_summaries, get_prompt_context_from_summaries
 
 
 def create_trader(llm: BaseChatModel, memory: Any) -> Callable[[AgentState], Dict[str, Any]]:
     def trader_node(state: AgentState) -> Dict[str, Any]:
         company_name = state["company_of_interest"]
-        
-        # 读取 research_summary 中的 investment_plan
         research_summary: Dict[str, Any] | None = state.get("research_summary")  # type: ignore[assignment]
         investment_plan = (
             research_summary.get("investment_plan", "")  # type: ignore[union-attr]
             if research_summary is not None
             else state.get("investment_plan", "")
         )
-        
-        # 从四个 Analyst 的 MemorySummary 中构造当前情境
-        curr_situation = build_curr_situation_from_summaries(
-            state, include_history=True, max_length=4000
-        )
-        past_memories = memory.get_memories(curr_situation, n_matches=2)
 
-        past_memory_str = ""
+        curr_situation = build_curr_situation_from_summaries(state, include_history=True, max_length=4000)
+        past_memories = memory.get_memories(curr_situation, n_matches=2)
         if past_memories:
-            for i, rec in enumerate(past_memories, 1):
-                past_memory_str += rec["recommendation"] + "\n\n"
+            past_memory_str = "\n\n".join(rec["recommendation"] for rec in past_memories)
         else:
             past_memory_str = "No past memories found."
 
-        # 从四个 Analyst 的 MemorySummary 中获取 7 日 history 摘要
-        market_summary = state["market_analyst_summary"]
-        news_summary = state["news_analyst_summary"]
-        sentiment_summary = state["sentiment_analyst_summary"]
-        fundamentals_summary = state["fundamentals_analyst_summary"]
-
-        market_history_summary = market_summary.get("history_report", "")
-        news_history_summary = news_summary.get("history_report", "")
-        sentiment_history_summary = sentiment_summary.get("history_report", "")
-        fundamentals_history_summary = fundamentals_summary.get("history_report", "")
-
-        # 加载并渲染 system prompt 模板
+        summary_context = get_prompt_context_from_summaries(state)
         system_prompt = load_prompt_template(
             agent_type="trader",
             agent_name="trader",
             context={
                 "past_memory_str": past_memory_str,
-                "market_history_summary": market_history_summary,
-                "news_history_summary": news_history_summary,
-                "sentiment_history_summary": sentiment_history_summary,
-                "fundamentals_history_summary": fundamentals_history_summary,
+                **summary_context,
             },
         )
-        
-        # 读取当前仓位信息
+
         current_position = state.get("current_position")
         portfolio_state = state.get("portfolio_state")
-        
-        # 格式化仓位信息
-        position_info = ""
+
         if current_position:
-            shares = current_position.get("shares")
-            if shares is None:
-                shares = 0.0
-            entry_price = current_position.get("entry_price")
-            if entry_price is None:
-                entry_price = 0.0
+            shares = current_position.get("shares") or 0.0
+            entry_price = current_position.get("entry_price") or 0.0
             entry_date = current_position.get("entry_date") or ""
-            current_price = current_position.get("current_price")
-            if current_price is None:
-                current_price = 0.0
-            pnl = current_position.get("pnl")
-            if pnl is None:
-                pnl = 0.0
-            pnl_pct = current_position.get("pnl_pct")
-            if pnl_pct is None:
-                pnl_pct = 0.0
-
+            current_price = current_position.get("current_price") or 0.0
+            pnl = current_position.get("pnl") or 0.0
+            pnl_pct = current_position.get("pnl_pct") or 0.0
             sl_raw = current_position.get("stop_loss_price")
-            if sl_raw is None:
-                sl_str = "未设置"
-            else:
-                sl_str = f"${sl_raw:.2f}"
-
+            sl_str = f"${sl_raw:.2f}" if sl_raw is not None else "Not set"
             tp_raw = current_position.get("take_profit_price")
-            if tp_raw is None:
-                tp_str = "未设置"
-            else:
-                tp_str = f"${tp_raw:.2f}"
-
-            position_info = f"""
-当前持仓信息：
-- 持仓股数: {shares:.0f}
-- 建仓价格: ${entry_price:.2f}
-- 建仓日期: {entry_date}
-- 当前价格: ${current_price:.2f}
-- 盈亏金额: ${pnl:.2f}
-- 盈亏百分比: {pnl_pct:.2f}%
-- 止损价: {sl_str}
-- 止盈价: {tp_str}
-"""
+            tp_str = f"${tp_raw:.2f}" if tp_raw is not None else "Not set"
+            position_info = (
+                f"\nCurrent position:\n"
+                f"- Shares: {shares:.0f}\n"
+                f"- Entry price: ${entry_price:.2f}\n"
+                f"- Entry date: {entry_date}\n"
+                f"- Current price: ${current_price:.2f}\n"
+                f"- PnL: ${pnl:.2f}\n"
+                f"- PnL %: {pnl_pct:.2f}%\n"
+                f"- Stop loss: {sl_str}\n"
+                f"- Take profit: {tp_str}\n"
+            )
         else:
-            position_info = "\n当前未持仓。\n"
-        
-        # 格式化组合状态
+            position_info = "\nCurrent position: none\n"
+
         portfolio_info = ""
         if portfolio_state:
-            portfolio_info = f"""
-组合状态：
-- 总资产: ${portfolio_state.get('total_value', 0):,.2f}
-- 现金: ${portfolio_state.get('cash', 0):,.2f}
-- 持仓市值: ${portfolio_state.get('positions_value', 0):,.2f}
-- 总收益率: {portfolio_state.get('total_return', 0):.2f}%
-"""
-        
-        # 加载并渲染 user prompt 模板
+            portfolio_info = (
+                f"\nPortfolio state:\n"
+                f"- Total value: ${portfolio_state.get('total_value', 0):,.2f}\n"
+                f"- Cash: ${portfolio_state.get('cash', 0):,.2f}\n"
+                f"- Positions value: ${portfolio_state.get('positions_value', 0):,.2f}\n"
+                f"- Total return: {portfolio_state.get('total_return', 0):.2f}%\n"
+            )
+
         from pathlib import Path
         from jinja2 import Template
+
         user_prompt_path = Path(__file__).parent / "prompt.j2"
         if user_prompt_path.exists():
             with open(user_prompt_path, "r", encoding="utf-8") as f:
@@ -135,20 +88,16 @@ def create_trader(llm: BaseChatModel, memory: Any) -> Callable[[AgentState], Dic
                     portfolio_info=portfolio_info,
                 )
         else:
-            # Fallback
-            user_prompt = f"基于分析师团队的全面分析，以下是针对 {company_name} 量身定制的投资计划。该计划融合了当前技术市场趋势、宏观经济指标和社交媒体情绪的洞察。使用此计划作为评估你下一个交易决策的基础。\n\n拟议投资计划：{investment_plan}\n{position_info}{portfolio_info}\n利用这些洞察做出明智且具有战略性的决策。"
+            user_prompt = (
+                f"Create a trading plan for {company_name}.\n\n"
+                f"Investment plan:\n{investment_plan}\n"
+                f"{position_info}{portfolio_info}"
+            )
 
         messages = [
-            {
-                "role": "system",
-                "content": system_prompt,
-            },
-            {
-                "role": "user",
-                "content": user_prompt,
-            },
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
         ]
-
         result = llm.invoke(messages)
         content: str = getattr(result, "content", str(result))
 

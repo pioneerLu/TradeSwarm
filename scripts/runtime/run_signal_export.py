@@ -1,72 +1,89 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-信号导出脚本（方案 A：Agent 输出信号 → QuantConnect 执行）
+淇″彿瀵煎嚭鑴氭湰锛堟柟妗?A锛欰gent 杈撳嚭淇″彿 鈫?QuantConnect 鎵ц锛?
+鍒嗙被锛氭暟鎹瀯寤?/ 绂荤嚎娴嬭瘯锛堣 README锛?- 杩愯 Analyst锛堟垨浠?DB 璇伙級鈫?Pre-Open Graph 鈫?淇″彿瑙ｆ瀽
+- 杈撳嚭缁撴瀯鍖栦俊鍙?JSON 鍒?qc_signals/锛屼緵 QuantConnect 绠楁硶璇诲彇鎵ц
+- 鏂规 2a锛堝垎鏋愬伐鍏凤級锛歚--export-mode rating` 涓嶆敞鍏?Portfolio銆佷笉璋冪敤 `resolve_signal`锛屼粎鍐欏嚭
+  `research_manager.decision` 涓?`risk_manager` 鐨?`fine_rating` / `final_decision` / `risk_level`锛堣 `ratings.json`锛?
+浣跨敤娴佺▼锛?1. 纭繚 memory.db 涓湁鎵€闇€鏃ユ湡鐨?analyst_reports锛堝彲鐢?build_analyst_dataset 鏋勫缓锛?2. 鍙€夛細棰勫厛杩愯 run_history_maintainer_batch 鐢熸垚 analyst_summaries
+3. 杩愯鏈剼鏈鍑轰俊鍙?4. 灏?qc_signals/ 鐩綍鍐呭澶嶅埗鍒?QuantConnect 椤圭洰锛岃繍琛屽洖娴?
+璇存槑锛?- **榛樿 --use-db-reports-only**锛氫笉鐜板満璋冪敤鍥涗釜 Analyst 鍐欏簱锛汸re-Open 鍥撅紙Summary鈫扲esearch鈫扵rader鈫扲isk锛?*浠嶄細澶氭璋冪敤 LLM**銆?- **璁板繂锛圖atabaseMemory锛?*锛氫粎浠?DB 琛?cycle_reflections 璇诲懆鏈熷弽鎬濓紝涓斿綋鍓嶅浐瀹?weekly锛涜嫢鏃犺褰曞垯 get_memories 涓虹┖锛屽睘姝ｅ父銆?- **鎺ㄨ崘**浠ユ鑴氭湰涓恒€屼粠 Summary 璺戝叏鍥惧苟瀵煎嚭銆嶇殑鍞竴 CLI锛涘崟鏃ュ彲鐢?--dates銆?- **浜哄伐璇勫垽 / 璋冭瘯**锛歚--graph-dump DIR` 鍦ㄦ瘡涓氦鏄撴棩鍐欏叆 `DIR/{symbol}_{trade_date}/`锛圠angGraph `subgraphs=True`锛屽瓙鍥惧唴姣忎竴姝ヨ惤鐩樹负 `step_NNNN__{鍛藉悕绌洪棿}__{鑺傜偣}_output.json/.txt`锛屽彟鍚?`full_state_snapshot.json` 涓?`final_state_*`锛夈€?"""
 
-分类：数据构建 / 离线测试（见 README）
-- 运行 Analyst（或从 DB 读）→ Pre-Open Graph → 信号解析
-- 输出结构化信号 JSON 到 qc_signals/，供 QuantConnect 算法读取执行
-- 方案 2a（分析工具）：`--export-mode rating` 不注入 Portfolio、不调用 `resolve_signal`，仅写出
-  `research_manager.decision` 与 `risk_manager` 的 `fine_rating` / `final_decision` / `risk_level`（见 `ratings.json`）
+信号导出脚本（方案 A）：Agent 产出信号 -> QuantConnect 执行。
+
+用途：
+- 运行 Analyst（或直接复用 DB 报告）-> Pre-Open Graph -> 信号解析。
+- 输出结构化 JSON 到 qc_signals/（或指定输出目录），供 QuantConnect 算法读取执行。
+- 在 `--export-mode rating` 下仅导出分析评级，不注入 Portfolio，也不调用 `resolve_signal`。
 
 使用流程：
-1. 确保 memory.db 中有所需日期的 analyst_reports（可用 build_analyst_dataset 构建）
-2. 可选：预先运行 run_history_maintainer_batch 生成 analyst_summaries
-3. 运行本脚本导出信号
-4. 将 qc_signals/ 目录内容复制到 QuantConnect 项目，运行回测
+1. 确保 memory.db 中存在目标日期的 analyst_reports（可用 build_analyst_dataset 预构建）。
+2. 可选：先运行 run_history_maintainer_batch 生成 analyst_summaries。
+3. 运行本脚本导出 signals.json 或 ratings.json。
+4. 将输出目录内容复制到 QuantConnect 项目后执行回测。
 
 说明：
-- **默认 --use-db-reports-only**：不现场调用四个 Analyst 写库；Pre-Open 图（Summary→Research→Trader→Risk）**仍会多次调用 LLM**。
-- **记忆（DatabaseMemory）**：仅从 DB 表 cycle_reflections 读周期反思，且当前固定 weekly；若无记录则 get_memories 为空，属正常。
-- **推荐**以此脚本为「从 Summary 跑全图并导出」的唯一 CLI；单日可用 --dates。
-- **人工评判 / 调试**：`--graph-dump DIR` 在每个交易日写入 `DIR/{symbol}_{trade_date}/`（LangGraph `subgraphs=True`，子图内每一步落盘为 `step_NNNN__{命名空间}__{节点}_output.json/.txt`，另含 `full_state_snapshot.json` 与 `final_state_*`）。
+- 默认 `--use-db-reports-only`：不现场运行四个 Analyst，仅使用 DB 报告；Pre-Open 图仍会调用 LLM。
+- `DatabaseMemory` 仅从 `cycle_reflections` 读取 weekly 周期反思；无记录时返回空列表，属正常行为。
+- 推荐使用本脚本作为“从 Summary 跑全图并导出”的统一 CLI；单日可用 `--dates`。
+- `--graph-dump DIR` 会按交易日写入 `DIR/{experiment_id}/{symbol}/{trade_date}/`，包含子图节点输出与完整状态快照。
 """
-
-from __future__ import annotations
-
-import json
-import sys
-from pathlib import Path
-from datetime import datetime, timedelta
-from textwrap import dedent
-from typing import Dict, Any, List, Optional
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT))
+DEFAULT_ENABLED_ANALYSTS = ("market", "news", "sentiment", "fundamentals")
 
-from tradingagents.graph.trading_graph import create_trading_graph
-from tradingagents.graph.utils import load_llm_from_config
-from tradingagents.agents.utils.memory_db_helper import MemoryDBHelper
-from tradingagents.agents.utils.agentstate.agent_states import AgentState
-from tradingagents.agents.pre_open.summary import DEFAULT_ENABLED_ANALYSTS, resolve_enabled_analysts
-from tradingagents.core.data_adapter import DataAdapter
-from tradingagents.agents.market_open.signal_resolver import resolve_signal
-from tradingagents.agents.utils.json_parser import extract_json_from_text
-from tradingagents.core.portfolio_simulator import PortfolioSimulator
-from tradingagents.agents.analysts.market_analyst.agent import create_market_analyst
-from tradingagents.agents.analysts.news_analyst.agent import create_news_analyst
-from tradingagents.agents.analysts.fundamentals_analyst.agent import create_fundamentals_analyst
-from tradingagents.agents.analysts.social_media_analyst.agent import create_social_media_analyst
-from tradingagents.graph.node_dump import (
-    save_full_state_snapshot,
-    save_node_output,
-    stream_graph_updates_with_dump,
-)
 
-ANALYST_FACTORIES = {
-    "market": (create_market_analyst, "market_report"),
-    "news": (create_news_analyst, "news_report"),
-    "fundamentals": (create_fundamentals_analyst, "fundamentals_report"),
-    "sentiment": (create_social_media_analyst, "sentiment_report"),
-}
+def _get_runtime_dependencies() -> Dict[str, Any]:
+    from tradingagents.graph.trading_graph import create_trading_graph
+    from tradingagents.graph.utils import load_llm_from_config
+    from tradingagents.agents.utils.memory_db_helper import MemoryDBHelper
+    from tradingagents.core.data_adapter import DataAdapter
+    from tradingagents.dataflows.export.signal_resolver import resolve_signal
+    from tradingagents.agents.utils.json_parser import extract_json_from_text
+    from tradingagents.core.portfolio_simulator import PortfolioSimulator
+    from tradingagents.graph.node_dump import (
+        save_full_state_snapshot,
+        save_node_output,
+        stream_graph_updates_with_dump,
+    )
+
+    return {
+        "create_trading_graph": create_trading_graph,
+        "load_llm_from_config": load_llm_from_config,
+        "MemoryDBHelper": MemoryDBHelper,
+        "DataAdapter": DataAdapter,
+        "resolve_signal": resolve_signal,
+        "extract_json_from_text": extract_json_from_text,
+        "PortfolioSimulator": PortfolioSimulator,
+        "save_full_state_snapshot": save_full_state_snapshot,
+        "save_node_output": save_node_output,
+        "stream_graph_updates_with_dump": stream_graph_updates_with_dump,
+    }
+
+
+def _get_analyst_factories() -> Dict[str, Any]:
+    from tradingagents.agents.analysts.market_analyst.agent import create_market_analyst
+    from tradingagents.agents.analysts.news_analyst.agent import create_news_analyst
+    from tradingagents.agents.analysts.fundamentals_analyst.agent import create_fundamentals_analyst
+    from tradingagents.agents.analysts.social_media_analyst.agent import create_social_media_analyst
+
+    return {
+        "market": (create_market_analyst, "market_report"),
+        "news": (create_news_analyst, "news_report"),
+        "fundamentals": (create_fundamentals_analyst, "fundamentals_report"),
+        "sentiment": (create_social_media_analyst, "sentiment_report"),
+    }
 
 
 def _normalize_enabled_analysts(enabled_analysts: Optional[List[str]]) -> List[str]:
+    analyst_factories = _get_analyst_factories()
     requested = enabled_analysts or list(DEFAULT_ENABLED_ANALYSTS)
     normalized: List[str] = []
     for analyst_name in requested:
         name = str(analyst_name).strip().lower()
-        if name and name in ANALYST_FACTORIES and name not in normalized:
+        if name and name in analyst_factories and name not in normalized:
             normalized.append(name)
     return normalized or list(DEFAULT_ENABLED_ANALYSTS)
 
@@ -157,13 +174,13 @@ def _write_report_artifacts(
 
 class DatabaseMemory:
     """
-    从 memory.db 的 cycle_reflections 注入「周期反思」式记忆（供图中需要 memory 的节点使用）。
-
-    - 仅查询 **weekly** 周期；若表为空或无匹配 symbol，get_memories 返回 []，不影响主流程。
-    - 与 analyst_reports / analyst_summaries 无关；后者由 Summary 节点经 MemoryDBHelper 读取。
+    从 memory.db 的 cycle_reflections 注入“周期反思”记忆，供图中 memory 相关节点使用。
+    - 仅查询 weekly 周期；若无匹配 symbol 的记录，get_memories 返回 []。
+    - 与 analyst_reports / analyst_summaries 解耦，后者由 Summary 节点自行读取。
     """
 
     def __init__(self, db_path: str, symbol: str, limit: int = 5):
+        MemoryDBHelper = _get_runtime_dependencies()["MemoryDBHelper"]
         self.db_helper = MemoryDBHelper(db_path)
         self.symbol = symbol
         self.limit = limit
@@ -181,22 +198,22 @@ class DatabaseMemory:
             for r in reflections[:n_matches]:
                 parts = []
                 if r.get("key_insights"):
-                    parts.append(f"关键洞察：{r['key_insights']}")
+                    parts.append(f"Key insights: {r['key_insights']}")
                 if r.get("error_patterns"):
-                    parts.append(f"错误模式：{r['error_patterns']}")
+                    parts.append(f"Error patterns: {r['error_patterns']}")
                 if r.get("success_patterns"):
-                    parts.append(f"成功模式：{r['success_patterns']}")
+                    parts.append(f"Success patterns: {r['success_patterns']}")
                 if r.get("strategy_conditions"):
-                    parts.append(f"策略适用条件：{r['strategy_conditions']}")
-                recommendation = "\n".join(parts) if parts else "无结构化反思内容。"
+                    parts.append(f"Strategy conditions: {r['strategy_conditions']}")
+                recommendation = "\n".join(parts) if parts else "No structured reflection available."
                 memories.append({
-                    "matched_situation": f"周期 {r.get('cycle_start_date', '')} ~ {r.get('cycle_end_date', '')}",
+                    "matched_situation": f"Cycle {r.get('cycle_start_date', '')} ~ {r.get('cycle_end_date', '')}",
                     "recommendation": recommendation,
                     "similarity_score": 0.8,
                 })
             return memories
         except Exception as e:
-            print(f"[WARN] 从 cycle_reflections 读取记忆失败: {e}")
+            print(f"[WARN] Failed to load reflection memory from cycle_reflections: {e}")
             return []
 
     def close(self) -> None:
@@ -204,7 +221,7 @@ class DatabaseMemory:
 
 
 def get_trading_dates(start_date: str, end_date: str, data_adapter: DataAdapter) -> List[str]:
-    """获取交易日历"""
+    """获取交易日历。"""
     df = data_adapter.load_stock_data_until("SPY", end_date, start_date=start_date)
     if df is None or len(df) == 0:
         start = datetime.strptime(start_date, "%Y-%m-%d")
@@ -225,7 +242,7 @@ def get_trading_dates(start_date: str, end_date: str, data_adapter: DataAdapter)
 
 
 def _validate_signal(signal: Dict[str, Any]) -> Dict[str, Any]:
-    """对解析后的信号做最小约束，避免无效字段进入回测。"""
+    """Apply minimal validation to a resolved signal before exporting it."""
     action = str(signal.get("action", "HOLD")).upper()
     if action not in {"BUY", "SELL", "HOLD"}:
         action = "HOLD"
@@ -264,13 +281,13 @@ def extract_rating_record(
     trade_date: str,
     symbol: str,
 ) -> Dict[str, Any]:
-    """
-    方案 2a：完整跑图后仅抽取评级相关字段（不生成可执行信号）。
-    """
+    """Extract analysis-only rating fields after a full graph run."""
+
     rs = final_state.get("research_summary")
     rp = ""
     if isinstance(rs, dict):
         rp = (rs.get("investment_plan") or "").strip()
+    extract_json_from_text = _get_runtime_dependencies()["extract_json_from_text"]
     rj = extract_json_from_text(rp) if rp else None
 
     risk = final_state.get("risk_summary")
@@ -306,44 +323,38 @@ def run_signal_export(
     enabled_analysts: Optional[List[str]] = None,
     experiment_id: Optional[str] = None,
     report_output_root: Optional[str] = None,
+    max_research_debate_rounds: Optional[int] = None,
+    max_risk_debate_rounds: Optional[int] = None,
 ) -> Dict[str, Any]:
-    """
-    导出信号或评级 JSON。
+    """Export ratings or executable backtest signals from prepared analyst data."""
 
-    Args:
-        symbol: 股票代码
-        start_date / end_date: 日期范围（用于元数据；若传入 trading_dates_override，导出文件内起止日为该列表 min/max）
-        db_path: 数据库路径
-        output_dir: 输出目录（默认 qc_signals）
-        use_db_reports_only: True（默认）时 **不现场跑四个 Analyst 写库**，仅当日内报告已在 analyst_reports 中；
-            Pre-Open 全图仍会调用 LLM。False 时对每个交易日现场跑四分析师并 insert_report，再跑全图。
-        verbose: 打印 Pre-Open 各节点进度
-        export_mode: ``backtest`` 时走 resolve_signal，写 ``signals.json``；``rating`` 为方案 2a，写 ``ratings.json``
-        simulate_portfolio: 仅 ``backtest`` 有效；多日循环用轻量模拟仓注入 Trader/Risk，并与 resolve 的 is_holding 对齐
-        initial_cash: 模拟仓初始现金
-        trading_dates_override: 若提供，仅处理这些交易日（已排序去重），忽略由 start/end 推算的日历
-        graph_dump_dir: 若提供，每个交易日写入 ``{graph_dump_dir}/{symbol}_{trade_date}/``：逐节点输出 + ``full_state_snapshot.json``
-    """
     if export_mode not in ("backtest", "rating"):
-        raise ValueError("export_mode 须为 backtest 或 rating")
+        raise ValueError("export_mode must be either backtest or rating")
 
     print(f"\n{'='*80}")
     if export_mode == "rating":
-        print(f"评级导出（方案 2a：无 Portfolio，不生成可执行信号）")
+        print("Rating export mode (analysis only, no executable signal)")
     else:
-        print(f"信号导出（QuantConnect 方案 A）")
+        print("Signal export mode (QuantConnect backtest)")
     print(f"{'='*80}")
+
+
+
+
+
+
+
     if trading_dates_override:
         _dmin = min(trading_dates_override)
         _dmax = max(trading_dates_override)
-        print(f"股票: {symbol}  交易日: --dates 共 {len(trading_dates_override)} 天 ({_dmin} ~ {_dmax})")
+        print(f"Symbol: {symbol}  Dates from --dates: {len(trading_dates_override)} ({_dmin} ~ {_dmax})")
     else:
-        print(f"股票: {symbol}  日期: {start_date} ~ {end_date}")
-    print(f"数据库: {db_path}  输出: {output_dir}")
-    print(
-        f"Analyst: {'仅 DB 已有报告（不现场跑四分析师）' if use_db_reports_only else '每个交易日现场跑四分析师写库'}"
-    )
-    print(f"模式: {export_mode}" + (f"  模拟仓: {'开' if simulate_portfolio else '关'}" if export_mode == "backtest" else ""))
+        print(f"Symbol: {symbol}  Date range: {start_date} ~ {end_date}")
+    print(f"Database: {db_path}  Output: {output_dir}")
+    print("Analyst source: DB reports only" if use_db_reports_only else "Analyst source: run analysts on demand")
+
+
+    print(f"Mode: {export_mode}" + (f"  Simulate portfolio: {simulate_portfolio}" if export_mode == "backtest" else ""))
 
     enabled_analysts = _normalize_enabled_analysts(enabled_analysts)
     experiment_id = _derive_experiment_id(enabled_analysts, experiment_id)
@@ -352,6 +363,18 @@ def run_signal_export(
 
     output_path = Path(output_dir)
     output_path.mkdir(parents=True, exist_ok=True)
+
+    runtime = _get_runtime_dependencies()
+    load_llm_from_config = runtime["load_llm_from_config"]
+    DataAdapter = runtime["DataAdapter"]
+    MemoryDBHelper = runtime["MemoryDBHelper"]
+    PortfolioSimulator = runtime["PortfolioSimulator"]
+    create_trading_graph = runtime["create_trading_graph"]
+    resolve_signal = runtime["resolve_signal"]
+    save_full_state_snapshot = runtime["save_full_state_snapshot"]
+    save_node_output = runtime["save_node_output"]
+    stream_graph_updates_with_dump = runtime["stream_graph_updates_with_dump"]
+    analyst_factories = _get_analyst_factories()
 
     _cfg = str(REPO_ROOT / "config" / "config.yaml")
     llm = load_llm_from_config(_cfg)
@@ -365,12 +388,12 @@ def run_signal_export(
     else:
         trading_dates = get_trading_dates(start_date, end_date, data_adapter)
     if not trading_dates:
-        print("[ERROR] 未找到交易日")
+        print("[ERROR] No trading dates found")
         memory.close()
         db_helper.close()
         return {}
 
-    print(f"[INFO] 共 {len(trading_dates)} 个交易日")
+    print(f"[INFO] Total trading dates: {len(trading_dates)}")
 
     all_signals: Dict[str, Dict[str, Any]] = {}
     is_holding = False
@@ -390,7 +413,7 @@ def run_signal_export(
                 if not c or not c.strip():
                     missing.append(at)
             if missing:
-                print(f"  [WARN] 缺少报告: {missing}，跳过")
+                print(f"  [WARN] Missing reports: {missing}; skipping")
                 if export_mode == "rating":
                     all_signals[trade_date] = {
                         "date": trade_date,
@@ -400,14 +423,14 @@ def run_signal_export(
                         "fine_rating": None,
                         "final_decision": None,
                         "risk_level": None,
-                        "reason": f"缺少报告: {missing}",
+                        "reason": f"Missing reports: {missing}",
                     }
                 else:
-                    all_signals[trade_date] = {"action": "HOLD", "reason": f"缺少报告: {missing}"}
+                    all_signals[trade_date] = {"action": "HOLD", "reason": f"Missing reports: {missing}"}
                 continue
         else:
             for analyst_type in analyst_types:
-                analyst_factory, report_key = ANALYST_FACTORIES[analyst_type]
+                analyst_factory, report_key = analyst_factories[analyst_type]
                 try:
                     initial_state: AgentState = {
                         "company_of_interest": symbol,
@@ -425,13 +448,19 @@ def run_signal_export(
                     if report_content:
                         db_helper.insert_report(analyst_type, symbol, trade_date, report_content)
                 except Exception as e:
-                    print(f"  [ERROR] {analyst_type} Analyst 失败: {e}")
+                    print(f"  [ERROR] {analyst_type} analyst failed: {e}")
                     all_signals[trade_date] = {"action": "HOLD", "reason": str(e)}
                     continue
 
         # Pre-Open Graph
         try:
-            graph = create_trading_graph(llm, memory, db_helper)
+            graph = create_trading_graph(
+                llm,
+                memory,
+                db_helper,
+                max_research_debate_rounds=max_research_debate_rounds,
+                max_risk_debate_rounds=max_risk_debate_rounds,
+            )
             mark_price = data_adapter.get_price(symbol, trade_date, "close")
             cp: Optional[Dict[str, Any]] = None
             ps: Optional[Dict[str, Any]] = None
@@ -468,13 +497,13 @@ def run_signal_export(
             if day_dump is not None and final_state:
                 save_full_state_snapshot(final_state, day_dump / "full_state_snapshot.json")
                 save_node_output("final_state", final_state, day_dump)
-                print(f"  [DUMP] Pre-Open 输出已写入 {day_dump.resolve()}")
+                print(f"  [DUMP] Pre-Open outputs written to {day_dump.resolve()}")
 
             if not final_state:
-                all_signals[trade_date] = {"action": "HOLD", "reason": "Pre-Open 未返回状态"}
+                all_signals[trade_date] = {"action": "HOLD", "reason": "Pre-Open graph returned no state"}
                 continue
 
-            # 合并 pre_open 到 state
+            # 合并 pre_open 阶段状态
             final_state["risk_summary"] = final_state.get("risk_summary")
             final_state["trader_investment_plan"] = final_state.get("trader_investment_plan")
 
@@ -500,7 +529,6 @@ def run_signal_export(
                 print(f"  [OK] rating research={rd} risk={fd} fine={fr}")
                 continue
 
-            # 可执行信号（backtest）
             signal = resolve_signal(final_state, is_holding, data_adapter)
             signal = _validate_signal(signal)
             signal["date"] = trade_date
@@ -593,7 +621,7 @@ def run_signal_export(
     with open(out_file, "w", encoding="utf-8") as f:
         json.dump(merged, f, ensure_ascii=False, indent=2, default=str)
 
-    print(f"\n[OK] 已写入 {out_file.absolute()}")
+    print(f"\n[OK] Wrote output to {out_file.absolute()}")
 
     memory.close()
     db_helper.close()
@@ -604,7 +632,7 @@ def run_signal_export(
 def main() -> None:
     import argparse
     parser = argparse.ArgumentParser(
-        description="导出 QuantConnect 信号（Pre-Open 全图 + resolve_signal / 评级模式）"
+        description="Export QuantConnect ratings or backtest signals from the pre-open graph.",
     )
     parser.add_argument("--symbol", type=str, default="NVDA")
     parser.add_argument("--start", type=str, default="2025-01-01")
@@ -614,10 +642,10 @@ def main() -> None:
         type=str,
         default=None,
         metavar="D1,D2,...",
-        help="逗号分隔交易日 (YYYY-MM-DD)；指定后仅处理这些日期，不再按 --start/--end 向 SPY 推算日历",
+        help="Comma-separated trade dates in YYYY-MM-DD format. When set, --start/--end are ignored for date selection.",
     )
-    parser.add_argument("--db", type=str, default="memory.db")
-    parser.add_argument("--output", type=str, default="qc_signals")
+    parser.add_argument("--db", type=str, default="storage/db/memory.db")
+    parser.add_argument("--output", type=str, default="storage/signals")
     parser.add_argument(
         "--enabled-analysts",
         type=str,
@@ -626,37 +654,39 @@ def main() -> None:
     )
     parser.add_argument("--experiment-id", type=str, default=None)
     parser.add_argument("--report-output-root", type=str, default=None)
+    parser.add_argument("--max-research-debate-rounds", type=int, default=None)
+    parser.add_argument("--max-risk-debate-rounds", type=int, default=None)
     parser.add_argument(
         "--use-db-reports-only",
         action="store_true",
         default=True,
-        help="默认开启：不现场跑四分析师，要求 analyst_reports 已有当日四类报告；Pre-Open 仍调用 LLM",
+        help="Default behavior: do not run analysts on demand; require reports to already exist in analyst_reports.",
     )
     parser.add_argument(
         "--no-db-reports-only",
         action="store_false",
         dest="use_db_reports_only",
-        help="关闭上一项：每个交易日现场调用四分析师写库后再跑 Pre-Open",
+        help="Disable the previous option and run analysts on demand before the pre-open graph.",
     )
     parser.add_argument("-v", "--verbose", action="store_true")
     parser.add_argument(
         "--export-mode",
         choices=("backtest", "rating"),
         default="backtest",
-        help="backtest: resolve_signal + signals.json；rating: 方案2a，仅 ratings.json",
+        help="backtest writes signals.json; rating writes ratings.json only",
     )
     parser.add_argument(
         "--simulate-portfolio",
         action="store_true",
-        help="backtest 模式下用轻量模拟仓注入 current_position/portfolio_state（多日）",
+        help="Inject simulated portfolio state in backtest mode for multi-day runs",
     )
-    parser.add_argument("--initial-cash", type=float, default=100_000.0, help="模拟仓初始现金")
+    parser.add_argument("--initial-cash", type=float, default=100_000.0, help="Initial cash for portfolio simulation")
     parser.add_argument(
         "--graph-dump",
         type=str,
         default=None,
         metavar="DIR",
-        help="将每日 Pre-Open 逐节点输出与 full_state_snapshot.json 写入 DIR/{symbol}_{trade_date}/",
+        help="Write per-day graph outputs and full_state_snapshot.json under DIR/{experiment_id}/{symbol}/{trade_date}/",
     )
     args = parser.parse_args()
 
@@ -665,7 +695,7 @@ def main() -> None:
     if args.dates:
         dates_override = sorted({d.strip() for d in args.dates.split(",") if d.strip()})
         if not dates_override:
-            parser.error("--dates 解析后为空，请传入逗号分隔的 YYYY-MM-DD")
+            parser.error("--dates resolved to an empty list; please provide comma-separated YYYY-MM-DD values")
 
     run_signal_export(
         symbol=args.symbol,
@@ -683,8 +713,11 @@ def main() -> None:
         enabled_analysts=enabled_analysts,
         experiment_id=args.experiment_id,
         report_output_root=args.report_output_root,
+        max_research_debate_rounds=args.max_research_debate_rounds,
+        max_risk_debate_rounds=args.max_risk_debate_rounds,
     )
 
 
 if __name__ == "__main__":
     main()
+

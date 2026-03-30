@@ -18,6 +18,8 @@ def main() -> None:
     parser.add_argument("--db", type=str, default="storage/db/memory.db")
     parser.add_argument("--enabled-analysts", type=str, required=True, help="Comma-separated analyst list")
     parser.add_argument("--experiment-id", type=str, default=None)
+    parser.add_argument("--max-research-debate-rounds", type=int, default=None)
+    parser.add_argument("--max-risk-debate-rounds", type=int, default=None)
     args = parser.parse_args()
 
     enabled = [x.strip() for x in args.enabled_analysts.split(",") if x.strip()]
@@ -33,6 +35,8 @@ def main() -> None:
         experiment_id=args.experiment_id,
         report_output_root="storage/reports",
         graph_dump_dir="storage/graph_dumps",
+        max_research_debate_rounds=args.max_research_debate_rounds,
+        max_risk_debate_rounds=args.max_risk_debate_rounds,
     )
 
 

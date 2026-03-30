@@ -1,25 +1,26 @@
-# QUANTCONNECT.COM - TradeSwarm 信号执行算法
-# Algorithm Lab 云端无法读项目文件，需将信号嵌入下方 EMBEDDED_SIGNALS
+﻿# QUANTCONNECT.COM - TradeSwarm signal execution algorithm
+# Supports both local file loading and Object Store loading.
 
 from AlgorithmImports import *
 import os
 import json
 from datetime import datetime, timedelta
 
-# 嵌入信号（Algorithm Lab 必填）：将 qc_signals/signals.json 的 by_execution_date 部分粘贴到下面；
-# 实验区间 2025-01-01~2025-03-01，运行 run_signal_export 后粘贴对应内容
 EMBEDDED_SIGNALS = {}
+OBJECT_STORE_KEYS = ["signals.json", "TradeSwarm/signals.json", "trade-swarm/signals.json"]
 
 
 class LocalDailyBar(PythonData):
-    """读取本地 CSV 日线：date,open,high,low,close,volume"""
+    """Read local CSV daily bars: date,open,high,low,close,volume."""
+
+    FILE_BASENAME = "nvda_daily.csv"
 
     def GetSource(self, config, date, isLiveMode):
-        source = os.path.join(Globals.DataFolder, "custom", "nvda_daily.csv")
+        source = os.path.join(Globals.DataFolder, "custom", self.FILE_BASENAME)
         return SubscriptionDataSource(
             source,
             SubscriptionTransportMedium.LocalFile,
-            FileFormat.Csv
+            FileFormat.Csv,
         )
 
     def Reader(self, config, line, date, isLiveMode):
@@ -44,39 +45,111 @@ class LocalDailyBar(PythonData):
 class TradeSwarmSignalAlgorithm(QCAlgorithm):
 
     def initialize(self):
-        self.set_start_date(2025, 1, 1)
-        self.set_end_date(2025, 3, 1)
+        payload, signals = self._load_signals()
+        self.signal_payload = payload
+        self.signals = signals
+        self.symbol_str = self._resolve_symbol(payload)
+        self._apply_backtest_window(payload)
         self.set_cash(100000)
         self.SetBenchmark(lambda _: 0)
 
-        self.symbol_str = "NVDA"
         self._last_processed_date = None
         self.symbol = None
         self._init_symbol()
 
-        self.signals = self._load_signals()
         if not self.signals:
-            self.error("未加载到信号，请确保 signals/signals.json 存在且格式正确")
+            self.error("未加载到有效信号，请确保 Object Store、signals/signals.json、signals.json 或 EMBEDDED_SIGNALS 可用")
+
+    def _resolve_symbol(self, payload):
+        symbol = None
+        if isinstance(payload, dict):
+            symbol = payload.get("symbol")
+        if not symbol:
+            msg = "signals.json 缺少 symbol 字段，无法初始化算法"
+            self.error(msg)
+            raise ValueError(msg)
+        return str(symbol).upper()
+
+    def _parse_date(self, value):
+        if not value:
+            return None
+        try:
+            return datetime.strptime(str(value), "%Y-%m-%d")
+        except Exception:
+            return None
+
+    def _apply_backtest_window(self, payload):
+        start_dt = self._parse_date(payload.get("start_date") if isinstance(payload, dict) else None)
+        end_dt = self._parse_date(payload.get("end_date") if isinstance(payload, dict) else None)
+
+        if (start_dt is None or end_dt is None) and isinstance(self.signals, dict) and self.signals:
+            try:
+                execution_dates = sorted(self.signals.keys())
+                if start_dt is None:
+                    start_dt = self._parse_date(execution_dates[0])
+                    self.debug("signals.json 缺少 start_date，回退到最早执行日")
+                if end_dt is None:
+                    end_dt = self._parse_date(execution_dates[-1])
+                    self.debug("signals.json 缺少 end_date，回退到最晚执行日")
+            except Exception:
+                pass
+
+        if start_dt is None:
+            start_dt = datetime(2025, 1, 1)
+            self.debug("未解析到 start_date，使用默认 2025-01-01")
+        if end_dt is None:
+            end_dt = datetime(2025, 3, 1)
+            self.debug("未解析到 end_date，使用默认 2025-03-01")
+
+        self.set_start_date(start_dt.year, start_dt.month, start_dt.day)
+        self.set_end_date(end_dt.year, end_dt.month, end_dt.day)
 
     def _init_symbol(self):
         use_local = (os.environ.get("TS_LOCAL_DATA", "1").strip() != "0")
         if use_local:
             try:
-                custom = self.AddData(LocalDailyBar, "NVDA_LOCAL", Resolution.DAILY)
+                LocalDailyBar.FILE_BASENAME = f"{self.symbol_str.lower()}_daily.csv"
+                custom = self.AddData(LocalDailyBar, f"{self.symbol_str}_LOCAL", Resolution.DAILY)
                 self.symbol = custom.Symbol
                 self.SetBrokerageModel(BrokerageName.Default, AccountType.Cash)
-                self.Debug("使用本地数据 custom/nvda_daily.csv")
+                self.Debug(f"使用本地数据 custom/{LocalDailyBar.FILE_BASENAME}")
                 return
             except Exception as e:
                 self.Debug(f"本地数据初始化失败，回退 add_equity: {e}")
         self.equity = self.add_equity(self.symbol_str, Resolution.DAILY)
         self.symbol = self.equity.symbol
 
-    def _load_signals(self):
-        """优先使用 EMBEDDED_SIGNALS（Algorithm Lab），否则尝试读文件（本地/Lean CLI）"""
-        if EMBEDDED_SIGNALS:
-            self.debug("使用嵌入信号 EMBEDDED_SIGNALS")
-            return EMBEDDED_SIGNALS
+    def _normalize_signal_payload(self, payload):
+        if not isinstance(payload, dict):
+            return {}, {}
+        by_execution_date = payload.get("by_execution_date")
+        if isinstance(by_execution_date, dict):
+            return payload, by_execution_date
+        signals = payload.get("signals")
+        if isinstance(signals, dict):
+            return payload, signals
+        return {}, payload
+
+    def _load_from_object_store(self):
+        store = getattr(self, "object_store", None) or getattr(self, "ObjectStore", None)
+        if store is None:
+            return None
+        contains_key = getattr(store, "contains_key", None) or getattr(store, "ContainsKey", None)
+        read = getattr(store, "read", None) or getattr(store, "Read", None)
+        if contains_key is None or read is None:
+            return None
+        for key in OBJECT_STORE_KEYS:
+            try:
+                if contains_key(key):
+                    raw = read(key)
+                    if raw:
+                        self.debug(f"使用 Object Store 信号: {key}")
+                        return json.loads(raw)
+            except Exception as e:
+                self.debug(f"Object Store 读取失败 {key}: {e}")
+        return None
+
+    def _load_from_files(self):
         try:
             base = os.path.dirname(os.path.abspath(__file__))
         except Exception:
@@ -89,14 +162,29 @@ class TradeSwarmSignalAlgorithm(QCAlgorithm):
             if os.path.exists(path):
                 try:
                     with open(path, "r", encoding="utf-8") as f:
-                        data = json.load(f)
-                    return data.get("by_execution_date", data.get("signals", {}))
+                        payload = json.load(f)
+                    self.debug(f"使用本地信号文件: {path}")
+                    return payload
                 except Exception as e:
                     self.error(f"加载信号失败 {path}: {e}")
-        return {}
+        return None
+
+    def _load_signals(self):
+        payload = self._load_from_object_store()
+        if payload is not None:
+            return self._normalize_signal_payload(payload)
+
+        payload = self._load_from_files()
+        if payload is not None:
+            return self._normalize_signal_payload(payload)
+
+        if EMBEDDED_SIGNALS:
+            self.debug("使用嵌入信号 EMBEDDED_SIGNALS")
+            return self._normalize_signal_payload(EMBEDDED_SIGNALS)
+
+        return {}, {}
 
     def on_data(self, data: Slice):
-        # 每个交易日仅处理一次信号
         if self.symbol is None or not data.ContainsKey(self.symbol):
             return
         today = self.time.date().isoformat()
@@ -127,15 +215,11 @@ class TradeSwarmSignalAlgorithm(QCAlgorithm):
                 if qty > 0:
                     self.limit_order(self.symbol, qty, entry_price)
                     self.debug(f"[{today}] BUY LIMIT qty={qty} price={entry_price} target_pct={target_pct}")
-                else:
-                    self.debug(f"[{today}] BUY LIMIT skipped qty={qty}")
             elif entry_type == "STOP" and entry_price is not None and entry_price > 0:
                 qty = self.calculate_order_quantity(self.symbol, target_pct)
                 if qty > 0:
                     self.stop_market_order(self.symbol, qty, entry_price)
                     self.debug(f"[{today}] BUY STOP qty={qty} stop={entry_price} target_pct={target_pct}")
-                else:
-                    self.debug(f"[{today}] BUY STOP skipped qty={qty}")
             else:
                 self.set_holdings(self.symbol, target_pct)
                 self.debug(f"[{today}] BUY MKT target_pct={target_pct}")

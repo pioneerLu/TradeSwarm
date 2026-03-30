@@ -82,7 +82,7 @@ class BaseAnalystMemoryManager(ABC):
         symbol: str,
         trade_date: str,
         window_size: int = 7,
-    ) -> bool:
+    ) -> str:
         """针对单个 symbol / trade_date 执行一次 7 日窗口 summary 更新。
 
         高层流程：
@@ -104,7 +104,7 @@ class BaseAnalystMemoryManager(ABC):
         )
         if existing is not None:
             # 返回 False 表示这次没有执行更新（调用方可据此统计 skipped 数量）
-            return False
+            return "skipped_existing"
 
         # 1. 计算窗口日期（这里先简单使用日期减法，后续可接 DateResolver）
         window_start_date, window_end_date = self._resolve_window(trade_date, window_size)
@@ -119,7 +119,7 @@ class BaseAnalystMemoryManager(ABC):
         source_reports_count = len(reports)
         if source_reports_count == 0:
             # 没有任何报告，直接跳过（返回 False 表示无更新）
-            return False
+            return "skipped_no_reports"
 
         context = SummaryContext(
             analyst_type=self.analyst_type,
@@ -158,7 +158,7 @@ class BaseAnalystMemoryManager(ABC):
             llm_model=llm_model,
             token_usage=token_usage,
         )
-        return ok
+        return "ok" if ok else "error"
 
     # ------------------------------------------------------------------
     # 可复用的内部工具
@@ -230,5 +230,4 @@ class BaseAnalystMemoryManager(ABC):
         注意：
             - 此方法只定义接口，具体 Prompt 和 JSON 结构由子类实现
         """
-
 
