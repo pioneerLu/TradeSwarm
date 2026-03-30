@@ -181,17 +181,6 @@ python apps\reporting\run_reports.py --symbol NVDA --dates 2026-02-13 --db stora
 - 日级报告文件
 - graph dump
 
-回测与 Agent 系统端到端链路：
-
-1. [apps/backtest/run_backtest.py](apps/backtest/run_backtest.py)
-2. [scripts/runtime/run_automated_backtest.py](scripts/runtime/run_automated_backtest.py)
-3. [scripts/runtime/run_signal_export.py](scripts/runtime/run_signal_export.py)
-4. [tradingagents/graph/trading_graph.py](tradingagents/graph/trading_graph.py)
-5. [tradingagents/dataflows/export/signal_resolver.py](tradingagents/dataflows/export/signal_resolver.py)
-6. [quantconnect/main.py](quantconnect/main.py)
-
-其中第 3-5 步是 Agent 决策到可执行信号的关键桥接层。
-
 #### 3.1 只导出信号 / rating
 
 ```powershell
@@ -294,9 +283,7 @@ storage/backtests/
 
 ## 动态 Analyst 说明
 
-系统现在按 `enabled_analysts` 动态构造运行上下文，而不是固定四槽位。
-
-这意味着：
+系统现在按 `enabled_analysts` 动态构造运行上下文:
 
 - summary loader 按启用集合装配
 - pre-open prompt 按启用集合组织上下文
@@ -319,15 +306,15 @@ storage/backtests/
 
 | 功能 | 路径 |
 |------|------|
-| 报告流入口 | [apps/reporting/run_reports.py](apps/reporting/run_reports.py) |
-| 回测流入口 | [apps/backtest/run_backtest.py](apps/backtest/run_backtest.py) |
-| report 构建入口 | [apps/data_prep/build_analyst_reports.py](apps/data_prep/build_analyst_reports.py) |
-| summary 构建入口 | [apps/data_prep/build_analyst_summaries.py](apps/data_prep/build_analyst_summaries.py) |
-| Summary 装配 | [tradingagents/agents/pre_open/summary/loader.py](tradingagents/agents/pre_open/summary/loader.py) |
-| Summary 注册表 | [tradingagents/agents/pre_open/summary/registry.py](tradingagents/agents/pre_open/summary/registry.py) |
-| 主图 | [tradingagents/graph/trading_graph.py](tradingagents/graph/trading_graph.py) |
-| 信号导出 | [scripts/runtime/run_signal_export.py](scripts/runtime/run_signal_export.py) |
-| 自动回测 | [scripts/runtime/run_automated_backtest.py](scripts/runtime/run_automated_backtest.py) |
+| 报告流入口 | `apps/reporting/run_reports.py` |
+| 回测流入口 | `apps/backtest/run_backtest.py` |
+| report 构建入口 | `apps/data_prep/build_analyst_reports.py` |
+| summary 构建入口 | `apps/data_prep/build_analyst_summaries.py` |
+| Summary 装配 | `tradingagents/agents/pre_open/summary/loader.py` |
+| Summary 注册表 | `tradingagents/agents/pre_open/summary/registry.py` |
+| 主图 | `tradingagents/graph/trading_graph.py` |
+| 信号导出 | `scripts/runtime/run_signal_export.py` |
+| 自动回测 | `scripts/runtime/run_automated_backtest.py` |
 
 ## 当前注意事项
 
@@ -335,4 +322,3 @@ storage/backtests/
 2. `analyst_reports` 和 `analyst_summaries` 现在都支持 `--types`，可按单 analyst 或多 analyst 组合构建。
 3. 默认辩论轮数下，完整 pre-open 流程耗时会明显增加；做 smoke test 时建议临时使用 `--max-research-debate-rounds 1 --max-risk-debate-rounds 1`。
 4. 在当前环境里，仓库根目录下的 `memory.db` 可能出现 SQLite 只读问题，建议优先使用 `storage\db\memory.db`。
-5. 所有命令示例均使用 Windows 单行格式。
