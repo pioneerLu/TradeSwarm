@@ -3,7 +3,10 @@ from pathlib import Path
 import json
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.language_models import BaseChatModel
-from tradingagents.agents.init_db import conn, cursor
+from tradingagents.db.connection import get_connection
+
+conn = get_connection()
+cursor = conn.cursor()
 
 def _parse_report_to_sql_structure(
     llm: BaseChatModel,

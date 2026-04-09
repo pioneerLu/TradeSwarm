@@ -1,37 +1,34 @@
-﻿#!/usr/bin/env python
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 """
-淇″彿瀵煎嚭鑴氭湰锛堟柟妗?A锛欰gent 杈撳嚭淇″彿 鈫?QuantConnect 鎵ц锛?
-鍒嗙被锛氭暟鎹瀯寤?/ 绂荤嚎娴嬭瘯锛堣 README锛?- 杩愯 Analyst锛堟垨浠?DB 璇伙級鈫?Pre-Open Graph 鈫?淇″彿瑙ｆ瀽
-- 杈撳嚭缁撴瀯鍖栦俊鍙?JSON 鍒?qc_signals/锛屼緵 QuantConnect 绠楁硶璇诲彇鎵ц
-- 鏂规 2a锛堝垎鏋愬伐鍏凤級锛歚--export-mode rating` 涓嶆敞鍏?Portfolio銆佷笉璋冪敤 `resolve_signal`锛屼粎鍐欏嚭
-  `research_manager.decision` 涓?`risk_manager` 鐨?`fine_rating` / `final_decision` / `risk_level`锛堣 `ratings.json`锛?
-浣跨敤娴佺▼锛?1. 纭繚 memory.db 涓湁鎵€闇€鏃ユ湡鐨?analyst_reports锛堝彲鐢?build_analyst_dataset 鏋勫缓锛?2. 鍙€夛細棰勫厛杩愯 run_history_maintainer_batch 鐢熸垚 analyst_summaries
-3. 杩愯鏈剼鏈鍑轰俊鍙?4. 灏?qc_signals/ 鐩綍鍐呭澶嶅埗鍒?QuantConnect 椤圭洰锛岃繍琛屽洖娴?
-璇存槑锛?- **榛樿 --use-db-reports-only**锛氫笉鐜板満璋冪敤鍥涗釜 Analyst 鍐欏簱锛汸re-Open 鍥撅紙Summary鈫扲esearch鈫扵rader鈫扲isk锛?*浠嶄細澶氭璋冪敤 LLM**銆?- **璁板繂锛圖atabaseMemory锛?*锛氫粎浠?DB 琛?cycle_reflections 璇诲懆鏈熷弽鎬濓紝涓斿綋鍓嶅浐瀹?weekly锛涜嫢鏃犺褰曞垯 get_memories 涓虹┖锛屽睘姝ｅ父銆?- **鎺ㄨ崘**浠ユ鑴氭湰涓恒€屼粠 Summary 璺戝叏鍥惧苟瀵煎嚭銆嶇殑鍞竴 CLI锛涘崟鏃ュ彲鐢?--dates銆?- **浜哄伐璇勫垽 / 璋冭瘯**锛歚--graph-dump DIR` 鍦ㄦ瘡涓氦鏄撴棩鍐欏叆 `DIR/{symbol}_{trade_date}/`锛圠angGraph `subgraphs=True`锛屽瓙鍥惧唴姣忎竴姝ヨ惤鐩樹负 `step_NNNN__{鍛藉悕绌洪棿}__{鑺傜偣}_output.json/.txt`锛屽彟鍚?`full_state_snapshot.json` 涓?`final_state_*`锛夈€?"""
+Signal export script: Agent outputs -> QuantConnect execution.
 
-信号导出脚本（方案 A）：Agent 产出信号 -> QuantConnect 执行。
+Usage:
+- Run Analyst (or reuse DB reports) -> Pre-Open Graph -> signal resolution.
+- Output structured JSON to qc_signals/ for QuantConnect.
+- In ``--export-mode rating`` mode, only export analysis ratings.
 
-用途：
-- 运行 Analyst（或直接复用 DB 报告）-> Pre-Open Graph -> 信号解析。
-- 输出结构化 JSON 到 qc_signals/（或指定输出目录），供 QuantConnect 算法读取执行。
-- 在 `--export-mode rating` 下仅导出分析评级，不注入 Portfolio，也不调用 `resolve_signal`。
-
-使用流程：
-1. 确保 memory.db 中存在目标日期的 analyst_reports（可用 build_analyst_dataset 预构建）。
-2. 可选：先运行 run_history_maintainer_batch 生成 analyst_summaries。
-3. 运行本脚本导出 signals.json 或 ratings.json。
-4. 将输出目录内容复制到 QuantConnect 项目后执行回测。
-
-说明：
-- 默认 `--use-db-reports-only`：不现场运行四个 Analyst，仅使用 DB 报告；Pre-Open 图仍会调用 LLM。
-- `DatabaseMemory` 仅从 `cycle_reflections` 读取 weekly 周期反思；无记录时返回空列表，属正常行为。
-- 推荐使用本脚本作为“从 Summary 跑全图并导出”的统一 CLI；单日可用 `--dates`。
-- `--graph-dump DIR` 会按交易日写入 `DIR/{experiment_id}/{symbol}/{trade_date}/`，包含子图节点输出与完整状态快照。
+Workflow:
+1. Ensure analyst_reports exist in memory.db for target dates.
+2. Optional: run run_history_maintainer_batch to generate analyst_summaries.
+3. Run this script to export signals.json or ratings.json.
+4. Copy output to QuantConnect project for backtesting.
 """
+from __future__ import annotations
+
+import json
+import sys
+from datetime import datetime, timedelta
+from pathlib import Path
+from textwrap import dedent
+from typing import Any, Dict, List, Optional
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT))
+
+from tradingagents.agents.utils.agentstate.agent_states import AgentState  # noqa: E402
+from tradingagents.core.data_adapter import DataAdapter  # noqa: E402
+
 DEFAULT_ENABLED_ANALYSTS = ("market", "news", "sentiment", "fundamentals")
 
 
@@ -305,6 +302,140 @@ def extract_rating_record(
         "final_decision": (kj or {}).get("final_decision") if kj else None,
         "risk_level": (kj or {}).get("risk_level") if kj else None,
     }
+
+
+def run_single_day(
+    trade_date: str,
+    symbol: str,
+    current_position: Optional[Dict[str, Any]],
+    portfolio_state: Optional[Dict[str, Any]],
+    graph: Any,
+    data_adapter: Any,
+    db_helper: Any,
+    enabled_analysts: List[str],
+    experiment_id: str,
+    use_db_reports_only: bool = True,
+    verbose: bool = False,
+    graph_dump_dir: Optional[str] = None,
+    report_output_root: Optional[str] = None,
+    llm: Any = None,
+) -> Dict[str, Any]:
+    """
+    Execute the agent graph for a single trading day and return the resolved signal.
+
+    This function encapsulates all per-day logic previously embedded in run_signal_export's
+    main loop, making it callable from both the batch export script and the interleaved
+    backtest orchestrator.
+
+    Returns:
+        Resolved and validated signal dict, always contains 'action' key.
+    """
+    runtime = _get_runtime_dependencies()
+    resolve_signal = runtime["resolve_signal"]
+    stream_graph_updates_with_dump = runtime["stream_graph_updates_with_dump"]
+    save_full_state_snapshot = runtime["save_full_state_snapshot"]
+    save_node_output = runtime["save_node_output"]
+    analyst_factories = _get_analyst_factories()
+
+    # Analyst reports
+    if use_db_reports_only:
+        missing = []
+        for at in enabled_analysts:
+            c = db_helper.query_today_report(at, symbol, trade_date)
+            if not c or not c.strip():
+                missing.append(at)
+        if missing:
+            print(f"  [WARN] Missing reports: {missing}; skipping")
+            return {"action": "HOLD", "reason": f"Missing reports: {missing}", "date": trade_date, "symbol": symbol}
+    elif llm is not None:
+        for analyst_type in enabled_analysts:
+            analyst_factory, report_key = analyst_factories[analyst_type]
+            try:
+                init_st: AgentState = {
+                    "company_of_interest": symbol,
+                    "trade_date": trade_date,
+                    report_key: "",
+                    "messages": [],
+                }
+                result = analyst_factory(llm)(init_st)
+                report_content = result.get(report_key) or ""
+                if not report_content and result.get("messages"):
+                    for msg in reversed(result.get("messages", [])):
+                        if hasattr(msg, "content") and msg.content:
+                            report_content = msg.content
+                            break
+                if report_content:
+                    db_helper.insert_report(analyst_type, symbol, trade_date, report_content)
+            except Exception as e:
+                print(f"  [ERROR] {analyst_type} analyst failed: {e}")
+
+    # Determine holding status from position
+    is_holding = False
+    if current_position and float(current_position.get("shares") or 0) > 1e-9:
+        is_holding = True
+
+    try:
+        initial_state: AgentState = {
+            "company_of_interest": symbol,
+            "trade_date": trade_date,
+            "trading_session": "pre_open",
+            "messages": [],
+            "current_position": current_position,
+            "portfolio_state": portfolio_state,
+            "enabled_analysts": enabled_analysts,
+            "experiment_id": experiment_id,
+        }
+
+        day_dump: Optional[Path] = None
+        if graph_dump_dir:
+            day_dump = Path(graph_dump_dir) / experiment_id / symbol / trade_date
+            day_dump.mkdir(parents=True, exist_ok=True)
+
+        final_state = stream_graph_updates_with_dump(
+            graph,
+            initial_state,
+            dump_dir=day_dump,
+            verbose=verbose,
+            log_prefix="Pre-Open",
+        )
+
+        if day_dump is not None and final_state:
+            save_full_state_snapshot(final_state, day_dump / "full_state_snapshot.json")
+            save_node_output("final_state", final_state, day_dump)
+
+        if not final_state:
+            return {"action": "HOLD", "reason": "Pre-Open graph returned no state", "date": trade_date, "symbol": symbol}
+
+        final_state["risk_summary"] = final_state.get("risk_summary")
+        final_state["trader_investment_plan"] = final_state.get("trader_investment_plan")
+
+        signal = resolve_signal(final_state, is_holding, data_adapter)
+        signal = _validate_signal(signal)
+        signal["date"] = trade_date
+        signal["symbol"] = symbol
+        signal["experiment_id"] = experiment_id
+        signal["enabled_analysts"] = enabled_analysts
+
+        if report_output_root:
+            _write_report_artifacts(
+                report_output_root=report_output_root,
+                experiment_id=experiment_id,
+                symbol=symbol,
+                trade_date=trade_date,
+                enabled_analysts=enabled_analysts,
+                final_state=final_state,
+                export_mode="backtest",
+                execution_payload=signal,
+            )
+
+        print(f"  [OK] {signal.get('action', 'HOLD')} - {signal.get('reason', '')[:50]}")
+        return signal
+
+    except Exception as e:
+        print(f"  [ERROR] {e}")
+        import traceback
+        traceback.print_exc()
+        return {"action": "HOLD", "reason": str(e), "date": trade_date, "symbol": symbol}
 
 
 def run_signal_export(

@@ -1,1 +1,0 @@
-"""QuantConnect integration namespace."""

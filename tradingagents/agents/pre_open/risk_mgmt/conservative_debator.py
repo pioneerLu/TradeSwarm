@@ -4,7 +4,7 @@ from typing import Any, Dict
 
 from tradingagents.agents.utils.agentstate.agent_states import AgentState, RiskDebateState, RiskSummary
 from tradingagents.agents.utils.prompt_loader import load_prompt_template
-from tradingagents.agents.utils.state_helpers import get_prompt_context_from_summaries
+from tradingagents.agents.utils.state_helpers import format_position_context, get_prompt_context_from_summaries
 
 
 def create_safe_debator(llm: Any):
@@ -59,6 +59,7 @@ def create_safe_debator(llm: Any):
                 "is_first_round": is_first_round,
                 "risky_history": risky_history,
                 "neutral_history": neutral_history,
+                "position_context": format_position_context(state),
             },
         )
 

@@ -6,7 +6,7 @@ from langchain_core.language_models import BaseChatModel
 
 from tradingagents.agents.utils.agentstate.agent_states import AgentState, InvestDebateState, ResearchSummary
 from tradingagents.agents.utils.prompt_loader import load_prompt_template
-from tradingagents.agents.utils.state_helpers import get_prompt_context_from_summaries
+from tradingagents.agents.utils.state_helpers import format_position_context, get_prompt_context_from_summaries
 
 
 def create_bull_researcher(llm: BaseChatModel, memory: Any) -> Callable[[AgentState], Dict[str, Any]]:
@@ -45,6 +45,7 @@ def create_bull_researcher(llm: BaseChatModel, memory: Any) -> Callable[[AgentSt
                 "round_number": round_number,
                 "is_first_round": is_first_round,
                 "bear_history": bear_history,
+                "position_context": format_position_context(state),
             },
         )
 

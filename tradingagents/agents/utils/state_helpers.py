@@ -1,8 +1,8 @@
-"""Helpers for reading analyst summaries from AgentState."""
+"""Helpers for reading analyst summaries and portfolio context from AgentState."""
 
 from __future__ import annotations
 
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 from tradingagents.agents.utils.agentstate.agent_states import AgentState, AnalystMemorySummary
 
@@ -76,6 +76,58 @@ def get_prompt_context_from_summaries(state: AgentState) -> Dict[str, str]:
         "enabled_analysts_text": ", ".join(enabled),
         "active_analyst_blocks": "\n\n".join(block for block in analyst_blocks if block).strip(),
     }
+
+
+def format_position_info(current_position: Optional[Dict[str, Any]]) -> str:
+    """Format current_position dict into a human-readable text block."""
+    if not current_position:
+        return "\nCurrent position: none\n"
+    shares = current_position.get("shares") or 0.0
+    entry_price = current_position.get("entry_price") or 0.0
+    entry_date = current_position.get("entry_date") or ""
+    current_price = current_position.get("current_price") or 0.0
+    pnl = current_position.get("pnl") or 0.0
+    pnl_pct = current_position.get("pnl_pct") or 0.0
+    sl_raw = current_position.get("stop_loss_price")
+    sl_str = f"${sl_raw:.2f}" if sl_raw is not None else "Not set"
+    tp_raw = current_position.get("take_profit_price")
+    tp_str = f"${tp_raw:.2f}" if tp_raw is not None else "Not set"
+    return (
+        f"\nCurrent position:\n"
+        f"- Shares: {shares:.0f}\n"
+        f"- Entry price: ${entry_price:.2f}\n"
+        f"- Entry date: {entry_date}\n"
+        f"- Current price: ${current_price:.2f}\n"
+        f"- PnL: ${pnl:.2f}\n"
+        f"- PnL %: {pnl_pct:.2f}%\n"
+        f"- Stop loss: {sl_str}\n"
+        f"- Take profit: {tp_str}\n"
+    )
+
+
+def format_portfolio_info(portfolio_state: Optional[Dict[str, Any]]) -> str:
+    """Format portfolio_state dict into a human-readable text block."""
+    if not portfolio_state:
+        return ""
+    total_value = portfolio_state.get("total_value") or 0.0
+    cash = portfolio_state.get("cash") or 0.0
+    positions_value = portfolio_state.get("positions_value") or 0.0
+    total_return = portfolio_state.get("total_return") or 0.0
+    return (
+        f"\nPortfolio state:\n"
+        f"- Total value: ${total_value:,.2f}\n"
+        f"- Cash: ${cash:,.2f}\n"
+        f"- Positions value: ${positions_value:,.2f}\n"
+        f"- Total return: {total_return:.2f}%\n"
+    )
+
+
+def format_position_context(state: AgentState) -> str:
+    """Return combined position + portfolio text from AgentState. Empty string if no data."""
+    position_info = format_position_info(state.get("current_position"))
+    portfolio_info = format_portfolio_info(state.get("portfolio_state"))
+    combined = (position_info + portfolio_info).strip()
+    return combined if combined and combined != "Current position: none" else ""
 
 
 def build_curr_situation_from_summaries(

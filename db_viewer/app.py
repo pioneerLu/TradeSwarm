@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 """memory.db 本地 Web 查看器"""
+from __future__ import annotations
+
+import argparse
+import os
 import re
 import sqlite3
 from pathlib import Path
@@ -7,7 +11,25 @@ from flask import Flask, render_template_string, jsonify, request
 
 APP_DIR = Path(__file__).parent
 PROJECT_ROOT = APP_DIR.parent
-DB_PATH = PROJECT_ROOT / "memory.db"
+
+
+def resolve_db_path(cli_db: str | None = None) -> Path:
+  # Priority: CLI > env > storage/db/memory.db > legacy memory.db
+  if cli_db:
+    return Path(cli_db).expanduser().resolve()
+
+  env_db = os.getenv("DB_VIEWER_DB")
+  if env_db:
+    return Path(env_db).expanduser().resolve()
+
+  storage_db = PROJECT_ROOT / "storage" / "db" / "memory.db"
+  if storage_db.exists():
+    return storage_db
+
+  return PROJECT_ROOT / "memory.db"
+
+
+DB_PATH = resolve_db_path()
 
 # 允许按 id 删除行的表（本地工具，仍做白名单）
 ALLOWED_DELETE_BY_ID_TABLES = frozenset({"analyst_reports", "analyst_summaries"})
@@ -642,10 +664,23 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
 
 def main():
+    global DB_PATH
+    parser = argparse.ArgumentParser(description="TradeSwarm SQLite Web viewer")
+    parser.add_argument(
+        "--db",
+        type=str,
+        default=None,
+        help="Path to SQLite file (default: storage/db/memory.db, fallback: memory.db)",
+    )
+    args = parser.parse_args()
+
+    DB_PATH = resolve_db_path(args.db)
     if not DB_PATH.exists():
         print(f"数据库不存在: {DB_PATH}")
+        print("可通过 --db 或环境变量 DB_VIEWER_DB 指定数据库路径")
         return
     print(f"启动 memory.db 查看器: http://127.0.0.1:5555")
+    print(f"当前数据库: {DB_PATH}")
     print("按 Ctrl+C 停止")
     app.run(host="127.0.0.1", port=5555, debug=False)
 

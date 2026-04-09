@@ -4,25 +4,30 @@
 
 ```
 tradingagents/
+├── config.py               # 统一配置（YAML + .env + LLM 初始化）
+├── llm_env_compat.py       # Silicon Flow 环境变量解析
+├── db/                     # 统一数据库访问层
+│   ├── connection.py       # 连接工厂（替代旧 init_db 全局 conn）
+│   ├── schema.py           # 集中 DDL 定义
+│   └── memory_db.py        # MemoryDBHelper CRUD
 ├── agents/
-│   ├── pre_open/          # 开盘前分析阶段
-│   │   ├── trader/        # 交易员节点（可访问仓位信息）
+│   ├── analysts/           # 4 类分析师（market, news, sentiment, fundamentals）
+│   ├── pre_open/           # 开盘前分析阶段
+│   │   ├── trader/         # 交易员节点（可访问仓位信息）
 │   │   ├── managers/
-│   │   │   ├── research_manager/  # 研究侧辩论收口（对齐上游 Research Manager）
-│   │   │   └── risk_manager/      # 风险辩论终审（对齐上游 Portfolio Manager）
-│   │   └── ...
-│   ├── market_open/       # 信号解析（如 signal_resolver → QuantConnect）
-│   └── post_close/        # 收盘后：历史维护、反思等
-│       ├── history_maintainer.py
-│       └── reflector.py
-│
-├── core/                   # 核心模块
-│   ├── selection/          # 选股服务
-│   │   └── stock_selector.py
-│   └── data_adapter.py     # 数据适配器
-│
-└── graph/
-    └── trading_graph.py    # 主交易图
+│   │   │   ├── research_manager/
+│   │   │   └── risk_manager/
+│   │   ├── researchers/    # 牛熊研究员
+│   │   ├── risk_mgmt/      # 风险辩论者
+│   │   └── summary/        # Summary 装配（loader + registry）
+│   ├── market_open/        # 信号解析
+│   └── post_close/         # 历史维护、反思
+├── core/                   # 数据适配器、策略、选股
+├── graph/                  # LangGraph 图定义
+│   ├── trading_graph.py
+│   └── subgraphs/
+├── tool_nodes/             # 分析师数据工具
+└── dataflows/export/       # 信号导出
 ```
 
 ## 流程说明
@@ -77,13 +82,13 @@ portfolio_state: Optional[Dict[str, Any]]   # 组合状态
 位置：`tradingagents/core/selection/stock_selector.py`
 
 功能：
-- 封装 `trading_sys` 的选股功能
+- 选股逻辑
 - 每月第一个交易日选股
 - 判断再平衡日
 
 ## 使用方式
 
-Pre-Open 决策图入口：[`graph/trading_graph.py`](graph/trading_graph.py) 的 `create_trading_graph`；信号导出见仓库根目录脚本 `scripts/runtime/run_signal_export.py` 与 `quantconnect/`。
+Pre-Open 决策图入口：[`graph/trading_graph.py`](graph/trading_graph.py) 的 `create_trading_graph`；信号导出见 `scripts/runtime/run_signal_export.py`；CLI 入口见 `apps/`。
 
 ## 关键设计
 

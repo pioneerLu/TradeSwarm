@@ -53,6 +53,27 @@ def _parse_risk_decision(risk_summary: Optional[Dict[str, Any]]) -> Dict[str, An
         return {}
 
 
+def _extract_position_info(state: AgentState) -> Dict[str, Any]:
+    """Extract position info from state for guard rules."""
+    cp = state.get("current_position")
+    ps = state.get("portfolio_state")
+    if not cp:
+        return {"has_position": False, "shares": 0, "entry_price": 0, "pnl_pct": 0, "current_weight": 0}
+    shares = float(cp.get("shares") or 0)
+    entry_price = float(cp.get("entry_price") or 0)
+    pnl_pct = float(cp.get("pnl_pct") or 0)
+    market_value = shares * float(cp.get("current_price") or 0)
+    total_value = float((ps or {}).get("total_value") or 0)
+    current_weight = market_value / total_value if total_value > 0 else 0
+    return {
+        "has_position": shares > 1e-9,
+        "shares": shares,
+        "entry_price": entry_price,
+        "pnl_pct": pnl_pct,
+        "current_weight": current_weight,
+    }
+
+
 def resolve_signal(
     state: AgentState,
     is_holding: bool,
@@ -61,10 +82,8 @@ def resolve_signal(
     """
     从 Pre-Open 的 state 解析出最终交易信号。
 
-    Args:
-        state: Pre-Open 图输出的 AgentState
-        is_holding: 当前是否已持有该标的
-        data_adapter: 数据适配器（用于计算下一个交易日）
+    Uses full position info from state when available (interleaved backtest mode)
+    and falls back to the simple is_holding flag (legacy batch mode).
 
     Returns:
         标准化信号字典，包含 action、target_pct、execution_date、entry_type、entry_price、reason 等字段。
@@ -87,10 +106,11 @@ def resolve_signal(
     if not symbol or not trade_date:
         return default_hold
 
-    # 1) 获取 T+1 执行日
     next_trading_day = data_adapter.get_next_trading_day(trade_date)
+    pos_info = _extract_position_info(state)
+    has_position = pos_info["has_position"] or is_holding
 
-    # 2) Trader 直接输出（主来源）
+    # Trader output (primary source)
     trader_json = _parse_trader_plan(state.get("trader_investment_plan"))
     trader_action = str(trader_json.get("action", "HOLD")).upper()
     trader_target_pct = _safe_float(trader_json.get("target_pct"))
@@ -103,14 +123,13 @@ def resolve_signal(
         else {}
     )
 
-    # 3) Risk Manager 输出（约束层）
+    # Risk Manager output (constraint layer)
     risk_json = _parse_risk_decision(state.get("risk_summary"))
     risk_action = str(risk_json.get("final_decision", "")).upper()
     risk_position_size = _safe_float(risk_json.get("position_size"))
     risk_stop_loss = risk_json.get("stop_loss")
     risk_take_profit = risk_json.get("take_profit")
 
-    # 4) 动作融合：Risk 明确时优先，否则使用 Trader
     merged_action = risk_action if risk_action in {"BUY", "SELL", "HOLD"} else trader_action
     if merged_action not in {"BUY", "SELL", "HOLD"}:
         merged_action = "HOLD"
@@ -122,21 +141,26 @@ def resolve_signal(
             "reason": "Risk/Trader 决策为 HOLD",
         }
 
-    # 5) 仓位融合：Risk 仅做上限约束，不放大 Trader 仓位
     base_target_pct = _clip_pct(trader_target_pct, default=0.5 if merged_action == "BUY" else 0.0)
     risk_cap_pct = _clip_pct(risk_position_size, default=base_target_pct)
     final_target_pct = min(base_target_pct, risk_cap_pct)
     if merged_action == "SELL":
         final_target_pct = 0.0
 
-    # 6) 基础有效性约束
-    if merged_action == "BUY" and is_holding and final_target_pct <= 0:
-        return {
-            **default_hold,
-            "execution_date": next_trading_day,
-            "reason": "已持仓且目标仓位无增量，忽略 BUY",
-        }
-    if merged_action == "SELL" and not is_holding:
+    # Guard: duplicate BUY at same target -> HOLD
+    if merged_action == "BUY" and has_position:
+        current_weight = pos_info["current_weight"]
+        delta = final_target_pct - current_weight
+        if delta < 0.02:
+            return {
+                **default_hold,
+                "execution_date": next_trading_day,
+                "reason": f"已持仓 {current_weight:.1%}，目标 {final_target_pct:.1%} 无显著增量，HOLD",
+            }
+        final_target_pct = delta
+
+    # Guard: SELL with no position -> HOLD
+    if merged_action == "SELL" and not has_position:
         return {
             **default_hold,
             "execution_date": next_trading_day,

@@ -73,10 +73,13 @@ report = query_today_report("news", "000001", "2024-01-15")
 history = query_history_reports("news", "000001", "2024-01-15", lookback_days=7)
 ```
 
-### 方法 3：直接使用 init_db 的全局连接（不推荐，但兼容旧代码）
+### 方法 3：使用统一 DB 连接（推荐替代旧 init_db 全局连接）
 
 ```python
-from tradingagents.agents.init_db import conn, cursor
+from tradingagents.db.connection import get_connection
+
+conn = get_connection()
+cursor = conn.cursor()
 
 # 插入报告
 cursor.execute(

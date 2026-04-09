@@ -6,7 +6,12 @@ from langchain_core.language_models import BaseChatModel
 
 from tradingagents.agents.utils.agentstate.agent_states import AgentState
 from tradingagents.agents.utils.prompt_loader import load_prompt_template
-from tradingagents.agents.utils.state_helpers import build_curr_situation_from_summaries, get_prompt_context_from_summaries
+from tradingagents.agents.utils.state_helpers import (
+    build_curr_situation_from_summaries,
+    format_portfolio_info,
+    format_position_info,
+    get_prompt_context_from_summaries,
+)
 
 
 def create_trader(llm: BaseChatModel, memory: Any) -> Callable[[AgentState], Dict[str, Any]]:
@@ -36,43 +41,8 @@ def create_trader(llm: BaseChatModel, memory: Any) -> Callable[[AgentState], Dic
             },
         )
 
-        current_position = state.get("current_position")
-        portfolio_state = state.get("portfolio_state")
-
-        if current_position:
-            shares = current_position.get("shares") or 0.0
-            entry_price = current_position.get("entry_price") or 0.0
-            entry_date = current_position.get("entry_date") or ""
-            current_price = current_position.get("current_price") or 0.0
-            pnl = current_position.get("pnl") or 0.0
-            pnl_pct = current_position.get("pnl_pct") or 0.0
-            sl_raw = current_position.get("stop_loss_price")
-            sl_str = f"${sl_raw:.2f}" if sl_raw is not None else "Not set"
-            tp_raw = current_position.get("take_profit_price")
-            tp_str = f"${tp_raw:.2f}" if tp_raw is not None else "Not set"
-            position_info = (
-                f"\nCurrent position:\n"
-                f"- Shares: {shares:.0f}\n"
-                f"- Entry price: ${entry_price:.2f}\n"
-                f"- Entry date: {entry_date}\n"
-                f"- Current price: ${current_price:.2f}\n"
-                f"- PnL: ${pnl:.2f}\n"
-                f"- PnL %: {pnl_pct:.2f}%\n"
-                f"- Stop loss: {sl_str}\n"
-                f"- Take profit: {tp_str}\n"
-            )
-        else:
-            position_info = "\nCurrent position: none\n"
-
-        portfolio_info = ""
-        if portfolio_state:
-            portfolio_info = (
-                f"\nPortfolio state:\n"
-                f"- Total value: ${portfolio_state.get('total_value', 0):,.2f}\n"
-                f"- Cash: ${portfolio_state.get('cash', 0):,.2f}\n"
-                f"- Positions value: ${portfolio_state.get('positions_value', 0):,.2f}\n"
-                f"- Total return: {portfolio_state.get('total_return', 0):.2f}%\n"
-            )
+        position_info = format_position_info(state.get("current_position"))
+        portfolio_info = format_portfolio_info(state.get("portfolio_state"))
 
         from pathlib import Path
         from jinja2 import Template

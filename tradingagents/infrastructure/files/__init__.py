@@ -1,1 +1,0 @@
-"""File persistence infrastructure namespace."""

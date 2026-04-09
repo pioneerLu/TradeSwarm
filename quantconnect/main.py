@@ -1,4 +1,4 @@
-﻿# QUANTCONNECT.COM - TradeSwarm signal execution algorithm
+# QUANTCONNECT.COM - TradeSwarm signal execution algorithm
 # Supports both local file loading and Object Store loading.
 
 from AlgorithmImports import *
@@ -193,9 +193,12 @@ class TradeSwarmSignalAlgorithm(QCAlgorithm):
         self._last_processed_date = today
         signal = self.signals.get(today) if isinstance(self.signals, dict) else None
 
-        if not signal:
-            return
+        if signal:
+            self._execute_signal(today, signal)
 
+        self._write_daily_snapshot(today)
+
+    def _execute_signal(self, today, signal):
         action = (signal.get("action") or "HOLD").upper()
         if action == "HOLD":
             return
@@ -235,3 +238,65 @@ class TradeSwarmSignalAlgorithm(QCAlgorithm):
             else:
                 self.liquidate(self.symbol)
                 self.debug(f"[{today}] SELL MKT")
+
+    def _write_daily_snapshot(self, today):
+        """Write portfolio snapshot to Object Store for interleaved backtest consumption."""
+        holding = self.portfolio[self.symbol]
+        snapshot = {
+            "date": today,
+            "symbol": self.symbol_str,
+            "equity": self.portfolio.total_portfolio_value,
+            "cash": self.portfolio.cash,
+            "holdings": {
+                self.symbol_str: {
+                    "shares": float(holding.quantity),
+                    "avg_price": float(holding.average_price),
+                    "market_value": float(holding.holdings_value),
+                    "market_price": float(holding.price),
+                    "unrealized_pnl": float(holding.unrealized_profit),
+                    "unrealized_pnl_pct": float(holding.unrealized_profit_percent * 100) if holding.quantity != 0 else 0.0,
+                }
+            },
+            "pending_orders": self._collect_pending_orders(),
+            "filled_today": self._collect_filled_today(today),
+        }
+
+        store = getattr(self, "object_store", None) or getattr(self, "ObjectStore", None)
+        if store is not None:
+            save_fn = getattr(store, "save", None) or getattr(store, "Save", None)
+            if save_fn is not None:
+                try:
+                    save_fn(f"snapshots/{today}.json", json.dumps(snapshot))
+                except Exception as e:
+                    self.debug(f"Failed to write snapshot to Object Store: {e}")
+
+    def _collect_pending_orders(self):
+        pending = []
+        try:
+            for ticket in self.transactions.get_open_orders():
+                pending.append({
+                    "order_id": ticket.order_id,
+                    "type": str(ticket.order_type),
+                    "direction": str(ticket.direction),
+                    "quantity": float(ticket.quantity),
+                    "limit_price": float(ticket.get(OrderField.LIMIT_PRICE)) if ticket.order_type == OrderType.LIMIT else None,
+                    "stop_price": float(ticket.get(OrderField.STOP_PRICE)) if ticket.order_type == OrderType.STOP_MARKET else None,
+                })
+        except Exception:
+            pass
+        return pending
+
+    def _collect_filled_today(self, today):
+        filled = []
+        try:
+            for order in self.transactions.get_orders(lambda o: o.last_fill_time is not None and o.last_fill_time.date().isoformat() == today and o.status == OrderStatus.FILLED):
+                filled.append({
+                    "order_id": order.id,
+                    "direction": "BUY" if order.direction == OrderDirection.BUY else "SELL",
+                    "quantity": float(abs(order.quantity)),
+                    "fill_price": float(order.price),
+                    "type": str(order.type),
+                })
+        except Exception:
+            pass
+        return filled

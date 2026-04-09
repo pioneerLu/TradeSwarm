@@ -86,7 +86,6 @@ def create_fundamentals_analyst(llm: BaseChatModel) -> Callable[[FundamentalsAna
         
         # 准备输入消息
         if not state["messages"]:
-            # 如果没有消息，使用初始消息
             last_message = {"role": "user", "content": f"分析股票 {ticker} 的基本面和估值情况"}
         else:
             last_message = state["messages"][-1]
