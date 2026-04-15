@@ -8,7 +8,8 @@
 - ``get_config()``  — 返回校验后的配置字典
 - ``get_llm()``     — 返回 ChatOpenAI 实例（Silicon Flow，含多 key 故障转移）
 - ``get_graph_debate_rounds()`` — 返回 (research_rounds, risk_rounds)
-- ``create_chroma_memory_if_available()`` — 创建 ChromaDB Memory（可选）
+- ``create_chroma_memory_if_available()`` — 创建 ChromaDB Memory（可选，支持持久化目录）
+- ``get_memory_mode()`` — hybrid / sql_only / chroma_only
 """
 
 from __future__ import annotations
@@ -285,27 +286,76 @@ def get_graph_debate_rounds(
     return max(1, min(mr, 20)), max(1, min(mrr, 20))
 
 
-def create_chroma_memory_if_available(
-    collection_name: str = "tradeswarm_reflections",
-):
-    """Create a ``FinancialSituationMemory`` backed by ChromaDB if Silicon is configured.
+def get_memory_mode(config_path: Optional[str | Path] = None) -> str:
+    """``hybrid`` | ``sql_only`` | ``chroma_only`` — 控制 pre-open 经验召回策略。"""
+    path = Path(config_path).resolve() if config_path else _DEFAULT_CONFIG_PATH
+    if not path.is_file():
+        return "hybrid"
+    with open(path, "r", encoding="utf-8") as f:
+        cfg = yaml.safe_load(f) or {}
+    mode = str((cfg.get("memory") or {}).get("mode", "hybrid")).strip().lower()
+    if mode in ("hybrid", "sql_only", "chroma_only"):
+        return mode
+    return "hybrid"
 
+
+def create_chroma_memory_if_available(
+    collection_name: Optional[str] = None,
+    config_path: Optional[str | Path] = None,
+):
+    """Create a ``FinancialSituationMemory`` with optional on-disk persist dir from config.
+
+    Reads ``storage.chroma_persist_directory`` and ``storage.chroma_collection`` when present.
     Returns *None* on failure so callers can gracefully degrade.
     """
     try:
-        silicon_cfg: Dict[str, Any] = {}
-        if _DEFAULT_CONFIG_PATH.is_file():
-            with open(_DEFAULT_CONFIG_PATH, "r", encoding="utf-8") as f:
+        cfg_path = Path(config_path).resolve() if config_path else _DEFAULT_CONFIG_PATH
+        cfg: Dict[str, Any] = {}
+        if cfg_path.is_file():
+            with open(cfg_path, "r", encoding="utf-8") as f:
                 cfg = yaml.safe_load(f) or {}
-            silicon_cfg = (cfg.get("llm") or {}).get("silicon") or {}
-        silicon_pair = env_silicon_key_and_base(silicon_cfg.get("base_url"))
-        if not silicon_pair:
-            return None
-        api_key, backend_url = silicon_pair
+
+        storage = cfg.get("storage") or {}
+        persist_raw = storage.get("chroma_persist_directory")
+        persist_dir: Optional[str] = None
+        if persist_raw:
+            p = Path(str(persist_raw))
+            persist_dir = str(p.resolve() if p.is_absolute() else _PROJECT_ROOT / p)
+
+        coll = collection_name or storage.get("chroma_collection") or "tradeswarm_memory"
+
         from datasources.utils.memory.financial_situation_memory import FinancialSituationMemory
 
-        mem_config = {"api_key": api_key, "backend_url": backend_url}
-        return FinancialSituationMemory(name=collection_name, config=mem_config)
+        mem_config: Dict[str, Any] = {}
+        if persist_dir:
+            mem_config["persist_directory"] = persist_dir
+
+        # Embedding backend selection (default: silicon)
+        emb_backend = str(storage.get("embedding_backend") or "silicon").strip().lower()
+        mem_config["embedding_backend"] = emb_backend
+
+        if emb_backend == "silicon":
+            silicon_cfg = (cfg.get("llm") or {}).get("silicon") or {}
+            silicon_pair = env_silicon_key_and_base(silicon_cfg.get("base_url"))
+            if not silicon_pair:
+                return None
+            api_key, backend_url = silicon_pair
+            mem_config["api_key"] = api_key
+            mem_config["backend_url"] = backend_url
+            mem_config["embedding_model"] = storage.get("embedding_model") or "text-embedding-v4"
+        elif emb_backend == "bge_local":
+            # Prefer local path under repo root
+            mp_raw = storage.get("embedding_model_path") or storage.get("bge_model_path")
+            mn_raw = storage.get("embedding_model_name") or storage.get("bge_model_name")
+            if mp_raw:
+                p = Path(str(mp_raw))
+                mem_config["bge_model_path"] = str(p.resolve() if p.is_absolute() else _PROJECT_ROOT / p)
+            if mn_raw:
+                mem_config["bge_model_name"] = str(mn_raw)
+        else:
+            return None
+
+        return FinancialSituationMemory(name=coll, config=mem_config)
     except Exception:
         logger.debug("ChromaDB memory 初始化失败，降级为无长期记忆", exc_info=True)
         return None

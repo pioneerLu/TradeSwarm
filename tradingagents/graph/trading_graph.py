@@ -38,7 +38,7 @@ def create_trading_graph(
 
     Args:
         llm: LangChain BaseChatModel 实例
-        memory: Memory 实例（从数据库读取历史经验，如 DatabaseMemory）
+        memory: Memory 实例（如 HybridMemory：Chroma + cycle_reflections 兜底）
         data_manager: MemoryDBHelper 数据库连接
         max_research_debate_rounds: 研究侧辩论轮数；默认从 config/config.yaml 的 graph.max_research_debate_rounds 读取
         max_risk_debate_rounds: 风险侧辩论轮数；默认从 graph.max_risk_debate_rounds 读取

@@ -690,3 +690,46 @@ class MemoryDBHelper:
         except Exception as e:
             logger.error("[ERROR] 按 symbol 查询 cycle reflections 失败: %s", e)
             return []
+
+    def query_cycle_reflections_backfill(
+        self,
+        symbol: Optional[str] = None,
+        cycle_type: str = "weekly",
+        limit: int = 2000,
+    ) -> List[Dict[str, Any]]:
+        """按周期类型列出反思记录，供 Chroma 批量回填（可选过滤 symbol）。"""
+        cols = (
+            "id, cycle_type, cycle_start_date, cycle_end_date, symbol, "
+            "reflection_content, key_insights, error_patterns, success_patterns, "
+            "strategy_conditions, environment_biases, created_at, updated_at"
+        )
+        keys = [
+            "id", "cycle_type", "cycle_start_date", "cycle_end_date", "symbol",
+            "reflection_content", "key_insights", "error_patterns", "success_patterns",
+            "strategy_conditions", "environment_biases", "created_at", "updated_at",
+        ]
+        try:
+            conn = self._get_connection()
+            cur = conn.cursor()
+            if symbol:
+                cur.execute(
+                    f"""SELECT {cols}
+                       FROM cycle_reflections
+                       WHERE cycle_type=? AND symbol=?
+                       ORDER BY cycle_end_date DESC, created_at DESC LIMIT ?""",
+                    (cycle_type, symbol, limit),
+                )
+            else:
+                cur.execute(
+                    f"""SELECT {cols}
+                       FROM cycle_reflections
+                       WHERE cycle_type=?
+                       ORDER BY cycle_end_date DESC, created_at DESC LIMIT ?""",
+                    (cycle_type, limit),
+                )
+            rows = cur.fetchall()
+            cur.close()
+            return [dict(zip(keys, r)) for r in rows]
+        except Exception as e:
+            logger.error("[ERROR] query_cycle_reflections_backfill 失败: %s", e)
+            return []

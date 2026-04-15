@@ -42,8 +42,8 @@ def load_prompt_template(
         
     Examples:
         >>> context = {
-        ...     "market_research_report": "...",
-        ...     "history": "...",
+        ...     "enabled_analysts_text": "market, news",
+        ...     "active_analyst_blocks": "[market]\\n...",
         ... }
         >>> prompt = load_prompt_template(
         ...     "researchers",

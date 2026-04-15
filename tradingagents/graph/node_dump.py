@@ -30,6 +30,7 @@ def stream_graph_updates_with_dump(
     dump_dir: Optional[Path] = None,
     verbose: bool = False,
     log_prefix: str = "Pre-Open",
+    stream_config: Optional[Dict[str, Any]] = None,
 ) -> Optional[Dict[str, Any]]:
     """
     单次执行编译后的 LangGraph：可选落盘每一步（含子图内部节点）。
@@ -39,11 +40,13 @@ def stream_graph_updates_with_dump(
     - ``final_state`` 仅取根图（``namespace == ()``）的 ``values`` 事件。
     """
     final_state: Optional[Dict[str, Any]] = None
+    _cfg = dict(stream_config) if stream_config else None
     if dump_dir is not None:
         dump_dir.mkdir(parents=True, exist_ok=True)
         dump_seq = 0
         for chunk in graph.stream(
             initial_state,
+            config=_cfg,
             stream_mode=["updates", "values"],
             subgraphs=True,
         ):
@@ -65,6 +68,7 @@ def stream_graph_updates_with_dump(
     if verbose:
         for chunk in graph.stream(
             initial_state,
+            config=_cfg,
             stream_mode=["updates", "values"],
             subgraphs=False,
         ):
@@ -77,7 +81,7 @@ def stream_graph_updates_with_dump(
                     final_state = data
         return final_state
 
-    for state in graph.stream(initial_state, stream_mode="values"):
+    for state in graph.stream(initial_state, config=_cfg, stream_mode="values"):
         final_state = state
     return final_state
 

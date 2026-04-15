@@ -17,6 +17,7 @@ Workflow:
 from __future__ import annotations
 
 import json
+import os
 import sys
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -27,6 +28,7 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT))
 
 from tradingagents.agents.utils.agentstate.agent_states import AgentState  # noqa: E402
+from tradingagents.agents.utils.hybrid_memory import create_hybrid_trading_memory  # noqa: E402
 from tradingagents.core.data_adapter import DataAdapter  # noqa: E402
 
 DEFAULT_ENABLED_ANALYSTS = ("market", "news", "sentiment", "fundamentals")
@@ -38,6 +40,7 @@ def _get_runtime_dependencies() -> Dict[str, Any]:
     from tradingagents.agents.utils.memory_db_helper import MemoryDBHelper
     from tradingagents.core.data_adapter import DataAdapter
     from tradingagents.dataflows.export.signal_resolver import resolve_signal
+    from tradingagents.dataflows.export.daily_summary import build_daily_trading_summary
     from tradingagents.agents.utils.json_parser import extract_json_from_text
     from tradingagents.core.portfolio_simulator import PortfolioSimulator
     from tradingagents.graph.node_dump import (
@@ -52,6 +55,7 @@ def _get_runtime_dependencies() -> Dict[str, Any]:
         "MemoryDBHelper": MemoryDBHelper,
         "DataAdapter": DataAdapter,
         "resolve_signal": resolve_signal,
+        "build_daily_trading_summary": build_daily_trading_summary,
         "extract_json_from_text": extract_json_from_text,
         "PortfolioSimulator": PortfolioSimulator,
         "save_full_state_snapshot": save_full_state_snapshot,
@@ -75,12 +79,13 @@ def _get_analyst_factories() -> Dict[str, Any]:
 
 
 def _normalize_enabled_analysts(enabled_analysts: Optional[List[str]]) -> List[str]:
-    analyst_factories = _get_analyst_factories()
+    """Normalize names without importing analyst modules (avoids heavy deps when DB-only)."""
+    allowed = set(DEFAULT_ENABLED_ANALYSTS)
     requested = enabled_analysts or list(DEFAULT_ENABLED_ANALYSTS)
     normalized: List[str] = []
     for analyst_name in requested:
         name = str(analyst_name).strip().lower()
-        if name and name in analyst_factories and name not in normalized:
+        if name and name in allowed and name not in normalized:
             normalized.append(name)
     return normalized or list(DEFAULT_ENABLED_ANALYSTS)
 
@@ -167,54 +172,6 @@ def _write_report_artifacts(
 
     with open(base_dir / "report.txt", "w", encoding="utf-8") as f:
         f.write(text + "\n")
-
-
-class DatabaseMemory:
-    """
-    从 memory.db 的 cycle_reflections 注入“周期反思”记忆，供图中 memory 相关节点使用。
-    - 仅查询 weekly 周期；若无匹配 symbol 的记录，get_memories 返回 []。
-    - 与 analyst_reports / analyst_summaries 解耦，后者由 Summary 节点自行读取。
-    """
-
-    def __init__(self, db_path: str, symbol: str, limit: int = 5):
-        MemoryDBHelper = _get_runtime_dependencies()["MemoryDBHelper"]
-        self.db_helper = MemoryDBHelper(db_path)
-        self.symbol = symbol
-        self.limit = limit
-
-    def get_memories(self, current_situation: str, n_matches: int = 3) -> List[Dict[str, Any]]:
-        try:
-            reflections = self.db_helper.query_cycle_reflections_by_symbol(
-                symbol=self.symbol,
-                cycle_type="weekly",
-                limit=max(self.limit, n_matches),
-            )
-            if not reflections:
-                return []
-            memories = []
-            for r in reflections[:n_matches]:
-                parts = []
-                if r.get("key_insights"):
-                    parts.append(f"Key insights: {r['key_insights']}")
-                if r.get("error_patterns"):
-                    parts.append(f"Error patterns: {r['error_patterns']}")
-                if r.get("success_patterns"):
-                    parts.append(f"Success patterns: {r['success_patterns']}")
-                if r.get("strategy_conditions"):
-                    parts.append(f"Strategy conditions: {r['strategy_conditions']}")
-                recommendation = "\n".join(parts) if parts else "No structured reflection available."
-                memories.append({
-                    "matched_situation": f"Cycle {r.get('cycle_start_date', '')} ~ {r.get('cycle_end_date', '')}",
-                    "recommendation": recommendation,
-                    "similarity_score": 0.8,
-                })
-            return memories
-        except Exception as e:
-            print(f"[WARN] Failed to load reflection memory from cycle_reflections: {e}")
-            return []
-
-    def close(self) -> None:
-        self.db_helper.close()
 
 
 def get_trading_dates(start_date: str, end_date: str, data_adapter: DataAdapter) -> List[str]:
@@ -319,6 +276,7 @@ def run_single_day(
     graph_dump_dir: Optional[str] = None,
     report_output_root: Optional[str] = None,
     llm: Any = None,
+    stream_config: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, Any]:
     """
     Execute the agent graph for a single trading day and return the resolved signal.
@@ -335,7 +293,6 @@ def run_single_day(
     stream_graph_updates_with_dump = runtime["stream_graph_updates_with_dump"]
     save_full_state_snapshot = runtime["save_full_state_snapshot"]
     save_node_output = runtime["save_node_output"]
-    analyst_factories = _get_analyst_factories()
 
     # Analyst reports
     if use_db_reports_only:
@@ -348,6 +305,7 @@ def run_single_day(
             print(f"  [WARN] Missing reports: {missing}; skipping")
             return {"action": "HOLD", "reason": f"Missing reports: {missing}", "date": trade_date, "symbol": symbol}
     elif llm is not None:
+        analyst_factories = _get_analyst_factories()
         for analyst_type in enabled_analysts:
             analyst_factory, report_key = analyst_factories[analyst_type]
             try:
@@ -397,6 +355,7 @@ def run_single_day(
             dump_dir=day_dump,
             verbose=verbose,
             log_prefix="Pre-Open",
+            stream_config=stream_config,
         )
 
         if day_dump is not None and final_state:
@@ -456,6 +415,7 @@ def run_signal_export(
     report_output_root: Optional[str] = None,
     max_research_debate_rounds: Optional[int] = None,
     max_risk_debate_rounds: Optional[int] = None,
+    prompt_log_path: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Export ratings or executable backtest signals from prepared analyst data."""
 
@@ -502,17 +462,33 @@ def run_signal_export(
     PortfolioSimulator = runtime["PortfolioSimulator"]
     create_trading_graph = runtime["create_trading_graph"]
     resolve_signal = runtime["resolve_signal"]
+    build_daily_trading_summary = runtime["build_daily_trading_summary"]
     save_full_state_snapshot = runtime["save_full_state_snapshot"]
     save_node_output = runtime["save_node_output"]
     stream_graph_updates_with_dump = runtime["stream_graph_updates_with_dump"]
-    analyst_factories = _get_analyst_factories()
 
     _cfg = str(REPO_ROOT / "config" / "config.yaml")
     llm = load_llm_from_config(_cfg)
+    stream_cfg: Optional[Dict[str, Any]] = None
+    analyst_context_trace_path: Optional[str] = None
+    if prompt_log_path:
+        from tradingagents.graph.prompt_capture import PromptScratchpadHandler
+
+        _handler = PromptScratchpadHandler(prompt_log_path)
+        stream_cfg = {"callbacks": [_handler]}
+        llm = llm.with_config(stream_cfg)
+        analyst_context_trace_path = str(Path(prompt_log_path).parent / "analyst_context_trace.jsonl")
+        Path(analyst_context_trace_path).parent.mkdir(parents=True, exist_ok=True)
+        Path(analyst_context_trace_path).write_text("", encoding="utf-8")
+        os.environ["TRADESWARM_ANALYST_CONTEXT_LOG"] = analyst_context_trace_path
     data_adapter = DataAdapter(use_cache=True)
     trading_dates_resolver = lambda end, n: data_adapter.get_last_n_trading_days(end, n)
     db_helper = MemoryDBHelper(db_path, trading_dates_resolver=trading_dates_resolver)
-    memory = DatabaseMemory(db_path=db_path, symbol=symbol)
+    memory = create_hybrid_trading_memory(
+        db_path,
+        symbol,
+        config_path=REPO_ROOT / "config" / "config.yaml",
+    )
 
     if trading_dates_override:
         trading_dates = sorted(set(trading_dates_override))
@@ -520,6 +496,8 @@ def run_signal_export(
         trading_dates = get_trading_dates(start_date, end_date, data_adapter)
     if not trading_dates:
         print("[ERROR] No trading dates found")
+        if analyst_context_trace_path is not None:
+            os.environ.pop("TRADESWARM_ANALYST_CONTEXT_LOG", None)
         memory.close()
         db_helper.close()
         return {}
@@ -531,6 +509,7 @@ def run_signal_export(
     sim: Optional[PortfolioSimulator] = None
     if export_mode == "backtest" and simulate_portfolio:
         sim = PortfolioSimulator(symbol=symbol, initial_cash=float(initial_cash))
+    last_equity: Optional[float] = None
 
     for i, trade_date in enumerate(trading_dates, 1):
         print(f"\n[{i}/{len(trading_dates)}] {trade_date}")
@@ -560,6 +539,7 @@ def run_signal_export(
                     all_signals[trade_date] = {"action": "HOLD", "reason": f"Missing reports: {missing}"}
                 continue
         else:
+            analyst_factories = _get_analyst_factories()
             for analyst_type in analyst_types:
                 analyst_factory, report_key = analyst_factories[analyst_type]
                 try:
@@ -623,6 +603,7 @@ def run_signal_export(
                 dump_dir=day_dump,
                 verbose=verbose,
                 log_prefix="Pre-Open",
+                stream_config=stream_cfg,
             )
 
             if day_dump is not None and final_state:
@@ -690,6 +671,30 @@ def run_signal_export(
                     )
                     if signal.get("action") == "BUY":
                         sim.set_entry_date_after_buy(str(ed))
+
+                    # Persist daily summary (post-fill simulated portfolio snapshot)
+                    _cp2, ps_after = sim.to_agent_fields(trade_date, ep or mark_price)
+                    try:
+                        row = build_daily_trading_summary(
+                            trade_date=trade_date,
+                            symbol=symbol,
+                            signal=signal,
+                            final_state=final_state,
+                            portfolio_state=ps_after,
+                            prev_equity=last_equity,
+                        )
+                        ok = db_helper.upsert_daily_trading_summary(**row)
+                        if not ok:
+                            print("  [WARN] daily_trading_summary upsert failed")
+                    except Exception as _e:
+                        print(f"  [WARN] daily_trading_summary build/upsert error: {_e}")
+
+                    if ps_after and isinstance(ps_after, dict):
+                        try:
+                            _eq = ps_after.get("total_value")
+                            last_equity = float(_eq) if _eq is not None else last_equity
+                        except Exception:
+                            pass
             else:
                 if signal.get("action") == "BUY":
                     is_holding = True
@@ -753,6 +758,10 @@ def run_signal_export(
         json.dump(merged, f, ensure_ascii=False, indent=2, default=str)
 
     print(f"\n[OK] Wrote output to {out_file.absolute()}")
+
+    if analyst_context_trace_path is not None:
+        os.environ.pop("TRADESWARM_ANALYST_CONTEXT_LOG", None)
+        print(f"[INFO] Analyst context trace: {Path(analyst_context_trace_path).resolve()}")
 
     memory.close()
     db_helper.close()
@@ -819,6 +828,14 @@ def main() -> None:
         metavar="DIR",
         help="Write per-day graph outputs and full_state_snapshot.json under DIR/{experiment_id}/{symbol}/{trade_date}/",
     )
+    parser.add_argument(
+        "--prompt-log",
+        type=str,
+        default=None,
+        metavar="FILE",
+        help="Append LLM prompts/responses to this file; also writes analyst_context_trace.jsonl "
+        "next to it (each get_prompt_context_from_summaries call: full enabled_analysts_text + active_analyst_blocks).",
+    )
     args = parser.parse_args()
 
     dates_override = None
@@ -846,6 +863,7 @@ def main() -> None:
         report_output_root=args.report_output_root,
         max_research_debate_rounds=args.max_research_debate_rounds,
         max_risk_debate_rounds=args.max_risk_debate_rounds,
+        prompt_log_path=args.prompt_log,
     )
 
 

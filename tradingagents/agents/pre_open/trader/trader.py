@@ -47,7 +47,7 @@ def create_trader(llm: BaseChatModel, memory: Any) -> Callable[[AgentState], Dic
         from pathlib import Path
         from jinja2 import Template
 
-        user_prompt_path = Path(__file__).parent / "prompt.j2"
+        user_prompt_path = Path(__file__).parent / "user_prompt.j2"
         if user_prompt_path.exists():
             with open(user_prompt_path, "r", encoding="utf-8") as f:
                 user_template = Template(f.read())

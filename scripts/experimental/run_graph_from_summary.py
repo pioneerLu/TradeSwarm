@@ -24,93 +24,8 @@ from tradingagents.graph.node_dump import (
 )
 from tradingagents.graph.utils import load_llm_from_config
 from tradingagents.agents.utils.memory_db_helper import MemoryDBHelper
+from tradingagents.agents.utils.hybrid_memory import create_hybrid_trading_memory
 from tradingagents.agents.utils.agentstate.agent_states import AgentState
-from typing import Any, Dict, List
-
-
-class DatabaseMemory:
-    """
-    从数据库读取历史经验的 Memory 类
-    
-    从 SQLite 数据库中查询历史分析师报告，提取关键信息作为记忆。
-    """
-    
-    def __init__(self, db_path: str, symbol: str, limit: int = 10):
-        """
-        初始化 DatabaseMemory
-        
-        Args:
-            db_path: 数据库文件路径
-            symbol: 股票代码
-            limit: 查询的历史报告数量限制
-        """
-        self.db_helper = MemoryDBHelper(db_path)
-        self.symbol = symbol
-        self.limit = limit
-    
-    def get_memories(self, current_situation: str, n_matches: int = 2) -> List[Dict[str, Any]]:
-        """
-        从数据库查询历史报告，提取相似情况和建议
-        
-        Args:
-            current_situation: 当前情境描述
-            n_matches: 返回的匹配数量
-            
-        Returns:
-            包含历史记忆的列表，格式: [{"matched_situation": ..., "recommendation": ..., "similarity_score": ...}]
-        """
-        try:
-            # 直接查询数据库获取历史报告内容
-            # 查询所有类型的历史报告，按日期倒序排列
-            conn = self.db_helper._get_connection()
-            cursor = conn.cursor()
-            
-            sql = """
-            SELECT analyst_type, trade_date, report_content
-            FROM analyst_reports
-            WHERE symbol = ?
-                AND report_content IS NOT NULL
-                AND report_content != ''
-            ORDER BY trade_date DESC, created_at DESC
-            LIMIT ?
-            """
-            
-            cursor.execute(sql, (self.symbol, self.limit))
-            results = cursor.fetchall()
-            cursor.close()
-            
-            if not results:
-                return []
-            
-            # 从历史报告中提取关键信息
-            memories = []
-            for row in results[:n_matches]:
-                analyst_type = row[0]
-                trade_date = row[1]
-                report_content = row[2]
-                
-                # 简单提取：使用报告的前200个字符作为情况描述
-                situation = report_content[:200] + "..." if len(report_content) > 200 else report_content
-                
-                # 尝试从报告中提取建议（如果有的话）
-                # 这里简化处理，实际可以解析报告内容提取建议
-                recommendation = "基于历史数据分析，建议谨慎操作，关注市场变化。"
-                
-                memories.append({
-                    "matched_situation": situation,
-                    "recommendation": recommendation,
-                    "similarity_score": 0.7,  # 简化处理，实际可以使用相似度计算
-                })
-            
-            return memories
-            
-        except Exception as e:
-            print(f"[WARN] 从数据库读取记忆失败: {e}")
-            return []
-    
-    def close(self) -> None:
-        """关闭数据库连接"""
-        self.db_helper.close()
 
 
 def run_full_graph(
@@ -235,8 +150,11 @@ def main():
         llm = load_llm_from_config()
         print("[OK] LLM 加载成功")
         
-        # 创建 Memory（从数据库读取）
-        memory = DatabaseMemory(db_path=db_path, symbol=symbol)
+        memory = create_hybrid_trading_memory(
+            db_path,
+            symbol,
+            config_path=REPO_ROOT / "config" / "config.yaml",
+        )
         
         # 运行完整 Graph
         final_state = run_full_graph(

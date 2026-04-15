@@ -140,7 +140,21 @@ def create_reflector_node(
                             summary_text=summary_text,
                         )
                         recommendation = _build_recommendation_from_reflection_json(reflection_json)
-                        chroma_memory.add_situations([(situation, recommendation)])
+                        stable_id = f"ref_{symbol}_{cycle_start_date}_{cycle_end_date}"
+                        chroma_memory.add_situations(
+                            [
+                                (
+                                    situation,
+                                    recommendation,
+                                    {
+                                        "symbol": symbol,
+                                        "cycle_start_date": str(cycle_start_date),
+                                        "cycle_end_date": str(cycle_end_date),
+                                        "id": stable_id,
+                                    },
+                                )
+                            ]
+                        )
                         print("[Reflector] 已同步写入 ChromaDB")
                     except Exception as chroma_err:
                         print(f"[Reflector] ChromaDB 写入失败（已忽略）: {chroma_err}")

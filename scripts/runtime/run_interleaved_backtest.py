@@ -15,11 +15,13 @@ For each trading day:
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 import shutil
 import subprocess
 import sys
 import time
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -27,7 +29,6 @@ REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT))
 
 from scripts.runtime.run_signal_export import (  # noqa: E402
-    DatabaseMemory,
     _get_runtime_dependencies,
     _normalize_enabled_analysts,
     _derive_experiment_id,
@@ -35,6 +36,7 @@ from scripts.runtime.run_signal_export import (  # noqa: E402
     get_trading_dates,
     run_single_day,
 )
+from tradingagents.agents.utils.hybrid_memory import create_hybrid_trading_memory  # noqa: E402
 from tradingagents.core.lean_result_parser import (  # noqa: E402
     parse_daily_snapshot,
     parse_latest_snapshot,
@@ -94,6 +96,143 @@ def _clear_storage_snapshots(storage_dir: Path) -> None:
         shutil.rmtree(snapshots_dir)
 
 
+def _lean_custom_csv_path(lean_workspace: Path, symbol: str) -> Path:
+    return lean_workspace / "data" / "custom" / f"{symbol.lower()}_daily.csv"
+
+
+def _read_custom_trading_dates(csv_path: Path) -> List[str]:
+    """Read trading dates from Lean custom CSV (column: date)."""
+    if not csv_path.exists():
+        return []
+    dates: List[str] = []
+    try:
+        with open(csv_path, "r", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                d = (row.get("date") or "").strip()
+                if d:
+                    dates.append(d)
+    except Exception as exc:
+        print(f"[WARN] Failed reading custom CSV {csv_path}: {exc}")
+        return []
+    return sorted(set(dates))
+
+
+def _check_custom_data_coverage(trading_dates: List[str], csv_path: Path) -> Dict[str, Any]:
+    csv_dates = set(_read_custom_trading_dates(csv_path))
+    missing_dates = [d for d in trading_dates if d not in csv_dates]
+    total = len(trading_dates)
+    covered = total - len(missing_dates)
+    ratio = (covered / total) if total > 0 else 0.0
+    return {
+        "custom_csv_path": str(csv_path),
+        "required_days": total,
+        "covered_days": covered,
+        "missing_days": len(missing_dates),
+        "missing_dates": missing_dates,
+        "coverage_ratio": ratio,
+    }
+
+
+def _auto_download_lean_custom_csv(
+    symbol: str,
+    start_date: str,
+    end_date: str,
+    output_csv: Path,
+) -> bool:
+    """Download missing Lean custom CSV data via bundled downloader."""
+    downloader = REPO_ROOT / "scripts" / "runtime" / "download_yf_for_lean.py"
+    cmd = [
+        sys.executable,
+        str(downloader),
+        "--symbol",
+        symbol,
+        "--start",
+        start_date,
+        "--end",
+        end_date,
+        "--output",
+        str(output_csv),
+    ]
+    print(f"[DATA] Running downloader: {' '.join(cmd)}")
+    proc = subprocess.run(cmd, cwd=str(REPO_ROOT))
+    return proc.returncode == 0
+
+
+def _write_performance_chart(
+    symbol: str,
+    trading_dates: List[str],
+    daily_results: List[Dict[str, Any]],
+    initial_cash: float,
+    data_adapter: Any,
+    output_path: Path,
+) -> Optional[Path]:
+    """Write a chart comparing strategy return vs underlying price move."""
+    try:
+        import matplotlib.pyplot as plt  # Lazy import so runtime still works without plotting deps
+    except Exception as exc:
+        print(f"[WARN] Skip performance chart: matplotlib unavailable ({exc})")
+        return None
+
+    if not trading_dates:
+        return None
+
+    # Strategy cumulative return (%), aligned by trade_date with forward-filled equity.
+    equity_by_date = {str(item.get("trade_date")): item.get("equity") for item in daily_results}
+    aligned_equity: List[float] = []
+    last_equity = float(initial_cash)
+    for d in trading_dates:
+        e = equity_by_date.get(d)
+        if e is not None:
+            try:
+                last_equity = float(e)
+            except Exception:
+                pass
+        aligned_equity.append(last_equity)
+    strategy_ret_pct = [((e / float(initial_cash)) - 1.0) * 100.0 for e in aligned_equity]
+
+    # Underlying close-price move (%), aligned by trade_date with forward fill.
+    aligned_close: List[float] = []
+    last_close: Optional[float] = None
+    for d in trading_dates:
+        close_raw = data_adapter.get_price(symbol, d, "close")
+        try:
+            close = float(close_raw) if close_raw is not None else None
+        except Exception:
+            close = None
+        if close is not None and close > 0:
+            last_close = close
+        aligned_close.append(last_close if last_close is not None else 0.0)
+
+    first_close = next((c for c in aligned_close if c > 0), None)
+    if first_close is None:
+        price_ret_pct = [0.0 for _ in aligned_close]
+    else:
+        price_ret_pct = [((c / first_close) - 1.0) * 100.0 if c > 0 else 0.0 for c in aligned_close]
+
+    x_dates = []
+    for d in trading_dates:
+        try:
+            x_dates.append(datetime.strptime(d, "%Y-%m-%d").date())
+        except Exception:
+            x_dates.append(d)
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    plt.figure(figsize=(11, 4.5))
+    plt.plot(x_dates, strategy_ret_pct, label="Strategy Return %", linewidth=2.0)
+    plt.plot(x_dates, price_ret_pct, label=f"{symbol} Price Change %", linewidth=1.8, alpha=0.9)
+    plt.axhline(0, color="gray", linewidth=1.0, alpha=0.5)
+    plt.xlabel("Date")
+    plt.ylabel("Change (%)")
+    plt.title(f"Interleaved Backtest: Strategy vs {symbol} Price")
+    plt.legend()
+    plt.grid(alpha=0.25)
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=150)
+    plt.close()
+    return output_path
+
+
 def run_interleaved_backtest(
     symbol: str,
     start_date: str,
@@ -135,14 +274,57 @@ def run_interleaved_backtest(
     data_adapter = DataAdapter(use_cache=True)
     trading_dates_resolver = lambda end, n: data_adapter.get_last_n_trading_days(end, n)
     db_helper = MemoryDBHelper(db_path, trading_dates_resolver=trading_dates_resolver)
-    memory = DatabaseMemory(db_path=db_path, symbol=symbol)
+    memory = create_hybrid_trading_memory(
+        db_path,
+        symbol,
+        config_path=REPO_ROOT / "config" / "config.yaml",
+    )
 
     trading_dates = get_trading_dates(start_date, end_date, data_adapter)
     if not trading_dates:
         print("[ERROR] No trading dates found")
+        memory.close()
+        db_helper.close()
         return {}
 
     print(f"Trading dates: {len(trading_dates)} ({trading_dates[0]} ~ {trading_dates[-1]})")
+
+    custom_csv = _lean_custom_csv_path(lean_workspace, symbol)
+    data_coverage = _check_custom_data_coverage(trading_dates, custom_csv)
+    auto_download_performed = False
+    if data_coverage["missing_days"] > 0:
+        print(
+            "[DATA] Lean custom CSV coverage incomplete: "
+            f"{data_coverage['covered_days']}/{data_coverage['required_days']} "
+            f"({data_coverage['coverage_ratio']:.1%})"
+        )
+        print(f"[DATA] Missing dates (first 10): {data_coverage['missing_dates'][:10]}")
+        auto_download_performed = True
+        ok = _auto_download_lean_custom_csv(
+            symbol=symbol,
+            start_date=start_date,
+            end_date=end_date,
+            output_csv=custom_csv,
+        )
+        if not ok:
+            print("[ERROR] Auto-download failed; aborting interleaved backtest")
+            memory.close()
+            db_helper.close()
+            return {}
+        data_coverage = _check_custom_data_coverage(trading_dates, custom_csv)
+        if data_coverage["missing_days"] > 0:
+            print(
+                "[ERROR] Lean custom CSV still incomplete after auto-download: "
+                f"{data_coverage['covered_days']}/{data_coverage['required_days']} "
+                f"({data_coverage['coverage_ratio']:.1%})"
+            )
+            print(f"[ERROR] Missing dates: {data_coverage['missing_dates']}")
+            memory.close()
+            db_helper.close()
+            return {}
+        print("[DATA] Lean custom CSV coverage verified after auto-download")
+    else:
+        print("[DATA] Lean custom CSV coverage verified")
 
     storage_dir = _find_storage_dir(lean_workspace, project_name)
     _clear_storage_snapshots(storage_dir)
@@ -157,6 +339,7 @@ def run_interleaved_backtest(
     }
 
     results: List[Dict[str, Any]] = []
+    missing_snapshot_days: List[str] = []
 
     for i, trade_date in enumerate(trading_dates, 1):
         print(f"\n{'─'*60}")
@@ -255,6 +438,7 @@ def run_interleaved_backtest(
             )
         else:
             print(f"  [WARN] No QC snapshot found for {trade_date}, keeping previous state")
+            missing_snapshot_days.append(trade_date)
 
         results.append({
             "trade_date": trade_date,
@@ -284,6 +468,19 @@ def run_interleaved_backtest(
         "trading_days": len(trading_dates),
         "signals_count": len(all_signals),
         "daily_results": results,
+        "data_coverage": {
+            **data_coverage,
+            "auto_download_performed": auto_download_performed,
+        },
+        "snapshot_coverage": {
+            "missing_snapshot_days": missing_snapshot_days,
+            "missing_snapshot_count": len(missing_snapshot_days),
+            "snapshot_coverage_ratio": (
+                (len(trading_dates) - len(missing_snapshot_days)) / len(trading_dates)
+                if trading_dates
+                else 0.0
+            ),
+        },
     }
 
     output_dir = REPO_ROOT / "storage" / "interleaved_backtests"
@@ -293,6 +490,24 @@ def run_interleaved_backtest(
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(summary, f, ensure_ascii=False, indent=2, default=str)
     print(f"\n[OK] Results saved to {out_path}")
+    if missing_snapshot_days:
+        ratio = summary["snapshot_coverage"]["snapshot_coverage_ratio"]
+        print(
+            "[WARN] Snapshot coverage is incomplete: "
+            f"{ratio:.1%} ({len(trading_dates) - len(missing_snapshot_days)}/{len(trading_dates)})"
+        )
+
+    chart_path = output_dir / f"interleaved_{symbol}_{ts}_return_vs_price.png"
+    chart_written = _write_performance_chart(
+        symbol=symbol,
+        trading_dates=trading_dates,
+        daily_results=results,
+        initial_cash=float(initial_cash),
+        data_adapter=data_adapter,
+        output_path=chart_path,
+    )
+    if chart_written:
+        print(f"[OK] Performance chart saved to {chart_written}")
 
     memory.close()
     db_helper.close()

@@ -6,6 +6,7 @@ import argparse
 import os
 import re
 import sqlite3
+import json
 from pathlib import Path
 from flask import Flask, render_template_string, jsonify, request
 
@@ -67,6 +68,12 @@ def api_overview():
         if t == "analyst_summaries" and cnt > 0:
             cur.execute("SELECT symbol, COUNT(*) as n FROM analyst_summaries GROUP BY symbol")
             info["by_symbol"] = [{"symbol": r["symbol"], "count": r["n"]} for r in cur.fetchall()]
+        if t == "daily_trading_summaries" and cnt > 0:
+            cur.execute("SELECT symbol, COUNT(*) as n FROM daily_trading_summaries GROUP BY symbol")
+            info["by_symbol"] = [{"symbol": r["symbol"], "count": r["n"]} for r in cur.fetchall()]
+        if t == "cycle_reflections" and cnt > 0:
+            cur.execute("SELECT COALESCE(symbol,'(null)') as symbol, COUNT(*) as n FROM cycle_reflections GROUP BY symbol")
+            info["by_symbol"] = [{"symbol": r["symbol"], "count": r["n"]} for r in cur.fetchall()]
         result.append(info)
     conn.close()
     return jsonify({"tables": result, "db": str(DB_PATH)})
@@ -99,6 +106,127 @@ def api_summary_dates():
     dates = [r["trade_date"] for r in cur.fetchall()]
     conn.close()
     return jsonify({"symbol": symbol, "dates": dates})
+
+
+@app.route("/api/trading_summary_dates")
+def api_trading_summary_dates():
+    """daily_trading_summaries 可选日期列表"""
+    symbol = request.args.get("symbol", "NVDA")
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute(
+        "SELECT DISTINCT date FROM daily_trading_summaries WHERE symbol=? ORDER BY date DESC",
+        (symbol,),
+    )
+    dates = [r["date"] for r in cur.fetchall()]
+    conn.close()
+    return jsonify({"symbol": symbol, "dates": dates})
+
+
+@app.route("/api/trading_summary")
+def api_trading_summary():
+    """单条 daily_trading_summaries（同时返回解析后的 summary_json）"""
+    symbol = request.args.get("symbol", "NVDA")
+    date = request.args.get("date")
+    if not date:
+        return jsonify({"error": "缺少 date"}), 400
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute(
+        """SELECT id, date, symbol, market_regime, selected_strategy, expected_behavior,
+                  actual_return, actual_max_drawdown, positioning, anomaly, summary_json,
+                  created_at, updated_at
+           FROM daily_trading_summaries
+           WHERE symbol=? AND date=?
+           ORDER BY id DESC LIMIT 1""",
+        (symbol, date),
+    )
+    row = cur.fetchone()
+    conn.close()
+    if not row:
+        return jsonify({"error": "未找到 trading summary"}), 404
+
+    parsed = None
+    sj = row.get("summary_json") if isinstance(row, dict) else None
+    if isinstance(sj, str) and sj.strip():
+        try:
+            parsed = json.loads(sj)
+        except Exception:
+            parsed = None
+    return jsonify({**row, "summary_json_parsed": parsed})
+
+
+@app.route("/api/cycle_reflections")
+def api_cycle_reflections():
+    """cycle_reflections 列表（可按 symbol/cycle_type 过滤，返回最新若干条）"""
+    symbol = request.args.get("symbol", "")
+    cycle_type = request.args.get("cycle_type", "")
+    limit = min(int(request.args.get("limit", 50)), 200)
+    where = []
+    params = []
+    if symbol:
+        where.append("symbol=?")
+        params.append(symbol)
+    if cycle_type:
+        where.append("cycle_type=?")
+        params.append(cycle_type)
+    where_sql = (" WHERE " + " AND ".join(where)) if where else ""
+
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute(
+        f"""SELECT id, cycle_type, cycle_start_date, cycle_end_date, symbol,
+                   key_insights, created_at, updated_at, reflection_content
+            FROM cycle_reflections
+            {where_sql}
+            ORDER BY cycle_end_date DESC, id DESC
+            LIMIT ?""",
+        tuple(params + [limit]),
+    )
+    rows = cur.fetchall()
+    conn.close()
+    # 列表页里 reflection_content 只保留短预览
+    for r in rows:
+        rc = r.get("reflection_content")
+        if isinstance(rc, str) and len(rc) > 500:
+            r["reflection_content_preview"] = rc[:500] + "..."
+        else:
+            r["reflection_content_preview"] = rc or ""
+        r.pop("reflection_content", None)
+    return jsonify({"rows": rows, "limit": limit})
+
+
+@app.route("/api/cycle_reflection")
+def api_cycle_reflection():
+    """读取单条 cycle_reflections（返回解析后的 reflection_content）"""
+    rid = request.args.get("id")
+    if rid is None:
+        return jsonify({"error": "缺少 id"}), 400
+    try:
+        rid_int = int(rid)
+    except Exception:
+        return jsonify({"error": "id 须为整数"}), 400
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute(
+        """SELECT id, cycle_type, cycle_start_date, cycle_end_date, symbol,
+                  key_insights, error_patterns, success_patterns, strategy_conditions,
+                  environment_biases, created_at, updated_at, reflection_content
+           FROM cycle_reflections WHERE id=? LIMIT 1""",
+        (rid_int,),
+    )
+    row = cur.fetchone()
+    conn.close()
+    if not row:
+        return jsonify({"error": "未找到 cycle reflection"}), 404
+    parsed = None
+    rc = row.get("reflection_content")
+    if isinstance(rc, str) and rc.strip():
+        try:
+            parsed = json.loads(rc)
+        except Exception:
+            parsed = None
+    return jsonify({**row, "reflection_content_parsed": parsed})
 
 
 @app.route("/api/report")
@@ -364,6 +492,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     .btn-danger:hover { background: #8b1a1a; }
     .btn-mini { padding: 0.2rem 0.45rem; font-size: 0.75rem; }
     .meta { color: #8b949e; font-size: 0.8rem; margin-top: 0.5rem; }
+    .kv { display: grid; grid-template-columns: 180px 1fr; gap: 0.35rem 0.75rem; font-size: 0.85rem; }
+    .kv .k { color: #8b949e; }
+    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    @media (max-width: 1000px) { .split { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
@@ -376,6 +508,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       <span class="tab active" data-panel="overview">概览</span>
       <span class="tab" data-panel="reports">Analyst 报告</span>
       <span class="tab" data-panel="summaries">Summary（7日）</span>
+      <span class="tab" data-panel="trading">Trading Summary（日）</span>
+      <span class="tab" data-panel="reflections">Reflector（周期反思）</span>
       <span class="tab" data-panel="tables">数据表</span>
     </div>
 
@@ -428,6 +562,61 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       </div>
     </div>
 
+    <div id="panel-trading" class="panel">
+      <div class="card">
+        <h3>选择 Daily Trading Summary（daily_trading_summaries）</h3>
+        <div class="report-selector">
+          <select id="selTradingSymbol"><option value="NVDA">NVDA</option><option value="AAPL">AAPL</option></select>
+          <select id="selTradingDate"><option value="">选择日期</option></select>
+        </div>
+        <div class="btn-row">
+          <span class="meta" id="tradingMeta"></span>
+        </div>
+        <div class="split">
+          <div>
+            <div class="card" style="margin-bottom:0">
+              <h3 style="margin-bottom:0.75rem">字段概览</h3>
+              <div id="tradingKv" class="kv"></div>
+            </div>
+          </div>
+          <div>
+            <div class="card" style="margin-bottom:0">
+              <h3 style="margin-bottom:0.75rem">summary_json（解析后）</h3>
+              <div id="tradingJson" class="report-content">(选择日期后显示)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="panel-reflections" class="panel">
+      <div class="card">
+        <h3>周期反思（cycle_reflections）</h3>
+        <div class="report-selector">
+          <select id="selReflSymbol">
+            <option value="">(全部 symbol)</option>
+            <option value="NVDA">NVDA</option>
+            <option value="AAPL">AAPL</option>
+          </select>
+          <select id="selReflCycle">
+            <option value="">(全部 cycle_type)</option>
+            <option value="weekly">weekly</option>
+            <option value="monthly">monthly</option>
+          </select>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn" id="btnLoadReflections">刷新列表</button>
+          <span class="meta" id="reflMeta"></span>
+        </div>
+        <div id="reflList" class="report-content">点击“刷新列表”加载</div>
+        <div style="height:0.75rem"></div>
+        <div class="card" style="margin-bottom:0">
+          <h3 style="margin-bottom:0.75rem">详情（reflection_content）</h3>
+          <div id="reflDetail" class="report-content">(从列表点选一条)</div>
+        </div>
+      </div>
+    </div>
+
     <div id="panel-tables" class="panel">
       <div class="card">
         <h3>选择表</h3>
@@ -444,6 +633,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     let overview = null;
     let currentReportId = null;
     let currentSummaryId = null;
+    let currentTradingSummaryId = null;
 
     document.querySelectorAll('.tab').forEach(t => {
       t.onclick = () => {
@@ -453,6 +643,8 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         document.getElementById('panel-' + t.dataset.panel).classList.add('active');
         if (t.dataset.panel === 'reports') loadDates();
         if (t.dataset.panel === 'summaries') loadSummaryDates();
+        if (t.dataset.panel === 'trading') loadTradingSummaryDates();
+        if (t.dataset.panel === 'reflections') loadReflections();
         if (t.dataset.panel === 'tables') loadTableList();
       };
     });
@@ -545,6 +737,120 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         meta.textContent = parts.join('  ·  ');
       } catch (e) { el.textContent = '加载失败: ' + e.message; }
       document.getElementById('selSummaryType').onchange = loadSummary;
+    }
+
+    async function loadTradingSummaryDates() {
+      const symbol = document.getElementById('selTradingSymbol').value;
+      const r = await fetch(API + '/api/trading_summary_dates?symbol=' + encodeURIComponent(symbol));
+      const d = await r.json();
+      const sel = document.getElementById('selTradingDate');
+      sel.innerHTML = '<option value="">选择日期</option>' + d.dates.map(x => `<option value="${x}">${x}</option>`).join('');
+      sel.onchange = loadTradingSummary;
+    }
+
+    function fmt(v) {
+      if (v === null || v === undefined) return '';
+      if (typeof v === 'number') return String(v);
+      return String(v);
+    }
+
+    function renderKv(map) {
+      const entries = Object.entries(map || {});
+      if (entries.length === 0) return '(无)';
+      return entries.map(([k,v]) => `<div class="k">${k}</div><div class="v">${String(v).replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>`).join('');
+    }
+
+    async function loadTradingSummary() {
+      const symbol = document.getElementById('selTradingSymbol').value;
+      const date = document.getElementById('selTradingDate').value;
+      const kvEl = document.getElementById('tradingKv');
+      const jsonEl = document.getElementById('tradingJson');
+      const meta = document.getElementById('tradingMeta');
+      currentTradingSummaryId = null;
+      meta.textContent = '';
+      kvEl.innerHTML = '';
+      jsonEl.textContent = '(选择日期后显示)';
+      if (!date) { jsonEl.textContent = '请选择日期'; return; }
+      jsonEl.textContent = '加载中...';
+      try {
+        const r = await fetch(API + `/api/trading_summary?symbol=${encodeURIComponent(symbol)}&date=${encodeURIComponent(date)}`);
+        const j = await r.json();
+        if (!r.ok || j.error) { jsonEl.textContent = j.error || '加载失败'; return; }
+        currentTradingSummaryId = j.id != null ? j.id : null;
+        meta.textContent = j.id != null ? `id=${j.id}  ${j.created_at || ''}` : '';
+        kvEl.innerHTML = renderKv({
+          date: j.date,
+          symbol: j.symbol,
+          market_regime: j.market_regime,
+          selected_strategy: j.selected_strategy,
+          expected_behavior: j.expected_behavior,
+          actual_return: j.actual_return,
+          actual_max_drawdown: j.actual_max_drawdown,
+          positioning: j.positioning,
+          anomaly: j.anomaly,
+        });
+        const parsed = j.summary_json_parsed;
+        if (parsed) {
+          jsonEl.textContent = JSON.stringify(parsed, null, 2);
+        } else {
+          jsonEl.textContent = j.summary_json || '(空)';
+        }
+      } catch (e) {
+        jsonEl.textContent = '加载失败: ' + e.message;
+      }
+    }
+
+    async function loadReflections() {
+      const symbol = document.getElementById('selReflSymbol').value;
+      const cycle = document.getElementById('selReflCycle').value;
+      const listEl = document.getElementById('reflList');
+      const meta = document.getElementById('reflMeta');
+      listEl.textContent = '加载中...';
+      meta.textContent = '';
+      try {
+        const qs = new URLSearchParams();
+        if (symbol) qs.set('symbol', symbol);
+        if (cycle) qs.set('cycle_type', cycle);
+        qs.set('limit', '100');
+        const r = await fetch(API + '/api/cycle_reflections?' + qs.toString());
+        const j = await r.json();
+        const rows = j.rows || [];
+        meta.textContent = `共 ${rows.length} 条（显示最近 ${rows.length}）`;
+        if (rows.length === 0) { listEl.textContent = '无数据'; return; }
+        listEl.innerHTML = rows.map(row => {
+          const title = `${row.cycle_type} ${row.cycle_start_date}~${row.cycle_end_date} ${row.symbol || ''}`.trim();
+          const ki = row.key_insights ? String(row.key_insights).replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
+          return `<div style="padding:0.5rem 0;border-bottom:1px solid #30363d">
+            <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
+              <button class="btn btn-mini" data-refl-id="${row.id}">查看</button>
+              <div style="font-weight:600">${title}</div>
+            </div>
+            <div class="meta">${ki}</div>
+          </div>`;
+        }).join('');
+        listEl.querySelectorAll('[data-refl-id]').forEach(btn => {
+          btn.onclick = () => loadReflectionDetail(btn.getAttribute('data-refl-id'));
+        });
+      } catch (e) {
+        listEl.textContent = '加载失败: ' + e.message;
+      }
+    }
+
+    async function loadReflectionDetail(id) {
+      const el = document.getElementById('reflDetail');
+      el.textContent = '加载中...';
+      try {
+        const r = await fetch(API + '/api/cycle_reflection?id=' + encodeURIComponent(id));
+        const j = await r.json();
+        if (!r.ok || j.error) { el.textContent = j.error || '加载失败'; return; }
+        if (j.reflection_content_parsed) {
+          el.textContent = JSON.stringify(j.reflection_content_parsed, null, 2);
+        } else {
+          el.textContent = j.reflection_content || '(空)';
+        }
+      } catch (e) {
+        el.textContent = '加载失败: ' + e.message;
+      }
     }
 
     document.getElementById('btnDeleteSummary').onclick = async () => {
@@ -652,10 +958,15 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     document.getElementById('selType').onchange = loadReport;
     document.getElementById('selSummarySymbol').onchange = () => { loadSummaryDates(); loadSummary(); };
     document.getElementById('selSummaryType').onchange = loadSummary;
+    document.getElementById('selTradingSymbol').onchange = () => { loadTradingSummaryDates(); loadTradingSummary(); };
+    document.getElementById('btnLoadReflections').onclick = loadReflections;
+    document.getElementById('selReflSymbol').onchange = loadReflections;
+    document.getElementById('selReflCycle').onchange = loadReflections;
 
     loadOverview().then(() => {
       loadDates();
       loadSummaryDates();
+      loadTradingSummaryDates();
     });
   </script>
 </body>

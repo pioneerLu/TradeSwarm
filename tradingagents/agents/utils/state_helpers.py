@@ -2,6 +2,11 @@
 
 from __future__ import annotations
 
+import inspect
+import json
+import os
+from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 from tradingagents.agents.utils.agentstate.agent_states import AgentState, AnalystMemorySummary
@@ -42,13 +47,33 @@ def get_analyst_summaries_map(state: AgentState) -> Dict[str, AnalystMemorySumma
     return {analyst: get_analyst_summary(state, analyst) for analyst in get_enabled_analysts(state)}
 
 
-def get_prompt_context_from_summaries(state: AgentState) -> Dict[str, str]:
-    summaries = {
-        "market": get_analyst_summary(state, "market"),
-        "news": get_analyst_summary(state, "news"),
-        "sentiment": get_analyst_summary(state, "sentiment"),
-        "fundamentals": get_analyst_summary(state, "fundamentals"),
+def _trace_prompt_context_consumer() -> str:
+    stack = inspect.stack()
+    for frame in stack[2:20]:
+        if frame.function == "get_prompt_context_from_summaries":
+            continue
+        return frame.function
+    return "unknown"
+
+
+def _append_analyst_context_trace(state: AgentState, ctx: Dict[str, str]) -> None:
+    path = os.environ.get("TRADESWARM_ANALYST_CONTEXT_LOG")
+    if not path:
+        return
+    rec = {
+        "ts": datetime.now(timezone.utc).isoformat(),
+        "consumer": _trace_prompt_context_consumer(),
+        "company_of_interest": state.get("company_of_interest"),
+        "trade_date": state.get("trade_date"),
+        "enabled_analysts_text": ctx.get("enabled_analysts_text", ""),
+        "active_analyst_blocks": ctx.get("active_analyst_blocks", ""),
     }
+    with Path(path).open("a", encoding="utf-8") as f:
+        f.write(json.dumps(rec, ensure_ascii=False) + "\n")
+
+
+def get_prompt_context_from_summaries(state: AgentState) -> Dict[str, str]:
+    """Prompt 侧只暴露启用列表与证据块；内容与 AnalystMemorySummary 一致，无扁平别名重复。"""
     enabled = get_enabled_analysts(state)
     analyst_blocks = []
     for analyst_name in enabled:
@@ -60,22 +85,12 @@ def get_prompt_context_from_summaries(state: AgentState) -> Dict[str, str]:
             block += f"\n\nHistory:\n{history_report}"
         analyst_blocks.append(block)
 
-    return {
-        "market_research_report": summaries["market"].get("today_report", ""),
-        "market_today_report": summaries["market"].get("today_report", ""),
-        "market_history_summary": summaries["market"].get("history_report", ""),
-        "news_report": summaries["news"].get("today_report", ""),
-        "news_today_report": summaries["news"].get("today_report", ""),
-        "news_history_summary": summaries["news"].get("history_report", ""),
-        "sentiment_report": summaries["sentiment"].get("today_report", ""),
-        "sentiment_today_report": summaries["sentiment"].get("today_report", ""),
-        "sentiment_history_summary": summaries["sentiment"].get("history_report", ""),
-        "fundamentals_report": summaries["fundamentals"].get("today_report", ""),
-        "fundamentals_today_report": summaries["fundamentals"].get("today_report", ""),
-        "fundamentals_history_summary": summaries["fundamentals"].get("history_report", ""),
+    ctx = {
         "enabled_analysts_text": ", ".join(enabled),
         "active_analyst_blocks": "\n\n".join(block for block in analyst_blocks if block).strip(),
     }
+    _append_analyst_context_trace(state, ctx)
+    return ctx
 
 
 def format_position_info(current_position: Optional[Dict[str, Any]]) -> str:
@@ -135,6 +150,7 @@ def build_curr_situation_from_summaries(
     max_length: Optional[int] = None,
     include_history: bool = False,
 ) -> str:
+    """拼接启用 analyst 的当日（及可选 history）报告，供 Research/Risk/Trader 与 HybridMemory 查询向量使用。"""
     sections = []
     for analyst_name in get_enabled_analysts(state):
         summary = get_analyst_summary(state, analyst_name)
