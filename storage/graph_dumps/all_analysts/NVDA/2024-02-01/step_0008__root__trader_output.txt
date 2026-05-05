@@ -1,0 +1,61 @@
+节点: trader
+时间: 2026-04-24 00:00:00
+================================================================================
+
+最后一条消息:
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "NVDA技术面维持多头主导，机构增持与AI需求验证形成双重支撑。当前股价接近布林带上轨但未突破，结合PEG估值合理及供应链端TSMC利润验证，顺势加仓把握趋势延续机会。",
+  "risk_controls": {
+    "stop_loss_pct": 55.23,
+    "take_profit_pct": 66.33,
+    "invalidation": "若跌破56.63美元支撑位或出现机构持仓连续三日减持",
+    "time_horizon": "3-6个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "当前持仓浮盈10.69%，建议同步设置移动止盈位。需注意RSI超买可能引发短期震荡，但ADX强趋势指标显示回调或为加仓机会。"
+}
+
+
+trader_investment_plan:
+================================================================================
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "NVDA技术面维持多头主导，机构增持与AI需求验证形成双重支撑。当前股价接近布林带上轨但未突破，结合PEG估值合理及供应链端TSMC利润验证，顺势加仓把握趋势延续机会。",
+  "risk_controls": {
+    "stop_loss_pct": 55.23,
+    "take_profit_pct": 66.33,
+    "invalidation": "若跌破56.63美元支撑位或出现机构持仓连续三日减持",
+    "time_horizon": "3-6个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "当前持仓浮盈10.69%，建议同步设置移动止盈位。需注意RSI超买可能引发短期震荡，但ADX强趋势指标显示回调或为加仓机会。"
+}

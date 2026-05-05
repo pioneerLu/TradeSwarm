@@ -1,0 +1,134 @@
+Symbol: NVDA
+        Trade Date: 2025-02-18
+        Experiment ID: all_analysts
+        Enabled Analysts: market, news, sentiment, fundamentals
+        Export Mode: backtest
+
+        [Research Investment Plan]
+
+
+{
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "NVDA技术面多头信号明确且基本面维持高增长，AI生态扩张巩固行业地位。短期超买风险可控，回调提供布局窗口。",
+  "rationale": [
+    "技术面多头排列与MACD金叉信号确认趋势反转，OBV资金流入验证价格上涨动能，布林带中轨支撑有效且距上轨仍有7.9%上涨空间",
+    "基本面ROE(101.5%)和三年营收CAGR(100.6%)维持行业顶尖水平，AI基础设施需求爆发与战略合作伙伴关系扩展形成技术壁垒，PEG比率0.71显示估值安全边际"
+  ],
+  "action_plan": [
+    "监控149.76美元布林带上轨突破有效性及RSI超买区域修正幅度",
+    "跟踪Lattice/Coherent合作落地进展与库存周转效率变化，验证AI需求持续性"
+  ],
+  "notes_from_past_mistakes": [
+    "2024年Q4曾因忽视库存积压风险导致误判，需密切跟踪存货周转天数变化",
+    "2025年初超买区域回调幅度达16.97%，应预设131.04美元支撑位止损观察机制"
+  ]
+}
+
+        [Trader Investment Plan]
+
+
+{
+  "role": "trader",
+  "market_regime": "strong_uptrend",
+  "selected_skill": "strong_uptrend_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "技术面多头排列与MACD金叉确认趋势反转，布林带中轨支撑有效且距上轨有7.9%上涨空间",
+    "基本面ROE(101.5%)和三年营收CAGR(100.6%)维持顶尖水平，AI生态合作强化技术壁垒"
+  ],
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "技术面多头信号明确且基本面高增长支撑，回调窗口已现。顺势加仓并设置布林带中轨止损，监控超买修正与库存风险。",
+  "risk_controls": {
+    "stop_loss_pct": 131.04,
+    "take_profit_pct": 149.76,
+    "invalidation": "若价格跌破131.04美元支撑位或RSI修正超10%触发超买警报",
+    "time_horizon": "1-3个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "当前持仓浮盈1.29%但组合Alpha落后B&H，需通过加仓巩固趋势收益。已预设布林带中轨止损位（131.04美元）以控制回调风险，同时关注149.76美元阻力位突破有效性。新增仓位需配合Lattice/Coherent合作落地进展及库存周转改善信号。"
+}
+
+        [Risk Final Trade Decision]
+
+
+{
+  "role": "risk_manager",
+  "market_regime": "strong_uptrend",
+  "selected_skill": "strong_uptrend_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "技术面多头排列（MA5/10/20/30均被突破）与MACD金叉信号确认趋势反转",
+    "基本面ROE(101.5%)和三年营收CAGR(100.6%)维持顶尖水平，AI生态合作强化技术壁垒"
+  ],
+  "final_decision": "BUY",
+  "fine_rating": "Overweight",
+  "summary": "NVDA技术面多头动能强劲叠加AI基础设施需求支撑，但需警惕超买修正与估值压力。建议维持趋势方向，通过仓位压缩和动态止盈控制短期波动风险。",
+  "rationale": [
+    "新闻数据时间戳异常（2026年3月）可能影响事件时效性验证，需密切跟踪Lattice/Coherent合作落地进展",
+    "机构持仓分化（内部人减持2.53亿美元）反映估值博弈，布林带中轨支撑有效性已通过2025年2月反弹验证"
+  ],
+  "position_size": 0.2,
+  "max_drawdown": "接受从138.80美元下跌至131.04美元（7.7%回撤）的可控波动",
+  "stop_loss": "跌破131.04美元支撑位（MA20/布林带中轨）触发止损",
+  "take_profit": "突破149.76美元阻力位（布林带上轨）后分批止盈，或RSI修正超10%（跌破69.70-10%）触发止盈",
+  "time_horizon": "1-3个月（需在2025-03-18前重新评估）",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "警惕2025年1月24日-27日16.97%暴跌的历史重演风险",
+    "需验证2026年3月合作事件的实际商业转化周期，避免过度依赖未来预期"
+  ]
+}
+
+        [Execution Payload]
+        {
+  "action": "BUY",
+  "target_pct": 0.2,
+  "stop_loss": "跌破131.04美元支撑位（MA20/布林带中轨）触发止损",
+  "take_profit": "突破149.76美元阻力位（布林带上轨）后分批止盈，或RSI修正超10%（跌破69.70-10%）触发止盈",
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "技术面多头信号明确且基本面高增长支撑，回调窗口已现。顺势加仓并设置布林带中轨止损，监控超买修正与库存风险。",
+  "is_exploratory": false,
+  "execution_date": "2025-02-19",
+  "cancel_pending_orders": true,
+  "market_regime": "strong_uptrend",
+  "selected_skill": "strong_uptrend_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "技术面多头排列（MA5/10/20/30均被突破）与MACD金叉信号确认趋势反转",
+    "基本面ROE(101.5%)和三年营收CAGR(100.6%)维持顶尖水平，AI生态合作强化技术壁垒"
+  ],
+  "skill_router_mode": "reflect",
+  "forced_selected_skill": "downtrend_skill",
+  "reflection_market_regime": "strong_uptrend",
+  "reflection_selected_skill": "strong_uptrend_skill",
+  "reflection_confidence": 0.75,
+  "reflection_evidence": [
+    "价格突破所有主要移动平均线形成多头排列且距布林带上轨仍有7.9%上涨空间",
+    "MACD即将金叉、OBV资金流入、RSI(69.70)和StochRSI(72.89)显示强劲动能但未触发极端超买警报",
+    "基本面维持ROE(101.5%)和三年营收CAGR(100.6%)的行业顶尖水平，AI生态扩展形成技术壁垒",
+    "新闻面战略合作伙伴关系扩展(如Lattice/Coherent)强化AI基础设施需求支撑"
+  ],
+  "date": "2025-02-18",
+  "symbol": "NVDA",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}

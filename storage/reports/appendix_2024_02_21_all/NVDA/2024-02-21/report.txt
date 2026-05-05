@@ -1,0 +1,128 @@
+Symbol: NVDA
+        Trade Date: 2024-02-21
+        Experiment ID: appendix_2024_02_21_all
+        Enabled Analysts: market, news, sentiment, fundamentals
+        Export Mode: rating
+
+        [Research Investment Plan]
+
+
+{
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "NVDA在AI革命与量子计算突破驱动下基本面强劲，技术调整接近关键支撑位，情绪面维持积极主导。尽管存在估值压力与短期技术性回调风险，但核心增长逻辑未被证伪。",
+  "rationale": [
+    "2026财年ROE突破100%且PEG仅0.717，证明高估值被业绩增长消化，微软等战略客户采购验证AI数据中心需求刚性",
+    "技术面显示调整周期临近尾声：布林带缩口+RSI 65.57处于健康区间，20日均线67.07美元支撑明确，MACD金叉结构未破坏"
+  ],
+  "action_plan": [
+    "监控67.07美元关键支撑位防守情况，结合微软季度订单数据验证技术位有效性",
+    "跟踪3月FCC算力标准指引与Q1数据中心业务增速，确认AI需求持续性与估值模型支撑假设"
+  ],
+  "notes_from_past_mistakes": []
+}
+
+        [Trader Investment Plan]
+
+
+{
+  "role": "trader",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.78,
+  "regime_evidence": [
+    "ATR值从1.65升至2.745显示波动性显著放大",
+    "MACD柱状图首次转负且布林带缩口形成，技术面出现多空信号分歧",
+    "机构减持与AI需求强劲形成基本面矛盾信号",
+    "新闻数据时间戳异常（2026年4月）增加信息可信度不确定性"
+  ],
+  "action": "BUY",
+  "target_pct": 0.30,
+  "entry_type": "LIMIT",
+  "entry_price": 67.07,
+  "execution_window": "T+1_OPEN",
+  "summary": "在AI革命与量子计算突破驱动下，NVDA基本面强劲且技术调整接近关键支撑位。尽管存在估值压力与短期回调风险，但核心增长逻辑未被证伪，建议以20日均线支撑位挂限价单分批建仓。",
+  "risk_controls": {
+    "stop_loss_pct": -5.0,
+    "take_profit_pct": 10.0,
+    "invalidation": "若跌破65.37美元EMA26支撑位或出现AI需求负面数据则止损",
+    "time_horizon": "3-5个交易日"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.30,
+      "price_type": "LIMIT",
+      "price": 67.07
+    }
+  ],
+  "comment": "信心：中。当前波动率显著上升且信息存在时间戳异常，但技术面20日均线支撑明确，基本面AI需求刚性验证。需严格监控67.07美元支撑有效性及微软订单数据，若支撑失效则转为SELL。"
+}
+
+        [Risk Final Trade Decision]
+
+
+{
+  "role": "risk_manager",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "ATR值从1.65升至2.745显示波动性显著放大",
+    "新闻数据时间戳异常（2026年4月）增加信息可信度不确定性"
+  ],
+  "final_decision": "BUY",
+  "fine_rating": "Overweight",
+  "summary": "NVDA技术面接近关键支撑位且基本面AI需求刚性验证，但需警惕数据时间戳异常和法律风险。建议以20日均线支撑位为入场锚点，动态监控67.07美元防守有效性及微软订单数据。",
+  "rationale": [
+    "新闻分析中2026年数据存在时间戳矛盾，可能削弱基本面预测可靠性",
+    "法律诉讼风险（Gartner等涉案）与存货减值压力（同比+112%）构成潜在尾部风险"
+  ],
+  "position_size": 0.2,
+  "max_drawdown": "最大回撤控制在5%以内",
+  "stop_loss": "跌破65.37美元EMA26支撑位或63.3美元30日均线时止损",
+  "take_profit": "盈利达10%且跌破71.27美元10日均线时止盈；若突破74.57美元前高且MACD柱状图转正则分批止盈",
+  "time_horizon": "3-5个交易日，若67.07美元支撑位失效则提前离场",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "需警惕2026年数据时间戳错误导致基本面预测失效的历史教训",
+    "避免重复高估值环境下过度依赖单一技术指标的错误"
+  ]
+}
+
+        [Execution Payload]
+        {
+  "date": "2024-02-21",
+  "symbol": "NVDA",
+  "export_mode": "rating",
+  "research_decision": "BUY",
+  "fine_rating": "Overweight",
+  "final_decision": "BUY",
+  "risk_level": "MEDIUM",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "ATR值从1.65升至2.745显示波动性显著放大",
+    "新闻数据时间戳异常（2026年4月）增加信息可信度不确定性"
+  ],
+  "skill_router_mode": "reflect",
+  "forced_selected_skill": null,
+  "reflection_market_regime": "high_vol_uncertain",
+  "reflection_selected_skill": "high_vol_uncertain_skill",
+  "reflection_confidence": 0.78,
+  "reflection_evidence": [
+    "ATR值从1.65升至2.745显示波动性显著放大",
+    "MACD柱状图首次转负且布林带缩口形成，技术面出现多空信号分歧",
+    "机构减持与AI需求强劲形成基本面矛盾信号",
+    "新闻数据时间戳异常（2026年4月）增加信息可信度不确定性"
+  ],
+  "experiment_id": "appendix_2024_02_21_all",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}

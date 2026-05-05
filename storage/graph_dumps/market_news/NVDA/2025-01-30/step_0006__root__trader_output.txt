@@ -1,0 +1,55 @@
+节点: trader
+时间: 2026-04-28 00:00:00
+================================================================================
+
+最后一条消息:
+{
+  "role": "trader",
+  "market_regime": "downtrend",
+  "selected_skill": "downtrend_skill",
+  "regime_confidence": 0.8,
+  "regime_evidence": ["价格跌破所有主要移动平均线，形成空头排列", "MACD和OBV指标显示强烈看跌信号，卖压持续", "股价从高点下跌约19.2%，且波动性显著增加"],
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "entry_type": null,
+  "entry_price": null,
+  "execution_window": null,
+  "summary": "尽管技术指标显示超卖状态，但下跌趋势尚未确认结束，建议等待更明确的反转信号再行动。",
+  "risk_controls": {
+    "stop_loss_pct": null,
+    "take_profit_pct": null,
+    "invalidation": "价格重新站上137.03美元（MA20）并伴随成交量放大",
+    "time_horizon": "短期观望"
+  },
+  "order_plan": [],
+  "comment": "信心：中。虽然存在短期反弹机会，但整体趋势仍偏弱，建议保持观望。"
+}
+
+
+trader_investment_plan:
+================================================================================
+{
+  "role": "trader",
+  "market_regime": "downtrend",
+  "selected_skill": "downtrend_skill",
+  "regime_confidence": 0.8,
+  "regime_evidence": [
+    "价格跌破所有主要移动平均线，形成空头排列",
+    "MACD和OBV指标显示强烈看跌信号，卖压持续",
+    "股价从高点下跌约19.2%，且波动性显著增加"
+  ],
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "entry_type": null,
+  "entry_price": null,
+  "execution_window": null,
+  "summary": "尽管技术指标显示超卖状态，但下跌趋势尚未确认结束，建议等待更明确的反转信号再行动。",
+  "risk_controls": {
+    "stop_loss_pct": null,
+    "take_profit_pct": null,
+    "invalidation": "价格重新站上137.03美元（MA20）并伴随成交量放大",
+    "time_horizon": "短期观望"
+  },
+  "order_plan": [],
+  "comment": "信心：中。虽然存在短期反弹机会，但整体趋势仍偏弱，建议保持观望。"
+}

@@ -1,0 +1,137 @@
+Symbol: NVDA
+        Trade Date: 2025-02-05
+        Experiment ID: all_analysts
+        Enabled Analysts: market, news, sentiment, fundamentals
+        Export Mode: backtest
+
+        [Research Investment Plan]
+
+
+{
+  "role": "research_manager",
+  "decision": "HOLD",
+  "summary": "NVDA当前处于技术面深度调整与基本面高增长的矛盾期，需等待供需格局与估值合理性验证关键信号。",
+  "rationale": [
+    "技术面空头动能未衰竭（MACD柱状图-2.236持续扩张）与基本面供应链风险（台积电产能分配、HBM4库存214亿美元）形成短期压制，但PEG0.71和AI生态绑定显示中长期支撑",
+    "机构持仓分化（Diversified Trust减持2.53亿美元）与社交媒体情绪（0.28分）的背离暴露市场分歧，需观察季度指引能否修复估值预期"
+  ],
+  "action_plan": [
+    "监控112.84美元布林带下轨支撑有效性与MACD动能收敛形态",
+    "跟踪微软核能AI合作落地进度及Micron HBM4量产对供应链风险的缓解效果"
+  ],
+  "notes_from_past_mistakes": [
+    "2024年Q3曾误判AI超卖反弹，实际因算力交付延迟导致二次探底",
+    "高估值科技股在2023年H2出现系统性修正，需警惕AI周期特殊性"
+  ]
+}
+
+        [Trader Investment Plan]
+
+
+{
+  "role": "trader",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.78,
+  "regime_evidence": [
+    "技术面空头动能未衰竭（MACD柱状图-2.236持续扩张）与基本面供应链风险（台积电产能分配、HBM4库存214亿美元）形成短期压制",
+    "机构持仓分化（Diversified Trust减持2.53亿美元）与社交媒体情绪（0.28分）的背离暴露市场分歧"
+  ],
+  "action": "HOLD",
+  "target_pct": 0.20,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "NVDA处于技术面深度调整与基本面高增长的矛盾期，维持HOLD等待关键信号验证。监控布林带下轨支撑有效性及供应链风险缓解进展。",
+  "risk_controls": {
+    "stop_loss_pct": -10,
+    "take_profit_pct": 5,
+    "invalidation": "若股价跌破112.84美元支撑位或MACD动能持续扩张，则继续降低风险敞口",
+    "time_horizon": "短期（1-2周）观察季度指引与供应链动态"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "HOLD",
+      "size_pct": 0.20,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "当前技术面空头排列与基本面PEG0.71形成矛盾，需等待微软核能AI合作落地及HBM4量产对供应链风险的缓解效果。注意2024Q3二次探底教训，避免过早反转交易。"
+}
+
+        [Risk Final Trade Decision]
+
+
+{
+  "role": "risk_manager",
+  "market_regime": "downtrend",
+  "selected_skill": "downtrend_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "价格跌破所有短期/中期均线（MA5/10/20/30）形成空头排列",
+    "MACD深度负值且柱状图持续扩张（-2.236）显示下跌动能未衰竭",
+    "OBV资金持续净流出（-1.599B）与布林带下轨支撑有效性存疑形成风险叠加",
+    "2024Q3二次探底历史教训显示技术面修复可能伴随新低"
+  ],
+  "final_decision": "HOLD",
+  "fine_rating": "Underweight",
+  "summary": "NVDA技术面空头动能未衰竭叠加供应链瓶颈风险，当前估值缺乏安全边际。维持HOLD但降低仓位至20%，严格止损于112.84美元下方，等待MA多头排列+MACD金叉+库存周转改善三重验证。",
+  "rationale": [
+    "技术面空头排列与MACD动能扩张显示趋势未终结，2024Q3二次探底教训要求避免过早反转交易",
+    "基本面高估值（PE34.12倍）与214亿美元HBM4库存形成隐性风险，需等待季度指引验证增长可持续性"
+  ],
+  "position_size": 0.2,
+  "max_drawdown": "当前持仓最大回撤16.99%，需控制新增仓位风险敞口不超过总组合20%",
+  "stop_loss": "若股价跌破112.84美元布林带下轨或MA5（120.71）支撑失效，则触发止损",
+  "take_profit": "若股价反弹至128.76美元（MA10）且MACD柱状图收敛，可分批止盈5%",
+  "time_horizon": "短期（1-2周）观察季度指引与供应链动态，中期（1-3个月）等待技术面三重验证",
+  "risk_level": "HIGH",
+  "notes_from_past_mistakes": [
+    "2024Q3算力交付延迟导致二次探底，需警惕供应链瓶颈引发的类似风险",
+    "历史数据显示超卖修复可能伴随二次下跌，需避免机械式抄底"
+  ]
+}
+
+        [Execution Payload]
+        {
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "stop_loss": null,
+  "take_profit": null,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "Risk/Trader 决策为 HOLD",
+  "is_exploratory": false,
+  "execution_date": "2025-02-06",
+  "market_regime": "downtrend",
+  "selected_skill": "downtrend_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "价格跌破所有短期/中期均线（MA5/10/20/30）形成空头排列",
+    "MACD深度负值且柱状图持续扩张（-2.236）显示下跌动能未衰竭",
+    "OBV资金持续净流出（-1.599B）与布林带下轨支撑有效性存疑形成风险叠加",
+    "2024Q3二次探底历史教训显示技术面修复可能伴随新低"
+  ],
+  "skill_router_mode": "reflect",
+  "forced_selected_skill": "downtrend_skill",
+  "reflection_market_regime": "high_vol_uncertain",
+  "reflection_selected_skill": "high_vol_uncertain_skill",
+  "reflection_confidence": 0.78,
+  "reflection_evidence": [
+    "技术面显示深度下跌趋势（MACD柱状图持续扩张、空头排列均线）与基本面高估值（PE 34.12倍、PB 26.68倍）形成矛盾",
+    "新闻分析揭示供应链瓶颈（台积电产能紧张）与AI需求超预期增长的潜在冲突",
+    "社交媒体情绪积极（0.28分）与机构持仓分化（Diversified Trust减持2.53亿美元）形成背离",
+    "历史数据显示2024年Q3曾因算力交付延迟导致二次探底，当前存在类似风险"
+  ],
+  "date": "2025-02-05",
+  "symbol": "NVDA",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}

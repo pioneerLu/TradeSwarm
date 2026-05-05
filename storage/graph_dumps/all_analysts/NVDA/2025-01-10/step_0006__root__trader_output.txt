@@ -1,0 +1,79 @@
+节点: trader
+时间: 2026-04-28 00:00:00
+================================================================================
+
+最后一条消息:
+
+
+{
+  "role": "trader",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.78,
+  "regime_evidence": [
+    "技术面显示上升趋势但MFI接近超买（65.02）且存在6.2%回调",
+    "新闻面存在地缘政治管制（中国业务风险）、AMD竞争升级、台积电产能分配等多重不确定性因素",
+    "基本面呈现盈利指标新高与估值压力并存的矛盾信号（PE 35.68x vs PEG 0.721）",
+    "情绪面显示机构乐观与散户谨慎的显著分化（社交媒体热度增加但Reddit讨论下降）"
+  ],
+  "action": "HOLD",
+  "target_pct": 0.15,
+  "entry_type": "HOLD",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "维持现有仓位但降低敞口至15%，等待技术面关键阻力位突破或政策风险明朗化。当前高波动性环境下需控制回撤风险，同时保留对AI生态扩张的潜在收益敞口。",
+  "risk_controls": {
+    "stop_loss_pct": -3.0,
+    "take_profit_pct": 5.0,
+    "invalidation": "若股价跌破137美元支撑位或突破146.99美元阻力位且成交量放大，需重新评估趋势有效性",
+    "time_horizon": "1-2周（待布林带突破或政策风险明朗）"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "HOLD",
+      "size_pct": 0.15,
+      "price_type": "MARKET",
+      "price": 140.14
+    }
+  ],
+  "comment": "当前持仓浮亏0.28%，需在137-140支撑区间设置动态止损。若后续出现EMA多头排列修复（EMA12站稳EMA26上方）且MFI脱离超买区，可考虑加仓；若中国管制政策升级或AMD市占率加速侵蚀，则需减仓。"
+}
+
+
+trader_investment_plan:
+================================================================================
+{
+  "role": "trader",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.78,
+  "regime_evidence": [
+    "技术面显示上升趋势但MFI接近超买（65.02）且存在6.2%回调",
+    "新闻面存在地缘政治管制（中国业务风险）、AMD竞争升级、台积电产能分配等多重不确定性因素",
+    "基本面呈现盈利指标新高与估值压力并存的矛盾信号（PE 35.68x vs PEG 0.721）",
+    "情绪面显示机构乐观与散户谨慎的显著分化（社交媒体热度增加但Reddit讨论下降）"
+  ],
+  "action": "HOLD",
+  "target_pct": 0.15,
+  "entry_type": "HOLD",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "维持现有仓位但降低敞口至15%，等待技术面关键阻力位突破或政策风险明朗化。当前高波动性环境下需控制回撤风险，同时保留对AI生态扩张的潜在收益敞口。",
+  "risk_controls": {
+    "stop_loss_pct": -3.0,
+    "take_profit_pct": 5.0,
+    "invalidation": "若股价跌破137美元支撑位或突破146.99美元阻力位且成交量放大，需重新评估趋势有效性",
+    "time_horizon": "1-2周（待布林带突破或政策风险明朗）"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "HOLD",
+      "size_pct": 0.15,
+      "price_type": "MARKET",
+      "price": 140.14
+    }
+  ],
+  "comment": "当前持仓浮亏0.28%，需在137-140支撑区间设置动态止损。若后续出现EMA多头排列修复（EMA12站稳EMA26上方）且MFI脱离超买区，可考虑加仓；若中国管制政策升级或AMD市占率加速侵蚀，则需减仓。"
+}

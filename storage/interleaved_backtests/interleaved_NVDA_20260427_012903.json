@@ -1,0 +1,135 @@
+{
+  "symbol": "NVDA",
+  "start_date": "2024-01-02",
+  "end_date": "2024-01-03",
+  "experiment_id": "all_analysts",
+  "initial_cash": 100000.0,
+  "llm": {
+    "provider": "siliconflow",
+    "profile": "glm_4_6",
+    "model_name": "zai-org/GLM-4.6",
+    "temperature": 0.1,
+    "base_url": "https://api.siliconflow.cn/v1"
+  },
+  "final_portfolio_state": {
+    "total_value": 100000.0,
+    "cash": 100000.0,
+    "positions_value": 0.0,
+    "total_return": 0.0
+  },
+  "final_position": null,
+  "trading_days": 2,
+  "signals_count": 0,
+  "daily_results": [
+    {
+      "trade_date": "2024-01-02",
+      "signal_action": "HOLD",
+      "execution_date": null,
+      "equity": null,
+      "shares": null,
+      "target_pct": null,
+      "entry_type": "MKT_OPEN",
+      "limit_price": null,
+      "cancel_pending_orders": null,
+      "reason": "Connection error.",
+      "pending_orders_count": 0,
+      "pending_order_limits": [],
+      "filled_today_count": 0,
+      "last_fill_offset_days": null
+    },
+    {
+      "trade_date": "2024-01-03",
+      "signal_action": "HOLD",
+      "execution_date": null,
+      "equity": 100000.0,
+      "shares": 0.0,
+      "target_pct": null,
+      "entry_type": "MKT_OPEN",
+      "limit_price": null,
+      "cancel_pending_orders": null,
+      "reason": "Connection error.",
+      "pending_orders_count": 0,
+      "pending_order_limits": [],
+      "filled_today_count": 0,
+      "last_fill_offset_days": null
+    }
+  ],
+  "data_coverage": {
+    "custom_csv_path": "E:\\agent_proj\\TradeSwarm\\lean_workspace\\data\\custom\\nvda_daily.csv",
+    "required_days": 2,
+    "covered_days": 2,
+    "missing_days": 0,
+    "missing_dates": [],
+    "coverage_ratio": 1.0,
+    "auto_download_performed": false
+  },
+  "snapshot_coverage": {
+    "missing_snapshot_days": [
+      "2024-01-02"
+    ],
+    "missing_snapshot_count": 1,
+    "snapshot_coverage_ratio": 0.5
+  },
+  "metrics": {
+    "final_equity": 100000.0,
+    "total_return": 0.0,
+    "cagr": 0.0,
+    "annualized_return": 0.0,
+    "annualized_return_simple": 0.0,
+    "daily_returns": [
+      0.0,
+      0.0
+    ],
+    "cumulative_returns": [
+      0.0,
+      0.0
+    ],
+    "sharpe": null,
+    "sortino": null,
+    "calmar": null,
+    "max_drawdown": 0.0,
+    "max_drawdown_duration_days": 0,
+    "trade_count": 0,
+    "win_rate": null,
+    "avg_holding_days": null,
+    "avg_trade_return_pct": null
+  },
+  "daily_dates": [
+    "2024-01-02",
+    "2024-01-03"
+  ],
+  "daily_equity": [
+    100000.0,
+    100000.0
+  ],
+  "daily_returns": [
+    0.0,
+    0.0
+  ],
+  "cumulative_returns": [
+    0.0,
+    0.0
+  ],
+  "open_position_metrics": {
+    "avg_position_weight": null,
+    "max_position_weight": null,
+    "held_days": 0,
+    "first_held_date": null,
+    "last_held_date": null,
+    "max_drawdown_while_holding": 0.0
+  },
+  "benchmark": {
+    "buy_hold_total_return": -0.012435621417447695,
+    "alpha_vs_buy_hold": 0.012435621417447695,
+    "first_close": 48.167999,
+    "last_close": 47.569
+  },
+  "behavior_metrics": {
+    "limit_signal_count": 0,
+    "final_pending_orders": 0,
+    "unfilled_ratio_approx": null,
+    "avg_limit_offset_pct": null,
+    "in_market_days": 0,
+    "in_market_days_ratio": 0.0
+  }
+}

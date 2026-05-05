@@ -1,0 +1,61 @@
+节点: trader
+时间: 2026-04-25 00:00:00
+================================================================================
+
+最后一条消息:
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "LIMIT",
+  "entry_price": 56.71,
+  "execution_window": "T+1_OPEN",
+  "summary": "利用技术性回调在MA5支撑位布局，双重验证AI生态主导地位与机构增持的护城河，中等信心下控制仓位比例",
+  "risk_controls": {
+    "stop_loss_pct": 54.71,
+    "take_profit_pct": 60.0,
+    "invalidation": "若库存周转天数突破150天或Meta-Broadcom合作导致市场份额单季下降5%",
+    "time_horizon": "3-6个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "LIMIT",
+      "price": 56.71
+    }
+  ],
+  "comment": "当前LIMIT价格与现价57.11仅0.69%差距，符合趋势内回调接单原则。MA5支撑有效性需结合成交量确认，若突破59.07后回踩支撑位放量可加仓。已持有仓位建议同步设置移动止盈位（突破60美元后止损上移至58美元）。"
+}
+
+
+trader_investment_plan:
+================================================================================
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "LIMIT",
+  "entry_price": 56.71,
+  "execution_window": "T+1_OPEN",
+  "summary": "利用技术性回调在MA5支撑位布局，双重验证AI生态主导地位与机构增持的护城河，中等信心下控制仓位比例",
+  "risk_controls": {
+    "stop_loss_pct": 54.71,
+    "take_profit_pct": 60.0,
+    "invalidation": "若库存周转天数突破150天或Meta-Broadcom合作导致市场份额单季下降5%",
+    "time_horizon": "3-6个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "LIMIT",
+      "price": 56.71
+    }
+  ],
+  "comment": "当前LIMIT价格与现价57.11仅0.69%差距，符合趋势内回调接单原则。MA5支撑有效性需结合成交量确认，若突破59.07后回踩支撑位放量可加仓。已持有仓位建议同步设置移动止盈位（突破60美元后止损上移至58美元）。"
+}

@@ -1,0 +1,61 @@
+节点: trader
+时间: 2026-04-25 00:00:00
+================================================================================
+
+最后一条消息:
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "LIMIT",
+  "entry_price": 66.58,
+  "execution_window": "T+1_OPEN",
+  "summary": "NVDA技术面多头结构稳固叠加AI革命驱动的基本面增长确定性，短期超买调整不改中长期核心资产地位。在MA20/布林带中轨64.26-65.15美元区间设置分批建仓计划，利用趋势延续性与支撑有效性构建安全边际。",
+  "risk_controls": {
+    "stop_loss_pct": 0.05,
+    "take_profit_pct": 0.15,
+    "invalidation": "若跌破MA20（64.26美元）或出现RSI顶背离（价格创新高但RSI<80）则止损",
+    "time_horizon": "中长期持有（3-6个月），短期调整后看涨动能恢复"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "LIMIT",
+      "price": 66.58
+    }
+  ],
+  "comment": "信心：高。技术面多头排列未破坏（MA5>MA10>MA20），基本面AI需求刚性（TSMC/微软采购验证），但需警惕AMD/Broadcom竞争加剧。LIMIT单锚定布林带中轨与MA20黄金分割位，符合历史回调中位数8.3%的安全边际，同时避免追高风险。"
+}
+
+
+trader_investment_plan:
+================================================================================
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "LIMIT",
+  "entry_price": 66.58,
+  "execution_window": "T+1_OPEN",
+  "summary": "NVDA技术面多头结构稳固叠加AI革命驱动的基本面增长确定性，短期超买调整不改中长期核心资产地位。在MA20/布林带中轨64.26-65.15美元区间设置分批建仓计划，利用趋势延续性与支撑有效性构建安全边际。",
+  "risk_controls": {
+    "stop_loss_pct": 0.05,
+    "take_profit_pct": 0.15,
+    "invalidation": "若跌破MA20（64.26美元）或出现RSI顶背离（价格创新高但RSI<80）则止损",
+    "time_horizon": "中长期持有（3-6个月），短期调整后看涨动能恢复"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "LIMIT",
+      "price": 66.58
+    }
+  ],
+  "comment": "信心：高。技术面多头排列未破坏（MA5>MA10>MA20），基本面AI需求刚性（TSMC/微软采购验证），但需警惕AMD/Broadcom竞争加剧。LIMIT单锚定布林带中轨与MA20黄金分割位，符合历史回调中位数8.3%的安全边际，同时避免追高风险。"
+}

@@ -1,0 +1,16 @@
+{
+  "risk_summary": {
+    "risk_debate_state": {
+      "history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面关键支撑密集且趋势结构完整，基本面ROE突破100%与AI生态扩张验证增长可持续性，量子计算突破打开第二增长曲线。\",\n  \"supporting_points\": [\n    \"布林带中轨（67.07）与20日均线重合形成强支撑带，MACD线（4.43）仍高于信号线（4.58）维持多头排列，历史数据显示趋势强度（ADX 59.75）未减弱\",\n    \"基本面ROE达101.5%叠加AI芯片供需缺口（TSMC Q1利润增50%），PEG比率0.717显示估值被增长合理支撑，量子计算技术突破已推动行业情绪升温\"\n  ],\n  \"counter_arguments\": [\n    \"机构小幅减持属于获利了结行为而非看空信号，NVDA仍为Beaumont第八大持仓，且AI基础设施采购订单（微软数万GPU）持续验证需求刚性\",\n    \"高估值风险被技术护城河（CUDA生态）和行业爆发性增长（数据中心AI需求）对冲，存货增长反映产业链主动补库而非被动积压\"\n  ],\n  \"risk_assessment\": \"短期回调风险已被布林带下轨（57.32）和多重均线支撑对冲，量子计算商业化存在不确定性但技术突破已形成行业共识，监管风险在当前ROE超100%的盈利弹性和3.91流动比率下具备抗压能力\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "risky_history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面关键支撑密集且趋势结构完整，基本面ROE突破100%与AI生态扩张验证增长可持续性，量子计算突破打开第二增长曲线。\",\n  \"supporting_points\": [\n    \"布林带中轨（67.07）与20日均线重合形成强支撑带，MACD线（4.43）仍高于信号线（4.58）维持多头排列，历史数据显示趋势强度（ADX 59.75）未减弱\",\n    \"基本面ROE达101.5%叠加AI芯片供需缺口（TSMC Q1利润增50%），PEG比率0.717显示估值被增长合理支撑，量子计算技术突破已推动行业情绪升温\"\n  ],\n  \"counter_arguments\": [\n    \"机构小幅减持属于获利了结行为而非看空信号，NVDA仍为Beaumont第八大持仓，且AI基础设施采购订单（微软数万GPU）持续验证需求刚性\",\n    \"高估值风险被技术护城河（CUDA生态）和行业爆发性增长（数据中心AI需求）对冲，存货增长反映产业链主动补库而非被动积压\"\n  ],\n  \"risk_assessment\": \"短期回调风险已被布林带下轨（57.32）和多重均线支撑对冲，量子计算商业化存在不确定性但技术突破已形成行业共识，监管风险在当前ROE超100%的盈利弹性和3.91流动比率下具备抗压能力\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "safe_history": "",
+      "neutral_history": "",
+      "latest_speaker": "Risky",
+      "current_risky_response": "Risky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面关键支撑密集且趋势结构完整，基本面ROE突破100%与AI生态扩张验证增长可持续性，量子计算突破打开第二增长曲线。\",\n  \"supporting_points\": [\n    \"布林带中轨（67.07）与20日均线重合形成强支撑带，MACD线（4.43）仍高于信号线（4.58）维持多头排列，历史数据显示趋势强度（ADX 59.75）未减弱\",\n    \"基本面ROE达101.5%叠加AI芯片供需缺口（TSMC Q1利润增50%），PEG比率0.717显示估值被增长合理支撑，量子计算技术突破已推动行业情绪升温\"\n  ],\n  \"counter_arguments\": [\n    \"机构小幅减持属于获利了结行为而非看空信号，NVDA仍为Beaumont第八大持仓，且AI基础设施采购订单（微软数万GPU）持续验证需求刚性\",\n    \"高估值风险被技术护城河（CUDA生态）和行业爆发性增长（数据中心AI需求）对冲，存货增长反映产业链主动补库而非被动积压\"\n  ],\n  \"risk_assessment\": \"短期回调风险已被布林带下轨（57.32）和多重均线支撑对冲，量子计算商业化存在不确定性但技术突破已形成行业共识，监管风险在当前ROE超100%的盈利弹性和3.91流动比率下具备抗压能力\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "current_safe_response": "",
+      "current_neutral_response": "",
+      "judge_decision": "",
+      "count": 1
+    }
+  }
+}

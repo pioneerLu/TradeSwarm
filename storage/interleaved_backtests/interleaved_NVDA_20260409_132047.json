@@ -1,0 +1,72 @@
+{
+  "symbol": "NVDA",
+  "start_date": "2025-01-02",
+  "end_date": "2025-01-10",
+  "experiment_id": "all_analysts",
+  "initial_cash": 100000.0,
+  "final_portfolio_state": {
+    "total_value": 101285.419484,
+    "cash": 86150.299592,
+    "positions_value": 15135.119892,
+    "total_return": 1.2854194839999982
+  },
+  "final_position": {
+    "shares": 108.0,
+    "entry_price": 139.56388757407407,
+    "entry_date": "",
+    "current_price": 140.139999,
+    "pnl": 62.220034,
+    "pnl_pct": 0.4127940514842369,
+    "stop_loss_price": null,
+    "take_profit_price": null,
+    "pending_orders": [],
+    "filled_today": [
+      {
+        "order_id": 3,
+        "direction": "BUY",
+        "quantity": 74.0,
+        "fill_price": 140.139999,
+        "type": "Market"
+      }
+    ]
+  },
+  "trading_days": 5,
+  "signals_count": 5,
+  "daily_results": [
+    {
+      "trade_date": "2025-01-02",
+      "signal_action": "BUY",
+      "execution_date": "2025-01-03",
+      "equity": 100000.0,
+      "shares": 144.0
+    },
+    {
+      "trade_date": "2025-01-03",
+      "signal_action": "HOLD",
+      "execution_date": "2025-01-06",
+      "equity": 100000.0,
+      "shares": 144.0
+    },
+    {
+      "trade_date": "2025-01-06",
+      "signal_action": "BUY",
+      "execution_date": "2025-01-07",
+      "equity": 101601.27928,
+      "shares": 34.0
+    },
+    {
+      "trade_date": "2025-01-07",
+      "signal_action": "BUY",
+      "execution_date": "2025-01-08",
+      "equity": 101601.27928,
+      "shares": 34.0
+    },
+    {
+      "trade_date": "2025-01-08",
+      "signal_action": "BUY",
+      "execution_date": "2025-01-10",
+      "equity": 101285.419484,
+      "shares": 108.0
+    }
+  ]
+}

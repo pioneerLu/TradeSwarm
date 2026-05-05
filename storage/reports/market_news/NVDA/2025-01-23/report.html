@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>NVDA 2025-01-23 TradeSwarm Report</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 16mm;
+    }
+    body {
+      color: #172033;
+      font-family: "Microsoft YaHei", "Noto Sans CJK SC", "Segoe UI", Arial, sans-serif;
+      font-size: 12px;
+      line-height: 1.55;
+      margin: 0;
+    }
+    h1, h2, h3 {
+      color: #0f2a4f;
+      margin: 0;
+    }
+    h1 {
+      font-size: 26px;
+      letter-spacing: 0.02em;
+    }
+    h2 {
+      border-bottom: 1px solid #d9e2ef;
+      font-size: 16px;
+      margin-top: 22px;
+      padding-bottom: 6px;
+    }
+    .subtitle {
+      color: #53657d;
+      margin-top: 6px;
+    }
+    .meta-grid {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: repeat(2, 1fr);
+      margin-top: 18px;
+    }
+    .card {
+      background: #f7f9fc;
+      border: 1px solid #dce5f1;
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .label {
+      color: #607086;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .value {
+      color: #172033;
+      font-size: 13px;
+      margin-top: 3px;
+      word-break: break-word;
+    }
+    .section {
+      margin-top: 12px;
+    }
+    .pre {
+      background: #fbfcff;
+      border: 1px solid #dce5f1;
+      border-radius: 8px;
+      color: #1f2937;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 10.5px;
+      padding: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .badge {
+      background: #e8f1ff;
+      border: 1px solid #bfd7ff;
+      border-radius: 999px;
+      color: #174984;
+      display: inline-block;
+      font-size: 10px;
+      margin: 3px 4px 0 0;
+      padding: 2px 8px;
+    }
+    .footer {
+      border-top: 1px solid #d9e2ef;
+      color: #7a889a;
+      font-size: 10px;
+      margin-top: 26px;
+      padding-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>TradeSwarm 投研报告</h1>
+  <div class="subtitle">NVDA · 2025-01-23 · backtest</div>
+
+  <div class="meta-grid">
+    <div class="card">
+      <div class="label">Experiment</div>
+      <div class="value">market_news</div>
+    </div>
+    <div class="card">
+      <div class="label">Analysts</div>
+      <div class="value">market, news</div>
+    </div>
+    <div class="card">
+      <div class="label">LLM</div>
+      <div class="value">-</div>
+    </div>
+    <div class="card">
+      <div class="label">Strategy Skill</div>
+      <div class="value">reflect / strong_uptrend_skill</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h2>市场状态与 Skill</h2>
+  <div class="section">
+    
+    <span class="badge">market_regime: strong_uptrend</span>
+    
+    <span class="badge">selected_skill: strong_uptrend_skill</span>
+    
+    <span class="badge">regime_confidence: 0.75</span>
+    
+    <span class="badge">skill_router_mode: reflect</span>
+    
+    <span class="badge">reflection_market_regime: strong_uptrend</span>
+    
+    <span class="badge">reflection_selected_skill: strong_uptrend_skill</span>
+    
+    <span class="badge">reflection_confidence: 0.75</span>
+    
+  </div>
+  
+
+  <h2>Research Manager 投资计划</h2>
+  <div class="pre">{
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "技术面多重指标共振显示上涨动能充沛，且AI生态系统向能源等新领域扩展提供长期增长动力，短期调整后配置价值凸显。",
+  "rationale": [
+    "技术指标全面转强：MACD金叉、RSI健康回升、均线多头排列，股价突破关键阻力位且成交量配合",
+    "基本面催化剂明确：与微软/SLB的能源AI合作已验证技术跨界能力，生态系统扩展抵消部分估值压力"
+  ],
+  "action_plan": [
+    "关注147.63美元布林带上轨的突破情况，确认有效突破后可提升仓位",
+    "密切跟踪微软核能合作项目的商业化进展，作为长期持仓依据"
+  ],
+  "notes_from_past_mistakes": [
+    "需警惕RSI突破60后可能引发的短期获利回吐",
+    "能源行业合作收入兑现周期可能长于市场预期"
+  ]
+}</div>
+
+  <h2>Trader 执行计划</h2>
+  <div class="pre">{
+  "role": "trader",
+  "market_regime": "strong_uptrend",
+  "selected_skill": "strong_uptrend_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": ["技术指标全面转强：MACD金叉、RSI健康回升、均线多头排列，股价突破关键阻力位且成交量配合", "基本面催化剂明确：与微软/SLB的能源AI合作已验证技术跨界能力，生态系统扩展抵消部分估值压力"],
+  "action": "BUY",
+  "target_pct": 0.40,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "技术面与基本面共振支持上涨趋势，当前Alpha落后B&H但趋势未破坏，中等信心加仓跟随主升浪",
+  "risk_controls": {
+    "stop_loss_pct": -5.0,
+    "take_profit_pct": 10.0,
+    "invalidation": "跌破布林带中轨138.56美元或MA30 137.33美元",
+    "time_horizon": "2-4周"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.40,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "信心：中。当前仓位亏损但趋势未破坏，加仓以捕捉潜在反弹机会，需密切关注布林带上轨突破情况"
+}</div>
+
+  <h2>Risk Manager 风控裁决</h2>
+  <div class="pre">```json
+{
+  "role": "risk_manager",
+  "market_regime": "strong_uptrend",
+  "selected_skill": "strong_uptrend_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "技术指标全面转强：MACD金叉、RSI健康回升、均线多头排列，股价突破关键阻力位且成交量配合",
+    "基本面催化剂明确：与微软/SLB的能源AI合作已验证技术跨界能力，生态系统扩展抵消部分估值压力"
+  ],
+  "final_decision": "BUY",
+  "fine_rating": "Overweight",
+  "summary": "技术面与基本面共振支持上涨趋势，当前Alpha落后B&H但趋势未破坏，中等信心加仓跟随主升浪。",
+  "rationale": [
+    "技术面多重指标共振显示短期上涨动能充沛，股价突破关键阻力位且成交量配合。",
+    "基本面AI生态系统向能源等新领域扩展提供长期增长动力，抵消部分估值压力。"
+  ],
+  "position_size": 0.4,
+  "max_drawdown": "可接受最大回撤为5%。",
+  "stop_loss": "跌破布林带中轨138.56美元或MA30 137.33美元时止损。",
+  "take_profit": "盈利达到10%且出现趋势破坏信号（如跌破短期均线/关键支撑）时止盈。",
+  "time_horizon": "建议持有期限为2-4周。",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "需警惕接近阻力位时的获利回吐压力。",
+    "需密切关注布林带上轨突破情况。"
+  ]
+}
+```</div>
+
+  <h2>最终执行载荷</h2>
+  <div class="pre">{
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "stop_loss": null,
+  "take_profit": null,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "已持仓 50.0%，目标 40.0% 无显著增量，HOLD",
+  "is_exploratory": false,
+  "execution_date": "2025-01-24",
+  "market_regime": "strong_uptrend",
+  "selected_skill": "strong_uptrend_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "技术指标全面转强：MACD金叉、RSI健康回升、均线多头排列，股价突破关键阻力位且成交量配合",
+    "基本面催化剂明确：与微软/SLB的能源AI合作已验证技术跨界能力，生态系统扩展抵消部分估值压力"
+  ],
+  "skill_router_mode": "reflect",
+  "reflection_market_regime": "strong_uptrend",
+  "reflection_selected_skill": "strong_uptrend_skill",
+  "reflection_confidence": 0.75,
+  "reflection_evidence": [
+    "技术指标全面转强：MACD金叉、RSI健康回升、均线多头排列，股价突破关键阻力位且成交量配合",
+    "基本面催化剂明确：与微软/SLB的能源AI合作已验证技术跨界能力，生态系统扩展抵消部分估值压力"
+  ],
+  "date": "2025-01-23",
+  "symbol": "NVDA",
+  "experiment_id": "market_news",
+  "enabled_analysts": [
+    "market",
+    "news"
+  ]
+}</div>
+
+  <div class="footer">
+    Generated by TradeSwarm. Source artifacts: report.json / report.txt / report.html.
+  </div>
+</body>
+</html>

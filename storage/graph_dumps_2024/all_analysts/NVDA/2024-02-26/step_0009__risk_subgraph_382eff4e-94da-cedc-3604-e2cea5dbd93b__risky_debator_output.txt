@@ -1,0 +1,11 @@
+节点: risky_debator
+时间: 2026-04-25 00:00:00
+================================================================================
+
+
+risk_summary (完整风险辩论历史):
+================================================================================
+
+risk_debate_state:
+--------------------------------------------------------------------------------
+{'history': '\nRisky Analyst: \n\n{\n  "role": "risky_debator",\n  "stance": "aggressive",\n  "summary": "NVDA技术面多头共振叠加AI生态护城河，高波动性与超买状态恰是趋势延续催化剂，估值溢价已获盈利质量对冲。",\n  "supporting_points": [\n    "布林带突破后维持30日均线上方40%涨幅显示趋势动能强劲，ATR波动性放大反映市场深度认同AI革命叙事",\n    "70%毛利率+55%净利率的盈利堡垒支撑估值扩张，CUDA生态与设计工具链构筑20年技术代差"\n  ],\n  "counter_arguments": [\n    "短期超买状态恰是机构持仓深度的证明，2022年H2因忽视技术护城河过早减仓导致错失300%涨幅",\n    "高估值已内化于PEG<1的合理区间，TSMC财报验证AI需求持续性，供应链风险反成议价能力优势"\n  ],\n  "risk_assessment": "承认短期波动率风险，但ADX趋势强度53.22表明主升浪未尽，量子计算突破已引发行业β溢价，通过MA20支撑位分批建仓可实现风险收益比优化",\n  "proposed_action": "INCREASE_RISK",\n  "confidence": 0.89\n}', 'risky_history': '\nRisky Analyst: \n\n{\n  "role": "risky_debator",\n  "stance": "aggressive",\n  "summary": "NVDA技术面多头共振叠加AI生态护城河，高波动性与超买状态恰是趋势延续催化剂，估值溢价已获盈利质量对冲。",\n  "supporting_points": [\n    "布林带突破后维持30日均线上方40%涨幅显示趋势动能强劲，ATR波动性放大反映市场深度认同AI革命叙事",\n    "70%毛利率+55%净利率的盈利堡垒支撑估值扩张，CUDA生态与设计工具链构筑20年技术代差"\n  ],\n  "counter_arguments": [\n    "短期超买状态恰是机构持仓深度的证明，2022年H2因忽视技术护城河过早减仓导致错失300%涨幅",\n    "高估值已内化于PEG<1的合理区间，TSMC财报验证AI需求持续性，供应链风险反成议价能力优势"\n  ],\n  "risk_assessment": "承认短期波动率风险，但ADX趋势强度53.22表明主升浪未尽，量子计算突破已引发行业β溢价，通过MA20支撑位分批建仓可实现风险收益比优化",\n  "proposed_action": "INCREASE_RISK",\n  "confidence": 0.89\n}', 'safe_history': '', 'neutral_history': '', 'latest_speaker': 'Risky', 'current_risky_response': 'Risky Analyst: \n\n{\n  "role": "risky_debator",\n  "stance": "aggressive",\n  "summary": "NVDA技术面多头共振叠加AI生态护城河，高波动性与超买状态恰是趋势延续催化剂，估值溢价已获盈利质量对冲。",\n  "supporting_points": [\n    "布林带突破后维持30日均线上方40%涨幅显示趋势动能强劲，ATR波动性放大反映市场深度认同AI革命叙事",\n    "70%毛利率+55%净利率的盈利堡垒支撑估值扩张，CUDA生态与设计工具链构筑20年技术代差"\n  ],\n  "counter_arguments": [\n    "短期超买状态恰是机构持仓深度的证明，2022年H2因忽视技术护城河过早减仓导致错失300%涨幅",\n    "高估值已内化于PEG<1的合理区间，TSMC财报验证AI需求持续性，供应链风险反成议价能力优势"\n  ],\n  "risk_assessment": "承认短期波动率风险，但ADX趋势强度53.22表明主升浪未尽，量子计算突破已引发行业β溢价，通过MA20支撑位分批建仓可实现风险收益比优化",\n  "proposed_action": "INCREASE_RISK",\n  "confidence": 0.89\n}', 'current_safe_response': '', 'current_neutral_response': '', 'judge_decision': '', 'count': 1}

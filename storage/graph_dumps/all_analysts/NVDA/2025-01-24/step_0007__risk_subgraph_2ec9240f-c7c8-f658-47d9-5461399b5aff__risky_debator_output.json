@@ -1,0 +1,16 @@
+{
+  "risk_summary": {
+    "risk_debate_state": {
+      "history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面呈现多重买入信号叠加基本面高增长韧性，AI生态跨行业渗透创造结构性机会，短期波动风险可通过动态止盈策略对冲。\",\n  \"supporting_points\": [\n    \"MACD金叉+均线多头排列+RSI未超买形成技术共振，突破148.83美元上轨后可能打开153.08美元关键阻力位的上涨空间\",\n    \"ROE突破100%且自由现金流超960亿美元的财务实力，叠加核能/能源行业战略合作带来的新增长曲线，支撑估值溢价的持续性\"\n  ],\n  \"counter_arguments\": [\n    \"RSI接近70的超买预警被误读为风险，实则当前62.06水平仍处于安全区间且突破中轨后动能未衰竭\",\n    \"机构持仓调整被过度解读为利空，Vanguard零持股本质是会计处理中性事件，反而可能引发技术性反弹\"\n  ],\n  \"risk_assessment\": \"短期波动性风险已被布林带宽度和ATR指标量化控制，而AI基础设施需求的长期确定性（LLM训练成本下降支撑硬件迭代需求）与合作伙伴生态系统的商业化加速（戴尔AI服务器500亿美元预期）形成收益-风险比的显著优势\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "risky_history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面呈现多重买入信号叠加基本面高增长韧性，AI生态跨行业渗透创造结构性机会，短期波动风险可通过动态止盈策略对冲。\",\n  \"supporting_points\": [\n    \"MACD金叉+均线多头排列+RSI未超买形成技术共振，突破148.83美元上轨后可能打开153.08美元关键阻力位的上涨空间\",\n    \"ROE突破100%且自由现金流超960亿美元的财务实力，叠加核能/能源行业战略合作带来的新增长曲线，支撑估值溢价的持续性\"\n  ],\n  \"counter_arguments\": [\n    \"RSI接近70的超买预警被误读为风险，实则当前62.06水平仍处于安全区间且突破中轨后动能未衰竭\",\n    \"机构持仓调整被过度解读为利空，Vanguard零持股本质是会计处理中性事件，反而可能引发技术性反弹\"\n  ],\n  \"risk_assessment\": \"短期波动性风险已被布林带宽度和ATR指标量化控制，而AI基础设施需求的长期确定性（LLM训练成本下降支撑硬件迭代需求）与合作伙伴生态系统的商业化加速（戴尔AI服务器500亿美元预期）形成收益-风险比的显著优势\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "safe_history": "",
+      "neutral_history": "",
+      "latest_speaker": "Risky",
+      "current_risky_response": "Risky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面呈现多重买入信号叠加基本面高增长韧性，AI生态跨行业渗透创造结构性机会，短期波动风险可通过动态止盈策略对冲。\",\n  \"supporting_points\": [\n    \"MACD金叉+均线多头排列+RSI未超买形成技术共振，突破148.83美元上轨后可能打开153.08美元关键阻力位的上涨空间\",\n    \"ROE突破100%且自由现金流超960亿美元的财务实力，叠加核能/能源行业战略合作带来的新增长曲线，支撑估值溢价的持续性\"\n  ],\n  \"counter_arguments\": [\n    \"RSI接近70的超买预警被误读为风险，实则当前62.06水平仍处于安全区间且突破中轨后动能未衰竭\",\n    \"机构持仓调整被过度解读为利空，Vanguard零持股本质是会计处理中性事件，反而可能引发技术性反弹\"\n  ],\n  \"risk_assessment\": \"短期波动性风险已被布林带宽度和ATR指标量化控制，而AI基础设施需求的长期确定性（LLM训练成本下降支撑硬件迭代需求）与合作伙伴生态系统的商业化加速（戴尔AI服务器500亿美元预期）形成收益-风险比的显著优势\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "current_safe_response": "",
+      "current_neutral_response": "",
+      "judge_decision": "",
+      "count": 1
+    }
+  }
+}

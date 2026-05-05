@@ -215,15 +215,17 @@ local_outputs/
 
 # Database files
 *.db
-!demo_data.db
 *.sqlite
 *.sqlite3
 
 # Runtime generated experiment artifacts
-storage/
 graph_outputs/
 test_results/
 backtest_results_v0/
+
+# Project storage data is versioned on this branch.
+!storage/
+!storage/**
 
 # Time series data files
 *.hdf5

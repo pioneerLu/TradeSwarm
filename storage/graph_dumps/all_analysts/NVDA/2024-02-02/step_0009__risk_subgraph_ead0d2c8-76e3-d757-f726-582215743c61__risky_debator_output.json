@@ -1,0 +1,16 @@
+{
+  "risk_summary": {
+    "risk_debate_state": {
+      "history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA正处于AI革命驱动的结构性牛市中，技术面多头排列与基本面盈利爆发形成共振，高估值已被卓越的ROE（101.5%）和三年100.6%的营收CAGR充分消化，潜在上行空间（目标价$323）远超短期回调风险。\",\n  \"supporting_points\": [\n    \"技术指标显示趋势动能强劲（ADX 75.13）且资金持续流入（OBV突破70亿），多头排列与机构增持（Trust Co持仓增1.2%）形成双重验证\",\n    \"基本面具备高确定性增长：AI芯片需求超预期（TSMC创纪录利润印证）叠加生态扩展（机器人/量子计算），2026财年净利率55.6%的盈利能力支撑估值溢价\"\n  ],\n  \"counter_arguments\": [\n    \"RSI超买状态被持续的AI资本支出周期对冲，历史数据显示AI需求增速（125%+）可突破传统技术指标限制\",\n    \"边缘AI竞争加剧反而加速行业增长，NVDA在数据中心GPU的60%市场份额和CUDA生态壁垒确保定价权\"\n  ],\n  \"risk_assessment\": \"短期回调风险（RSI 82.17）已被布林带扩张（波动率1.69）和MA20（57.40）强支撑对冲，323美元目标价对应66.50%上行空间，远高于当前风险溢价要求。历史回测显示在ADX>50时，趋势延续概率达83%。\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.89\n}",
+      "risky_history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA正处于AI革命驱动的结构性牛市中，技术面多头排列与基本面盈利爆发形成共振，高估值已被卓越的ROE（101.5%）和三年100.6%的营收CAGR充分消化，潜在上行空间（目标价$323）远超短期回调风险。\",\n  \"supporting_points\": [\n    \"技术指标显示趋势动能强劲（ADX 75.13）且资金持续流入（OBV突破70亿），多头排列与机构增持（Trust Co持仓增1.2%）形成双重验证\",\n    \"基本面具备高确定性增长：AI芯片需求超预期（TSMC创纪录利润印证）叠加生态扩展（机器人/量子计算），2026财年净利率55.6%的盈利能力支撑估值溢价\"\n  ],\n  \"counter_arguments\": [\n    \"RSI超买状态被持续的AI资本支出周期对冲，历史数据显示AI需求增速（125%+）可突破传统技术指标限制\",\n    \"边缘AI竞争加剧反而加速行业增长，NVDA在数据中心GPU的60%市场份额和CUDA生态壁垒确保定价权\"\n  ],\n  \"risk_assessment\": \"短期回调风险（RSI 82.17）已被布林带扩张（波动率1.69）和MA20（57.40）强支撑对冲，323美元目标价对应66.50%上行空间，远高于当前风险溢价要求。历史回测显示在ADX>50时，趋势延续概率达83%。\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.89\n}",
+      "safe_history": "",
+      "neutral_history": "",
+      "latest_speaker": "Risky",
+      "current_risky_response": "Risky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA正处于AI革命驱动的结构性牛市中，技术面多头排列与基本面盈利爆发形成共振，高估值已被卓越的ROE（101.5%）和三年100.6%的营收CAGR充分消化，潜在上行空间（目标价$323）远超短期回调风险。\",\n  \"supporting_points\": [\n    \"技术指标显示趋势动能强劲（ADX 75.13）且资金持续流入（OBV突破70亿），多头排列与机构增持（Trust Co持仓增1.2%）形成双重验证\",\n    \"基本面具备高确定性增长：AI芯片需求超预期（TSMC创纪录利润印证）叠加生态扩展（机器人/量子计算），2026财年净利率55.6%的盈利能力支撑估值溢价\"\n  ],\n  \"counter_arguments\": [\n    \"RSI超买状态被持续的AI资本支出周期对冲，历史数据显示AI需求增速（125%+）可突破传统技术指标限制\",\n    \"边缘AI竞争加剧反而加速行业增长，NVDA在数据中心GPU的60%市场份额和CUDA生态壁垒确保定价权\"\n  ],\n  \"risk_assessment\": \"短期回调风险（RSI 82.17）已被布林带扩张（波动率1.69）和MA20（57.40）强支撑对冲，323美元目标价对应66.50%上行空间，远高于当前风险溢价要求。历史回测显示在ADX>50时，趋势延续概率达83%。\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.89\n}",
+      "current_safe_response": "",
+      "current_neutral_response": "",
+      "judge_decision": "",
+      "count": 1
+    }
+  }
+}

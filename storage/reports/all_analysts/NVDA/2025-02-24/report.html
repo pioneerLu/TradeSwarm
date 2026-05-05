@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>NVDA 2025-02-24 TradeSwarm Report</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 16mm;
+    }
+    body {
+      color: #172033;
+      font-family: "Microsoft YaHei", "Noto Sans CJK SC", "Segoe UI", Arial, sans-serif;
+      font-size: 12px;
+      line-height: 1.55;
+      margin: 0;
+    }
+    h1, h2, h3 {
+      color: #0f2a4f;
+      margin: 0;
+    }
+    h1 {
+      font-size: 26px;
+      letter-spacing: 0.02em;
+    }
+    h2 {
+      border-bottom: 1px solid #d9e2ef;
+      font-size: 16px;
+      margin-top: 22px;
+      padding-bottom: 6px;
+    }
+    .subtitle {
+      color: #53657d;
+      margin-top: 6px;
+    }
+    .meta-grid {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: repeat(2, 1fr);
+      margin-top: 18px;
+    }
+    .card {
+      background: #f7f9fc;
+      border: 1px solid #dce5f1;
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .label {
+      color: #607086;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .value {
+      color: #172033;
+      font-size: 13px;
+      margin-top: 3px;
+      word-break: break-word;
+    }
+    .section {
+      margin-top: 12px;
+    }
+    .pre {
+      background: #fbfcff;
+      border: 1px solid #dce5f1;
+      border-radius: 8px;
+      color: #1f2937;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 10.5px;
+      padding: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .badge {
+      background: #e8f1ff;
+      border: 1px solid #bfd7ff;
+      border-radius: 999px;
+      color: #174984;
+      display: inline-block;
+      font-size: 10px;
+      margin: 3px 4px 0 0;
+      padding: 2px 8px;
+    }
+    .footer {
+      border-top: 1px solid #d9e2ef;
+      color: #7a889a;
+      font-size: 10px;
+      margin-top: 26px;
+      padding-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>TradeSwarm 投研报告</h1>
+  <div class="subtitle">NVDA · 2025-02-24 · backtest</div>
+
+  <div class="meta-grid">
+    <div class="card">
+      <div class="label">Experiment</div>
+      <div class="value">all_analysts</div>
+    </div>
+    <div class="card">
+      <div class="label">Analysts</div>
+      <div class="value">market, news, sentiment, fundamentals</div>
+    </div>
+    <div class="card">
+      <div class="label">LLM</div>
+      <div class="value">-</div>
+    </div>
+    <div class="card">
+      <div class="label">Strategy Skill</div>
+      <div class="value">reflect / downtrend_skill</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h2>市场状态与 Skill</h2>
+  <div class="section">
+    
+    <span class="badge">market_regime: strong_uptrend</span>
+    
+    <span class="badge">selected_skill: strong_uptrend_skill</span>
+    
+    <span class="badge">regime_confidence: 0.75</span>
+    
+    <span class="badge">skill_router_mode: reflect</span>
+    
+    <span class="badge">forced_selected_skill: downtrend_skill</span>
+    
+    <span class="badge">reflection_market_regime: strong_uptrend</span>
+    
+    <span class="badge">reflection_selected_skill: strong_uptrend_skill</span>
+    
+    <span class="badge">reflection_confidence: 0.75</span>
+    
+  </div>
+  
+
+  <h2>Research Manager 投资计划</h2>
+  <div class="pre">
+
+{
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "NVDA技术面呈现多头排列与MACD金叉确认趋势反转，基本面维持卓越盈利与现金流质量，AI生态扩展强化长期增长动能。尽管存在估值分歧和短期超买风险，但PEG比率显示估值安全边际。",
+  "rationale": [
+    "技术指标共振看涨（MACD金叉、多条均线突破、OBV转正）且成交量验证反弹有效性，趋势反转信号强于超买修正风险",
+    "基本面ROE超100%、经营现金流1027亿美元及连续三年三位数营收增速证明AI革命带来的定价权和增长韧性，存货增加可视为行业周期性特征而非需求反转"
+  ],
+  "action_plan": [
+    "以146美元布林带上轨作为趋势延续验证位，突破确认后关注机构持仓动态与Halos生态系统商业进展",
+    "设置动态止损位（布林带中轨130.05美元）并监控140-146美元阻力区间突破有效性，结合机构持仓分化信号调整仓位"
+  ],
+  "notes_from_past_mistakes": [
+    "警惕2024年AI算力需求短期过热导致的库存周期风险",
+    "2023年技术指标假突破事件表明需严格验证阻力位有效性"
+  ]
+}</div>
+
+  <h2>Trader 执行计划</h2>
+  <div class="pre">
+
+{
+  "role": "trader",
+  "market_regime": "strong_uptrend",
+  "selected_skill": "strong_uptrend_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "技术指标多头共振（MACD金叉、均线多头排列、OBV转正）且成交量验证反弹有效性",
+    "基本面ROE超100%、经营现金流1027亿美元及连续三年三位数营收增速证明AI革命带来的定价权和增长韧性"
+  ],
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "T+1_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "NVDA技术面确认趋势反转且基本面维持高成长性，以35%仓位顺势加仓并设置动态止损，持有至146美元阻力位突破确认",
+  "risk_controls": {
+    "stop_loss_pct": -7.17,
+    "take_profit_pct": 4.2,
+    "invalidation": "若价格跌破布林带中轨130.05美元或146美元阻力位突破失败则止损",
+    "time_horizon": "3-6个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "信心：高。技术面多头信号强于短期超买风险，基本面PEG比率显示估值安全边际，但需严格监控146美元阻力位突破有效性及库存周期变化。"
+}</div>
+
+  <h2>Risk Manager 风控裁决</h2>
+  <div class="pre">
+
+{
+  "role": "risk_manager",
+  "market_regime": "strong_uptrend",
+  "selected_skill": "strong_uptrend_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "技术指标多头共振（MACD金叉、均线多头排列、OBV转正）且成交量验证反弹有效性",
+    "基本面ROE超100%、经营现金流1027亿美元及连续三年三位数营收增速证明AI革命带来的定价权和增长韧性"
+  ],
+  "final_decision": "BUY",
+  "fine_rating": "Overweight",
+  "summary": "NVDA技术面确认趋势反转且基本面维持高成长性，以20%仓位顺势加仓并设置动态止损，持有至146美元阻力位突破确认",
+  "rationale": [
+    "技术面多头信号（MACD金叉、OBV转正）与基本面高增长形成正向协同，但需警惕短期超买回调风险（RSI 69.02）及新闻数据时间戳异常导致的信号可靠性问题",
+    "库存周期调整风险（存货同比激增112%）和竞争格局演变（AMD等对手进展）构成中长期不确定性，需通过仓位控制和严格止损对冲"
+  ],
+  "position_size": 0.2,
+  "max_drawdown": "最大回撤容忍度7%（布林带中轨130.05美元下方7%区域）",
+  "stop_loss": "跌破布林带中轨130.05美元或146美元阻力位突破失败则止损",
+  "take_profit": "盈利达4.2%且出现趋势破坏信号（如RSI超买区回调至50以下）时分批止盈",
+  "time_horizon": "3-6个月（需在146美元阻力位突破后重新评估）",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "2024Q4库存周期调整导致18%回撤，需密切监控存货周转天数变化",
+    "2023年MACD金叉场景出现3次假突破，突破失败后平均回撤18%"
+  ]
+}</div>
+
+  <h2>最终执行载荷</h2>
+  <div class="pre">{
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "stop_loss": null,
+  "take_profit": null,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "已持仓 20.0%，目标 20.0% 无显著增量，HOLD",
+  "is_exploratory": false,
+  "execution_date": "2025-02-25",
+  "market_regime": "strong_uptrend",
+  "selected_skill": "strong_uptrend_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "技术指标多头共振（MACD金叉、均线多头排列、OBV转正）且成交量验证反弹有效性",
+    "基本面ROE超100%、经营现金流1027亿美元及连续三年三位数营收增速证明AI革命带来的定价权和增长韧性"
+  ],
+  "skill_router_mode": "reflect",
+  "forced_selected_skill": "downtrend_skill",
+  "reflection_market_regime": "strong_uptrend",
+  "reflection_selected_skill": "strong_uptrend_skill",
+  "reflection_confidence": 0.75,
+  "reflection_evidence": [
+    "技术指标多头共振（MACD金叉、均线多头排列、OBV转正）且成交量验证反弹有效性",
+    "基本面ROE超100%、经营现金流1027亿美元及连续三年三位数营收增速证明AI革命带来的定价权和增长韧性"
+  ],
+  "date": "2025-02-24",
+  "symbol": "NVDA",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}</div>
+
+  <div class="footer">
+    Generated by TradeSwarm. Source artifacts: report.json / report.txt / report.html.
+  </div>
+</body>
+</html>

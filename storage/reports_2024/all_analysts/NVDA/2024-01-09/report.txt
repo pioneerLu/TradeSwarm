@@ -1,0 +1,102 @@
+Symbol: NVDA
+        Trade Date: 2024-01-09
+        Experiment ID: all_analysts
+        Enabled Analysts: market, news, sentiment, fundamentals
+        Export Mode: backtest
+
+        [Research Investment Plan]
+
+
+{
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "NVDA技术面突破获量价双重确认，机构增持与分析师目标价上调强化多头共识。基本面显示AI芯片需求驱动的超级成长模型，估值安全边际与生态系统壁垒支撑长期逻辑。",
+  "rationale": [
+    "技术面突破50美元阻力位伴随成交量放大1.7倍，MACD金叉与OBV创新高验证趋势延续性，49-49.5美元支撑位距现价仅5%回调空间且历史承接能力强",
+    "基本面三年营收/净利润复合增长率达100.3%/197.5%，AI业务70%营收占比对应83%市占率，PEG0.808与30.72倍市净率反映高ROE（101.5%）的持续溢价能力"
+  ],
+  "action_plan": [
+    "监控49-49.5美元支撑有效性，突破后持有者可沿55美元目标位分批止盈，空仓者可于支撑位波段建仓",
+    "跟踪Meta-Broadcom合作对定制芯片市场的影响，同时关注Cadence生态整合进展与Supermicro边缘AI方案的渗透速度"
+  ],
+  "notes_from_past_mistakes": [
+    "2023年Q4曾因高估及时段性回调误判支撑位强度，需注意当前49美元支撑已获多条均线（MA10/MA20）与机构持仓成本锚定",
+    "2025年H1过度依赖ROE增速未考虑资本开支周期，应持续验证2026年投资现金流-522.3亿对应的产能扩张与未来营收转化效率"
+  ]
+}
+
+        [Trader Investment Plan]
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.75,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "技术面突破获量价确认叠加分析师多头共识强化，按70%仓位比例追加配置。49-49.5美元支撑位提供安全边际，55美元目标位与PEG估值优势形成逻辑闭环。",
+  "risk_controls": {
+    "stop_loss_pct": 0.06,
+    "take_profit_pct": 0.09,
+    "invalidation": "若49美元支撑失守触发止损，或Meta-Broadcom合作导致AI芯片需求预期显著下修",
+    "time_horizon": "中短期持有（3-6个月），长期跟踪AI生态壁垒演化"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.75,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "当前持仓浮盈8.48%已提供安全垫，追加仓位可优化成本结构。需注意2026年投资现金流-522亿对应的产能爬坡周期，若Q2财报显示库存健康度恶化则触发失效条件"
+}
+
+        [Risk Final Trade Decision]
+
+
+{
+  "role": "risk_manager",
+  "final_decision": "BUY",
+  "fine_rating": "Overweight",
+  "summary": "NVDA技术面突破获量价确认叠加机构增持共识，但需警惕超买修正与地缘政治风险。建议维持多头方向，通过仓位压缩和动态风控平衡增长潜力与短期波动。",
+  "rationale": [
+    "技术面多头排列与基本面高ROE(101.5%)形成正向闭环，但RSI(64.6)接近超买区域(70)存在60%回调修正风险",
+    "地缘政治风险(霍尔木兹海峡)与内存股轮动可能引发短期资金分流，需通过MA20(48.75)支撑验证和OBV趋势监测控制敞口"
+  ],
+  "position_size": 0.50,
+  "max_drawdown": "最大回撤容忍度5%-8%，对应49-46美元关键支撑区间",
+  "stop_loss": "跌破48.75美元(MA20)或OBV出现连续3日下降时触发止损",
+  "take_profit": "盈利达10%且RSI(70+)与MACD柱状图同步扩张时分批止盈",
+  "time_horizon": "3-6个月中短期持有，密切跟踪Q2财报指引与边缘AI竞争格局",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "2023年Q4曾因过早设置单一价格止损错过突破延续",
+    "2025年H1未充分考虑机构持仓成本与技术指标的共振支撑"
+  ]
+}
+
+        [Execution Payload]
+        {
+  "action": "BUY",
+  "target_pct": 0.5,
+  "stop_loss": "跌破48.75美元(MA20)或OBV出现连续3日下降时触发止损",
+  "take_profit": "盈利达10%且RSI(70+)与MACD柱状图同步扩张时分批止盈",
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "技术面突破获量价确认叠加分析师多头共识强化，按70%仓位比例追加配置。49-49.5美元支撑位提供安全边际，55美元目标位与PEG估值优势形成逻辑闭环。",
+  "is_exploratory": false,
+  "execution_date": "2024-01-10",
+  "cancel_pending_orders": true,
+  "date": "2024-01-09",
+  "symbol": "NVDA",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}

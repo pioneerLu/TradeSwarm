@@ -1,0 +1,16 @@
+{
+  "risk_summary": {
+    "risk_debate_state": {
+      "history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面呈现完美多头排列与极强趋势动能（ADX 66.58），基本面三年营收CAGR 100.5%与净利率55.6%的盈利模型形成双重支撑，AI基础设施需求验证与量子计算突破带来的生态系统扩展具备持续爆发潜力。\",\n  \"supporting_points\": [\n    \"技术指标显示趋势强度极强（ADX>50）且多头排列完整，历史数据显示RSI超买后的回调常伴随快速反弹，未改变长期上升逻辑\",\n    \"基本面估值错配（PEG 0.717）与AI芯片需求验证（TSMC季度业绩指引）形成安全边际，存货风险被2159亿美元营收增长预期对冲\"\n  ],\n  \"counter_arguments\": [\n    \"短期超买风险已被量价结构消化：突破日成交量6.8亿股确认趋势有效性，布林带扩张显示波动性为趋势延续提供动能\",\n    \"估值压力源自市场对技术护城河的溢价认可，当前PE 41.15倍对应65.5%的营收增速，实际折价反映市场过度保守\"\n  ],\n  \"risk_assessment\": \"承认短期RSI超买与MACD动能收缩的回调风险，但布林带76.23美元阻力位突破后将打开新上涨空间。通过动态止损（70美元支撑位）可锁定已有收益，同时享受AI需求持续驱动的指数级增长潜力，风险收益比达1:3以上。\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "risky_history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面呈现完美多头排列与极强趋势动能（ADX 66.58），基本面三年营收CAGR 100.5%与净利率55.6%的盈利模型形成双重支撑，AI基础设施需求验证与量子计算突破带来的生态系统扩展具备持续爆发潜力。\",\n  \"supporting_points\": [\n    \"技术指标显示趋势强度极强（ADX>50）且多头排列完整，历史数据显示RSI超买后的回调常伴随快速反弹，未改变长期上升逻辑\",\n    \"基本面估值错配（PEG 0.717）与AI芯片需求验证（TSMC季度业绩指引）形成安全边际，存货风险被2159亿美元营收增长预期对冲\"\n  ],\n  \"counter_arguments\": [\n    \"短期超买风险已被量价结构消化：突破日成交量6.8亿股确认趋势有效性，布林带扩张显示波动性为趋势延续提供动能\",\n    \"估值压力源自市场对技术护城河的溢价认可，当前PE 41.15倍对应65.5%的营收增速，实际折价反映市场过度保守\"\n  ],\n  \"risk_assessment\": \"承认短期RSI超买与MACD动能收缩的回调风险，但布林带76.23美元阻力位突破后将打开新上涨空间。通过动态止损（70美元支撑位）可锁定已有收益，同时享受AI需求持续驱动的指数级增长潜力，风险收益比达1:3以上。\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "safe_history": "",
+      "neutral_history": "",
+      "latest_speaker": "Risky",
+      "current_risky_response": "Risky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面呈现完美多头排列与极强趋势动能（ADX 66.58），基本面三年营收CAGR 100.5%与净利率55.6%的盈利模型形成双重支撑，AI基础设施需求验证与量子计算突破带来的生态系统扩展具备持续爆发潜力。\",\n  \"supporting_points\": [\n    \"技术指标显示趋势强度极强（ADX>50）且多头排列完整，历史数据显示RSI超买后的回调常伴随快速反弹，未改变长期上升逻辑\",\n    \"基本面估值错配（PEG 0.717）与AI芯片需求验证（TSMC季度业绩指引）形成安全边际，存货风险被2159亿美元营收增长预期对冲\"\n  ],\n  \"counter_arguments\": [\n    \"短期超买风险已被量价结构消化：突破日成交量6.8亿股确认趋势有效性，布林带扩张显示波动性为趋势延续提供动能\",\n    \"估值压力源自市场对技术护城河的溢价认可，当前PE 41.15倍对应65.5%的营收增速，实际折价反映市场过度保守\"\n  ],\n  \"risk_assessment\": \"承认短期RSI超买与MACD动能收缩的回调风险，但布林带76.23美元阻力位突破后将打开新上涨空间。通过动态止损（70美元支撑位）可锁定已有收益，同时享受AI需求持续驱动的指数级增长潜力，风险收益比达1:3以上。\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "current_safe_response": "",
+      "current_neutral_response": "",
+      "judge_decision": "",
+      "count": 1
+    }
+  }
+}

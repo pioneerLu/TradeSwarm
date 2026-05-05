@@ -1,0 +1,16 @@
+{
+  "risk_summary": {
+    "risk_debate_state": {
+      "history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA在AI革命核心赛道占据绝对主导地位，技术指标显示超跌修复窗口，机构增持与分析师目标价上调形成强支撑，高波动性环境为风险敞口扩大提供超额收益机会。\",\n  \"supporting_points\": [\n    \"AI基础设施需求持续爆发（3年营收增速65.5%）叠加生态系统护城河（与Cadence深化合作），基本面支撑位稳固且成长性可验证\",\n    \"技术面出现黄金交叉前兆（MACD柱状图转正+RSI接近超卖），历史数据显示ADX>20时技术修复反弹平均带来18%超额收益\"\n  ],\n  \"counter_arguments\": [\n    \"地缘政治风险已被市场提前定价（S&P 500冲突6周后基本持平），当前估值（PEG 0.808）仍反映65%增速预期的安全边际\",\n    \"库存增长反映供应链对AI算力需求的前瞻备货（Synergy Research预测2026年AI数据中心需求翻倍），而非需求疲软的滞后指标\"\n  ],\n  \"risk_assessment\": \"短期波动性（ATR 5.38）和竞争加剧风险已被纳入交易框架，通过动态止盈（146.5阻力位）和止损（126.82支撑位）管理可将风险控制在3.5%以内，同时享受AI革命带来的指数级增长红利\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.78\n}",
+      "risky_history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA在AI革命核心赛道占据绝对主导地位，技术指标显示超跌修复窗口，机构增持与分析师目标价上调形成强支撑，高波动性环境为风险敞口扩大提供超额收益机会。\",\n  \"supporting_points\": [\n    \"AI基础设施需求持续爆发（3年营收增速65.5%）叠加生态系统护城河（与Cadence深化合作），基本面支撑位稳固且成长性可验证\",\n    \"技术面出现黄金交叉前兆（MACD柱状图转正+RSI接近超卖），历史数据显示ADX>20时技术修复反弹平均带来18%超额收益\"\n  ],\n  \"counter_arguments\": [\n    \"地缘政治风险已被市场提前定价（S&P 500冲突6周后基本持平），当前估值（PEG 0.808）仍反映65%增速预期的安全边际\",\n    \"库存增长反映供应链对AI算力需求的前瞻备货（Synergy Research预测2026年AI数据中心需求翻倍），而非需求疲软的滞后指标\"\n  ],\n  \"risk_assessment\": \"短期波动性（ATR 5.38）和竞争加剧风险已被纳入交易框架，通过动态止盈（146.5阻力位）和止损（126.82支撑位）管理可将风险控制在3.5%以内，同时享受AI革命带来的指数级增长红利\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.78\n}",
+      "safe_history": "",
+      "neutral_history": "",
+      "latest_speaker": "Risky",
+      "current_risky_response": "Risky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA在AI革命核心赛道占据绝对主导地位，技术指标显示超跌修复窗口，机构增持与分析师目标价上调形成强支撑，高波动性环境为风险敞口扩大提供超额收益机会。\",\n  \"supporting_points\": [\n    \"AI基础设施需求持续爆发（3年营收增速65.5%）叠加生态系统护城河（与Cadence深化合作），基本面支撑位稳固且成长性可验证\",\n    \"技术面出现黄金交叉前兆（MACD柱状图转正+RSI接近超卖），历史数据显示ADX>20时技术修复反弹平均带来18%超额收益\"\n  ],\n  \"counter_arguments\": [\n    \"地缘政治风险已被市场提前定价（S&P 500冲突6周后基本持平），当前估值（PEG 0.808）仍反映65%增速预期的安全边际\",\n    \"库存增长反映供应链对AI算力需求的前瞻备货（Synergy Research预测2026年AI数据中心需求翻倍），而非需求疲软的滞后指标\"\n  ],\n  \"risk_assessment\": \"短期波动性（ATR 5.38）和竞争加剧风险已被纳入交易框架，通过动态止盈（146.5阻力位）和止损（126.82支撑位）管理可将风险控制在3.5%以内，同时享受AI革命带来的指数级增长红利\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.78\n}",
+      "current_safe_response": "",
+      "current_neutral_response": "",
+      "judge_decision": "",
+      "count": 1
+    }
+  }
+}

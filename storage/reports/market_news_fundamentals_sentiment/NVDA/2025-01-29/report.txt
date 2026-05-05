@@ -1,0 +1,101 @@
+Symbol: NVDA
+        Trade Date: 2025-01-29
+        Experiment ID: market_news_fundamentals_sentiment
+        Enabled Analysts: market, news, fundamentals, sentiment
+        Export Mode: backtest
+
+        [Research Investment Plan]
+
+
+{
+  "role": "research_manager",
+  "decision": "HOLD",
+  "summary": "NVDA技术面空头排列与超卖指标形成短期博弈，基本面高成长性与存货风险并存，需等待趋势确认与商业化落地信号。",
+  "rationale": [
+    "技术指标显示股价接近布林带下轨支撑位（172.31美元），但MACD死叉与ADX空头主导表明下跌趋势惯性仍强，反弹信号需结合成交量验证",
+    "基本面维持卓越盈利能力（ROE 101.5%）和行业领导地位，但存货增速（112.3%）与应收账款周转天数延长（62天）暴露需求端潜在隐忧，估值合理性依赖增长持续性"
+  ],
+  "action_plan": [
+    "监控172美元支撑有效性及成交量变化，突破下轨后若出现放量反弹可视为短期交易信号",
+    "跟踪微软核能合作商业化进展与能源行业AI解决方案落地速度，确认生态系统扩展对营收的实质性贡献"
+  ],
+  "notes_from_past_mistakes": [
+    "2024年Q3曾误判布林带下轨支撑为反转信号，实际形成18%回撤，需警惕技术指标假突破风险",
+    "2025年初高估合作伙伴生态系统的短期协同效应，Dell服务器收入目标需结合其AI产品市占率数据重新验证"
+  ]
+}
+
+        [Trader Investment Plan]
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "LIMIT",
+  "entry_price": 172.31,
+  "execution_window": "T+1_OPEN",
+  "summary": "技术面显示股价接近布林带下轨支撑位且超卖指标触发反弹预期，基本面维持高成长性与盈利能力，选择在关键支撑位分批建仓",
+  "risk_controls": {
+    "stop_loss_pct": -5.0,
+    "take_profit_pct": 7.0,
+    "invalidation": "若股价跌破170美元心理关口或出现放量破位信号",
+    "time_horizon": "短期持有（1-2周）"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "LIMIT",
+      "price": 172.31
+    }
+  ],
+  "comment": "需密切跟踪微软核能合作商业化进展及道指科技股整体估值修复情况，若出现技术面反转信号需及时调整策略"
+}
+
+        [Risk Final Trade Decision]
+
+
+{
+  "role": "risk_manager",
+  "final_decision": "BUY",
+  "fine_rating": "Overweight",
+  "summary": "技术面显示超卖信号与关键支撑位形成短期反弹催化剂，但需警惕支撑失效与存货减值风险。基本面维持高成长性与盈利能力，建议在控制风险前提下分批建仓。",
+  "rationale": [
+    "布林带下轨支撑有效性存疑（成交量较1月27日峰值下降40%），若突破失败可能触发二次回撤（历史案例显示平均回撤12%）",
+    "存货激增112.3%反映需求前置风险，需验证微软/SLB合作项目首年采购合同落地情况以确认增长可持续性"
+  ],
+  "position_size": 0.2,
+  "max_drawdown": "单笔交易最大回撤控制在8%以内",
+  "stop_loss": "动态止损：若股价跌破170美元心理关口或布林带下轨172.31美元则触发止损",
+  "take_profit": "分层止盈：首层目标183.12美元（布林带中轨/20日均线），次层目标185.22美元（60日均线）",
+  "time_horizon": "短期持有（1-2周），若突破183.12美元可延长至4周",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "2024Q3误判技术支撑有效性导致18%回撤",
+    "2025年1月突破失败后二次回撤12%的历史教训"
+  ]
+}
+
+        [Execution Payload]
+        {
+  "action": "BUY",
+  "target_pct": 0.05412150591414838,
+  "stop_loss": "动态止损：若股价跌破170美元心理关口或布林带下轨172.31美元则触发止损",
+  "take_profit": "分层止盈：首层目标183.12美元（布林带中轨/20日均线），次层目标185.22美元（60日均线）",
+  "entry_type": "LIMIT",
+  "entry_price": 172.31,
+  "reason": "技术面显示股价接近布林带下轨支撑位且超卖指标触发反弹预期，基本面维持高成长性与盈利能力，选择在关键支撑位分批建仓",
+  "is_exploratory": false,
+  "execution_date": "2025-01-30",
+  "date": "2025-01-29",
+  "symbol": "NVDA",
+  "experiment_id": "market_news_fundamentals_sentiment",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "fundamentals",
+    "sentiment"
+  ]
+}

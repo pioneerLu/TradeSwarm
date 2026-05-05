@@ -1,0 +1,16 @@
+{
+  "risk_summary": {
+    "risk_debate_state": {
+      "history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面多头排列与基本面AI生态主导权形成共振，短期超买风险不改中长期增长逻辑。市场情绪积极且财务健康度高，高波动性环境为趋势延续提供动能。\",\n  \"supporting_points\": [\n    \"技术指标显示趋势强度（ADX 64-75区间）和资金流入（OBV持续创新高）仍维持健康，布林带扩张反映市场对AI算力需求的定价共识\",\n    \"基本面2026财年65.5%营收增速与51.2% ROA验证盈利质量，生态系统绑定（微软万卡采购+HPE云解决方案）形成技术壁垒，PEG 0.717提供估值安全边际\"\n  ],\n  \"counter_arguments\": [\n    \"短期超买状态被过度解读，历史数据显示NVDA在类似情况下回调后仍能快速恢复并创历史新高\",\n    \"高波动性并非风险而是机会，ATR指标显示2.4-2.5美元波动区间可为趋势交易者提供充足止损空间\"\n  ],\n  \"risk_assessment\": \"短期回调风险已被纳入技术分析框架，MA20（63.47-66.58美元）提供强支撑位。基本面65%营收增速和55%净利率形成安全边际，量子计算突破与生态绑定创造第二增长曲线，PEG<1证明估值具备增长支撑力。\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "risky_history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面多头排列与基本面AI生态主导权形成共振，短期超买风险不改中长期增长逻辑。市场情绪积极且财务健康度高，高波动性环境为趋势延续提供动能。\",\n  \"supporting_points\": [\n    \"技术指标显示趋势强度（ADX 64-75区间）和资金流入（OBV持续创新高）仍维持健康，布林带扩张反映市场对AI算力需求的定价共识\",\n    \"基本面2026财年65.5%营收增速与51.2% ROA验证盈利质量，生态系统绑定（微软万卡采购+HPE云解决方案）形成技术壁垒，PEG 0.717提供估值安全边际\"\n  ],\n  \"counter_arguments\": [\n    \"短期超买状态被过度解读，历史数据显示NVDA在类似情况下回调后仍能快速恢复并创历史新高\",\n    \"高波动性并非风险而是机会，ATR指标显示2.4-2.5美元波动区间可为趋势交易者提供充足止损空间\"\n  ],\n  \"risk_assessment\": \"短期回调风险已被纳入技术分析框架，MA20（63.47-66.58美元）提供强支撑位。基本面65%营收增速和55%净利率形成安全边际，量子计算突破与生态绑定创造第二增长曲线，PEG<1证明估值具备增长支撑力。\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "safe_history": "",
+      "neutral_history": "",
+      "latest_speaker": "Risky",
+      "current_risky_response": "Risky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面多头排列与基本面AI生态主导权形成共振，短期超买风险不改中长期增长逻辑。市场情绪积极且财务健康度高，高波动性环境为趋势延续提供动能。\",\n  \"supporting_points\": [\n    \"技术指标显示趋势强度（ADX 64-75区间）和资金流入（OBV持续创新高）仍维持健康，布林带扩张反映市场对AI算力需求的定价共识\",\n    \"基本面2026财年65.5%营收增速与51.2% ROA验证盈利质量，生态系统绑定（微软万卡采购+HPE云解决方案）形成技术壁垒，PEG 0.717提供估值安全边际\"\n  ],\n  \"counter_arguments\": [\n    \"短期超买状态被过度解读，历史数据显示NVDA在类似情况下回调后仍能快速恢复并创历史新高\",\n    \"高波动性并非风险而是机会，ATR指标显示2.4-2.5美元波动区间可为趋势交易者提供充足止损空间\"\n  ],\n  \"risk_assessment\": \"短期回调风险已被纳入技术分析框架，MA20（63.47-66.58美元）提供强支撑位。基本面65%营收增速和55%净利率形成安全边际，量子计算突破与生态绑定创造第二增长曲线，PEG<1证明估值具备增长支撑力。\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "current_safe_response": "",
+      "current_neutral_response": "",
+      "judge_decision": "",
+      "count": 1
+    }
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "risk_summary": {
+    "risk_debate_state": {
+      "history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA基本面盈利质量与AI生态主导权构成强安全垫，技术修复窗口叠加PEG估值洼地，高波动性反成风险对冲工具。\",\n  \"supporting_points\": [\n    \"ROE突破100%且净利率维持55.6%高位，2026财年2159亿美元营收规模支撑估值消化能力\",\n    \"Meta等科技巨头1350亿美元AI投资承诺形成刚性需求，Halos生态系统认证将打开物理AI千亿市场\"\n  ],\n  \"counter_arguments\": [\n    \"毛利率下降4%已被供应链优化预期对冲，历史数据显示其盈利能力具备强修复弹性\",\n    \"OBV流出反映短期套利而非长期需求退潮，机构持仓分化恰恰说明存在估值抬升共识\"\n  ],\n  \"risk_assessment\": \"ATR7.83的波动性可通过动态止盈止损转化为波动收益，130.85美元EMA金叉与25.88倍PB的负相关性提供安全边际，AI叙事强度与机构持仓差形成双保险机制\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.78\n}",
+      "risky_history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA基本面盈利质量与AI生态主导权构成强安全垫，技术修复窗口叠加PEG估值洼地，高波动性反成风险对冲工具。\",\n  \"supporting_points\": [\n    \"ROE突破100%且净利率维持55.6%高位，2026财年2159亿美元营收规模支撑估值消化能力\",\n    \"Meta等科技巨头1350亿美元AI投资承诺形成刚性需求，Halos生态系统认证将打开物理AI千亿市场\"\n  ],\n  \"counter_arguments\": [\n    \"毛利率下降4%已被供应链优化预期对冲，历史数据显示其盈利能力具备强修复弹性\",\n    \"OBV流出反映短期套利而非长期需求退潮，机构持仓分化恰恰说明存在估值抬升共识\"\n  ],\n  \"risk_assessment\": \"ATR7.83的波动性可通过动态止盈止损转化为波动收益，130.85美元EMA金叉与25.88倍PB的负相关性提供安全边际，AI叙事强度与机构持仓差形成双保险机制\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.78\n}",
+      "safe_history": "",
+      "neutral_history": "",
+      "latest_speaker": "Risky",
+      "current_risky_response": "Risky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA基本面盈利质量与AI生态主导权构成强安全垫，技术修复窗口叠加PEG估值洼地，高波动性反成风险对冲工具。\",\n  \"supporting_points\": [\n    \"ROE突破100%且净利率维持55.6%高位，2026财年2159亿美元营收规模支撑估值消化能力\",\n    \"Meta等科技巨头1350亿美元AI投资承诺形成刚性需求，Halos生态系统认证将打开物理AI千亿市场\"\n  ],\n  \"counter_arguments\": [\n    \"毛利率下降4%已被供应链优化预期对冲，历史数据显示其盈利能力具备强修复弹性\",\n    \"OBV流出反映短期套利而非长期需求退潮，机构持仓分化恰恰说明存在估值抬升共识\"\n  ],\n  \"risk_assessment\": \"ATR7.83的波动性可通过动态止盈止损转化为波动收益，130.85美元EMA金叉与25.88倍PB的负相关性提供安全边际，AI叙事强度与机构持仓差形成双保险机制\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.78\n}",
+      "current_safe_response": "",
+      "current_neutral_response": "",
+      "judge_decision": "",
+      "count": 1
+    }
+  }
+}

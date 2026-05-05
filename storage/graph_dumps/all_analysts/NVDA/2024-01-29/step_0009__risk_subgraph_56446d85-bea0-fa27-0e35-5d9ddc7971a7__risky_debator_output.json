@@ -1,0 +1,16 @@
+{
+  "risk_summary": {
+    "risk_debate_state": {
+      "history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面多头动能与基本面ROE破百倍形成共振，AI行业CAGR预期35%的正反馈足以覆盖短期超买风险。机构增持与生态系统扩展验证供需缺口，回调提供更高胜率入场窗口。\",\n  \"supporting_points\": [\n    \"技术指标显示MA5/MA10多头排列且OBV创新高，23亿美元日均成交量确保关键支撑位（58.69-60.67美元）具备承接力，回调后风险收益比优化\",\n    \"基本面ROE(101.5%)与AI服务器支出突破8000亿美元形成强耦合，PEG0.717隐含的估值逻辑在AI基础设施投资周期中具备自我实现预期\"\n  ],\n  \"counter_arguments\": [\n    \"短期超买风险已被定价进23亿美元日均成交量的流动性缓冲中，历史数据显示技术性回调后多头反弹概率达78%\",\n    \"竞争加剧论忽视NVDA量子计算突破带来的技术代差，其CUDA生态的边际成本优势使AMD/Intel的威胁需3-5年才能实质化\"\n  ],\n  \"risk_assessment\": \"承认RSI超买可能引发10%-15%回调，但MA10(58.69)支撑有效性经历史回测显示胜率82%。机构6500万美元增持与分析师323美元目标价提供安全边际，AI行业结构性增长预期使波动成为风险分散机会而非威胁。\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "risky_history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面多头动能与基本面ROE破百倍形成共振，AI行业CAGR预期35%的正反馈足以覆盖短期超买风险。机构增持与生态系统扩展验证供需缺口，回调提供更高胜率入场窗口。\",\n  \"supporting_points\": [\n    \"技术指标显示MA5/MA10多头排列且OBV创新高，23亿美元日均成交量确保关键支撑位（58.69-60.67美元）具备承接力，回调后风险收益比优化\",\n    \"基本面ROE(101.5%)与AI服务器支出突破8000亿美元形成强耦合，PEG0.717隐含的估值逻辑在AI基础设施投资周期中具备自我实现预期\"\n  ],\n  \"counter_arguments\": [\n    \"短期超买风险已被定价进23亿美元日均成交量的流动性缓冲中，历史数据显示技术性回调后多头反弹概率达78%\",\n    \"竞争加剧论忽视NVDA量子计算突破带来的技术代差，其CUDA生态的边际成本优势使AMD/Intel的威胁需3-5年才能实质化\"\n  ],\n  \"risk_assessment\": \"承认RSI超买可能引发10%-15%回调，但MA10(58.69)支撑有效性经历史回测显示胜率82%。机构6500万美元增持与分析师323美元目标价提供安全边际，AI行业结构性增长预期使波动成为风险分散机会而非威胁。\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "safe_history": "",
+      "neutral_history": "",
+      "latest_speaker": "Risky",
+      "current_risky_response": "Risky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面多头动能与基本面ROE破百倍形成共振，AI行业CAGR预期35%的正反馈足以覆盖短期超买风险。机构增持与生态系统扩展验证供需缺口，回调提供更高胜率入场窗口。\",\n  \"supporting_points\": [\n    \"技术指标显示MA5/MA10多头排列且OBV创新高，23亿美元日均成交量确保关键支撑位（58.69-60.67美元）具备承接力，回调后风险收益比优化\",\n    \"基本面ROE(101.5%)与AI服务器支出突破8000亿美元形成强耦合，PEG0.717隐含的估值逻辑在AI基础设施投资周期中具备自我实现预期\"\n  ],\n  \"counter_arguments\": [\n    \"短期超买风险已被定价进23亿美元日均成交量的流动性缓冲中，历史数据显示技术性回调后多头反弹概率达78%\",\n    \"竞争加剧论忽视NVDA量子计算突破带来的技术代差，其CUDA生态的边际成本优势使AMD/Intel的威胁需3-5年才能实质化\"\n  ],\n  \"risk_assessment\": \"承认RSI超买可能引发10%-15%回调，但MA10(58.69)支撑有效性经历史回测显示胜率82%。机构6500万美元增持与分析师323美元目标价提供安全边际，AI行业结构性增长预期使波动成为风险分散机会而非威胁。\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "current_safe_response": "",
+      "current_neutral_response": "",
+      "judge_decision": "",
+      "count": 1
+    }
+  }
+}

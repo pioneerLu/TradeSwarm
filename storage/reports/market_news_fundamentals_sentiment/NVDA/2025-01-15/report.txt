@@ -1,0 +1,103 @@
+Symbol: NVDA
+        Trade Date: 2025-01-15
+        Experiment ID: market_news_fundamentals_sentiment
+        Enabled Analysts: market, news, fundamentals, sentiment
+        Export Mode: backtest
+
+        [Research Investment Plan]
+
+
+```json
+{
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "NVDA技术面接近关键支撑位叠加基本面高成长性，AI生态扩展与合作伙伴验证形成正向循环。看空方对估值和库存的担忧已部分反映在股价中，PEG比率显示增长溢价合理。",
+  "rationale": [
+    "技术面显示股价接近布林带下轨（126.42美元）和130美元心理支撑位，StochRSI（15.46）和RSI（46.75）均指向超卖区域，历史数据显示该区域技术性反弹概率较高，且基本面强劲增长可对冲短期波动风险。",
+    "AI生态系统向核能、能源等关键基础设施的实质性扩展（微软、SLB合作）打开万亿级新市场，合作伙伴财务表现（Marvell+6.54%、Arista+3.05%）验证生态价值，PEG比率0.721表明估值与增长匹配，自由现金流充裕（967亿美元）和低负债率（23.9%）提供抗风险能力。"
+  ],
+  "action_plan": [
+    "关注130美元关键支撑位有效性，若企稳可视为布局机会，重点跟踪Blackwell量产进度及微软核能合作商业化进展。",
+    "监控库存周转效率（当前存货214亿美元）和台积电产能分配动态，同时评估合作伙伴收入增长是否持续验证生态健康度。"
+  ],
+  "notes_from_past_mistakes": [
+    "2024年Q3曾过度乐观估计AI服务器需求，导致忽视库存积压风险，需警惕当前库存增速与需求错配的潜在影响。",
+    "2024年低估地缘政治对华管制影响，本次需密切跟踪美国商务部政策变化对20-25%收入来源的实质性冲击。"
+  ]
+}
+```
+
+        [Trader Investment Plan]
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "LIMIT",
+  "entry_price": 128.0,
+  "execution_window": "T+1_OPEN",
+  "summary": "技术面显示股价接近布林带下轨与130美元支撑位，存在技术性反弹机会。基本面维持高成长性与盈利韧性，生态系统扩展提供长期支撑。采用分批建仓策略捕捉潜在反弹。",
+  "risk_controls": {
+    "stop_loss_pct": -5.0,
+    "take_profit_pct": 8.0,
+    "invalidation": "若跌破126.42美元布林带下轨或出现新的重大利空政策",
+    "time_horizon": "短期持有2-4周，跟踪技术修复与基本面验证"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "LIMIT",
+      "price": 128.0
+    }
+  ],
+  "comment": "需密切监控1月16日开盘后能否站稳136.60美元中轨，若突破则加仓；若持续缩量下探需动态调整止损位。注意微软核能合作的商业化落地进度可能成为中期催化剂。"
+}
+
+        [Risk Final Trade Decision]
+
+
+{
+  "role": "risk_manager",
+  "final_decision": "BUY",
+  "fine_rating": "Overweight",
+  "summary": "NVDA技术面接近关键支撑位叠加基本面高成长性，但需平衡估值压力与地缘政治风险。建议控制仓位并强化止损保护。",
+  "rationale": [
+    "技术面显示股价接近布林带下轨（126.42美元）与130美元心理支撑位，StochRSI（15.46）和RSI（46.75）均指向超卖区域，历史数据显示该区域技术性反弹概率较高",
+    "基本面维持AI基础设施领导地位，PEG比率0.721显示估值与增长匹配，但需警惕库存减值风险（214亿美元）及台积电产能分配对Blackwell量产的影响"
+  ],
+  "position_size": 0.2,
+  "max_drawdown": "单笔交易最大回撤控制在5%以内",
+  "stop_loss": "126.42美元布林带下轨下方5%（120美元）",
+  "take_profit": "突破136.60美元布林带中轨后分批止盈8%",
+  "time_horizon": "持有2-4周，跟踪技术修复与合作伙伴商业化进展",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "2024年Q3曾出现技术支撑失效导致的假突破，需验证130美元支撑有效性",
+    "2024年12月高杠杆买入后遭遇AI芯片需求预期降温引发的估值修正"
+  ]
+}
+
+        [Execution Payload]
+        {
+  "action": "BUY",
+  "target_pct": 0.0568832030170727,
+  "stop_loss": "126.42美元布林带下轨下方5%（120美元）",
+  "take_profit": "突破136.60美元布林带中轨后分批止盈8%",
+  "entry_type": "LIMIT",
+  "entry_price": 128.0,
+  "reason": "技术面显示股价接近布林带下轨与130美元支撑位，存在技术性反弹机会。基本面维持高成长性与盈利韧性，生态系统扩展提供长期支撑。采用分批建仓策略捕捉潜在反弹。",
+  "is_exploratory": false,
+  "execution_date": "2025-01-16",
+  "date": "2025-01-15",
+  "symbol": "NVDA",
+  "experiment_id": "market_news_fundamentals_sentiment",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "fundamentals",
+    "sentiment"
+  ]
+}

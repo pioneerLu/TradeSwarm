@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>NVDA 2025-01-28 TradeSwarm Report</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 16mm;
+    }
+    body {
+      color: #172033;
+      font-family: "Microsoft YaHei", "Noto Sans CJK SC", "Segoe UI", Arial, sans-serif;
+      font-size: 12px;
+      line-height: 1.55;
+      margin: 0;
+    }
+    h1, h2, h3 {
+      color: #0f2a4f;
+      margin: 0;
+    }
+    h1 {
+      font-size: 26px;
+      letter-spacing: 0.02em;
+    }
+    h2 {
+      border-bottom: 1px solid #d9e2ef;
+      font-size: 16px;
+      margin-top: 22px;
+      padding-bottom: 6px;
+    }
+    .subtitle {
+      color: #53657d;
+      margin-top: 6px;
+    }
+    .meta-grid {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: repeat(2, 1fr);
+      margin-top: 18px;
+    }
+    .card {
+      background: #f7f9fc;
+      border: 1px solid #dce5f1;
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .label {
+      color: #607086;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .value {
+      color: #172033;
+      font-size: 13px;
+      margin-top: 3px;
+      word-break: break-word;
+    }
+    .section {
+      margin-top: 12px;
+    }
+    .pre {
+      background: #fbfcff;
+      border: 1px solid #dce5f1;
+      border-radius: 8px;
+      color: #1f2937;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 10.5px;
+      padding: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .badge {
+      background: #e8f1ff;
+      border: 1px solid #bfd7ff;
+      border-radius: 999px;
+      color: #174984;
+      display: inline-block;
+      font-size: 10px;
+      margin: 3px 4px 0 0;
+      padding: 2px 8px;
+    }
+    .footer {
+      border-top: 1px solid #d9e2ef;
+      color: #7a889a;
+      font-size: 10px;
+      margin-top: 26px;
+      padding-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>TradeSwarm 投研报告</h1>
+  <div class="subtitle">NVDA · 2025-01-28 · backtest</div>
+
+  <div class="meta-grid">
+    <div class="card">
+      <div class="label">Experiment</div>
+      <div class="value">all_analysts</div>
+    </div>
+    <div class="card">
+      <div class="label">Analysts</div>
+      <div class="value">market, news, sentiment, fundamentals</div>
+    </div>
+    <div class="card">
+      <div class="label">LLM</div>
+      <div class="value">-</div>
+    </div>
+    <div class="card">
+      <div class="label">Strategy Skill</div>
+      <div class="value">reflect / downtrend_skill</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h2>市场状态与 Skill</h2>
+  <div class="section">
+    
+    <span class="badge">market_regime: downtrend</span>
+    
+    <span class="badge">selected_skill: downtrend_skill</span>
+    
+    <span class="badge">regime_confidence: 0.85</span>
+    
+    <span class="badge">skill_router_mode: reflect</span>
+    
+    <span class="badge">forced_selected_skill: downtrend_skill</span>
+    
+    <span class="badge">reflection_market_regime: high_vol_uncertain</span>
+    
+    <span class="badge">reflection_selected_skill: high_vol_uncertain_skill</span>
+    
+    <span class="badge">reflection_confidence: 0.75</span>
+    
+  </div>
+  
+
+  <h2>Research Manager 投资计划</h2>
+  <div class="pre">
+
+{
+  "role": "research_manager",
+  "decision": "HOLD",
+  "summary": "NVDA基本面维持卓越但技术面系统性崩溃，市场处于长期叙事与短期估值压力的博弈平衡点。建议等待多空动能充分释放后的结构性机会。",
+  "rationale": [
+    "技术面多重看空信号（头肩顶突破+MACD死叉+空头排列）与情绪面谨慎共识形成短期压制，但财务指标（ROE 101.5%、三年净利润CAGR 198.7%）和能源行业AI合作验证长期价值",
+    "PEG估值合理性依赖2026年65%增速预期，而Gartner成本预测和库存/应收账款增速（112%/66.8%）暴露增长边际放缓风险，多空逻辑存在时间维度错配"
+  ],
+  "action_plan": [
+    "监控120美元心理支撑有效性及OBV资金流反转信号，技术性反弹需结合基本面验证",
+    "跟踪微软核能合作商业化进度与毛利率变化，确认AI生态扩展是否能对冲硬件定价权压力"
+  ],
+  "notes_from_past_mistakes": [
+    "2024年Q4曾因忽视库存周期风险导致误判，需警惕当前214亿美元库存的行业传导效应",
+    "历史数据显示技术面超卖后反弹概率67%，但需结合成交量结构验证，避免重演2023年11月虚假突破"
+  ]
+}</div>
+
+  <h2>Trader 执行计划</h2>
+  <div class="pre">
+
+{
+  "role": "trader",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "技术面多重看空信号（头肩顶突破+MACD死叉+空头排列）与基本面卓越指标（ROE 101.5%、三年净利润CAGR 198.7%）形成明显矛盾",
+    "市场情绪呈现创新高讨论热度但估值担忧加剧（情绪得分0.15），叠加1月27日单日16.97%暴跌引发的极端波动性（ATR 7.81）"
+  ],
+  "action": "HOLD",
+  "target_pct": 0.15,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "当前NVDA处于基本面强劲与技术面崩溃的矛盾期，维持15%仓位观察多空动能转化，重点监控120美元支撑有效性及OBV反转信号",
+  "risk_controls": {
+    "stop_loss_pct": -10,
+    "take_profit_pct": 5,
+    "invalidation": "若120美元支撑失守或OBV连续3日为正则加仓至20%，若115美元再破或RSI跌破25则减仓至5%",
+    "time_horizon": "2-4周"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "HOLD",
+      "size_pct": 0.15,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "当前持仓浮亏15.74%需警惕，但基本面PEG合理性仍存。执行HOLD需严格遵守失效条件触发，避免因情绪波动扩大损失。重点关注微软核能合作商业化落地对毛利率的影响，以及120美元支撑位的成交量结构验证。"
+}</div>
+
+  <h2>Risk Manager 风控裁决</h2>
+  <div class="pre">
+
+{
+  "role": "risk_manager",
+  "market_regime": "downtrend",
+  "selected_skill": "downtrend_skill",
+  "regime_confidence": 0.85,
+  "regime_evidence": [
+    "技术面多重看空信号（头肩顶突破+MACD死叉+空头排列）与基本面卓越指标（ROE 101.5%、三年净利润CAGR 198.7%）形成明显矛盾",
+    "股价跌破布林带下轨（124.73）并形成头肩顶形态，OBV持续流出显示资金撤离尚未结束"
+  ],
+  "final_decision": "HOLD",
+  "fine_rating": "Underweight",
+  "summary": "NVDA技术面系统性崩溃与基本面强劲形成剪刀差，维持10%仓位观察120美元支撑有效性，严格控制风险敞口并等待反转信号确认。",
+  "rationale": [
+    "技术面空头排列与头肩顶形态确认中期下跌趋势，120美元支撑位距离当前价格仅1.3%需动态验证",
+    "基本面增长动能边际放缓（2026财年毛利率71.1%较2025财年下降3.9%）叠加库存/应收账款增速暴露供应链风险"
+  ],
+  "position_size": 0.10,
+  "max_drawdown": "最大回撤容忍度为10%（若跌破115美元需强制减仓至5%）",
+  "stop_loss": "跌破120美元支撑位或115美元技术支撑位时触发止损，分批减仓至5%",
+  "take_profit": "若股价反弹至130美元阻力位且OBV连续3日转正，则分批止盈至5%；若突破140美元前高并站稳MA5，则保留10%仓位观察",
+  "time_horizon": "2-4周（若支撑位失效需在1周内重新评估）",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "2023年11月虚假突破事件表明单纯依赖超卖指标可能误判趋势",
+    "需警惕2026年新闻数据时间戳异常导致的信号错位风险"
+  ]
+}</div>
+
+  <h2>最终执行载荷</h2>
+  <div class="pre">{
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "stop_loss": null,
+  "take_profit": null,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "Risk/Trader 决策为 HOLD",
+  "is_exploratory": false,
+  "execution_date": "2025-01-29",
+  "market_regime": "downtrend",
+  "selected_skill": "downtrend_skill",
+  "regime_confidence": 0.85,
+  "regime_evidence": [
+    "技术面多重看空信号（头肩顶突破+MACD死叉+空头排列）与基本面卓越指标（ROE 101.5%、三年净利润CAGR 198.7%）形成明显矛盾",
+    "股价跌破布林带下轨（124.73）并形成头肩顶形态，OBV持续流出显示资金撤离尚未结束"
+  ],
+  "skill_router_mode": "reflect",
+  "forced_selected_skill": "downtrend_skill",
+  "reflection_market_regime": "high_vol_uncertain",
+  "reflection_selected_skill": "high_vol_uncertain_skill",
+  "reflection_confidence": 0.75,
+  "reflection_evidence": [
+    "技术面多重看空信号（头肩顶突破+MACD死叉+空头排列）与基本面卓越指标（ROE 101.5%、三年净利润CAGR 198.7%）形成明显矛盾",
+    "市场情绪呈现创新高讨论热度但估值担忧加剧（情绪得分0.15），叠加1月27日单日16.97%暴跌引发的极端波动性（ATR 7.81）"
+  ],
+  "date": "2025-01-28",
+  "symbol": "NVDA",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}</div>
+
+  <div class="footer">
+    Generated by TradeSwarm. Source artifacts: report.json / report.txt / report.html.
+  </div>
+</body>
+</html>

@@ -1,0 +1,36 @@
+{
+  "symbol": "NVDA",
+  "export_mode": "rating",
+  "start_date": "2026-02-13",
+  "end_date": "2026-02-13",
+  "experiment_id": "smoke_llm_glm_pos",
+  "enabled_analysts": [
+    "market"
+  ],
+  "llm": {
+    "provider": "siliconflow",
+    "profile": "glm_4_9b",
+    "model_name": "Qwen/Qwen3-32B",
+    "temperature": 0.1,
+    "base_url": "https://api.siliconflow.cn/v1"
+  },
+  "input_position": {
+    "current_position_pct": 0.35,
+    "source": "cli"
+  },
+  "by_date": {
+    "2026-02-13": {
+      "date": "2026-02-13",
+      "symbol": "NVDA",
+      "export_mode": "rating",
+      "research_decision": "HOLD",
+      "fine_rating": "Hold",
+      "final_decision": "HOLD",
+      "risk_level": "MEDIUM",
+      "experiment_id": "smoke_llm_glm_pos",
+      "enabled_analysts": [
+        "market"
+      ]
+    }
+  }
+}

@@ -1,0 +1,162 @@
+{
+  "symbol": "NVDA",
+  "start_date": "2025-01-02",
+  "end_date": "2025-01-31",
+  "experiment_id": "market_news_fundamentals_sentiment",
+  "initial_cash": 100000.0,
+  "final_portfolio_state": {
+    "total_value": 100864.220132,
+    "cash": 86150.299592,
+    "positions_value": 14713.92054,
+    "total_return": 0.8642201320000021
+  },
+  "final_position": {
+    "shares": 108.0,
+    "entry_price": 139.56388757407407,
+    "entry_date": "",
+    "current_price": 136.240005,
+    "pnl": -358.97931800000003,
+    "pnl_pct": -2.3816207987971896,
+    "stop_loss_price": null,
+    "take_profit_price": null,
+    "pending_orders": [],
+    "filled_today": []
+  },
+  "trading_days": 19,
+  "signals_count": 19,
+  "daily_results": [
+    {
+      "trade_date": "2025-01-02",
+      "signal_action": "BUY",
+      "execution_date": "2025-01-03",
+      "equity": 100000.0,
+      "shares": 144.0
+    },
+    {
+      "trade_date": "2025-01-03",
+      "signal_action": "HOLD",
+      "execution_date": "2025-01-06",
+      "equity": 100000.0,
+      "shares": 144.0
+    },
+    {
+      "trade_date": "2025-01-06",
+      "signal_action": "BUY",
+      "execution_date": "2025-01-07",
+      "equity": 101601.27928,
+      "shares": 34.0
+    },
+    {
+      "trade_date": "2025-01-07",
+      "signal_action": "BUY",
+      "execution_date": "2025-01-08",
+      "equity": 101601.27928,
+      "shares": 34.0
+    },
+    {
+      "trade_date": "2025-01-08",
+      "signal_action": "BUY",
+      "execution_date": "2025-01-10",
+      "equity": 101285.419484,
+      "shares": 108.0
+    },
+    {
+      "trade_date": "2025-01-10",
+      "signal_action": "BUY",
+      "execution_date": "2025-01-13",
+      "equity": null,
+      "shares": null
+    },
+    {
+      "trade_date": "2025-01-13",
+      "signal_action": "HOLD",
+      "execution_date": "2025-01-14",
+      "equity": 100539.13916,
+      "shares": 108.0
+    },
+    {
+      "trade_date": "2025-01-14",
+      "signal_action": "HOLD",
+      "execution_date": "2025-01-15",
+      "equity": 100539.13916,
+      "shares": 108.0
+    },
+    {
+      "trade_date": "2025-01-15",
+      "signal_action": "BUY",
+      "execution_date": "2025-01-16",
+      "equity": 100380.379052,
+      "shares": 108.0
+    },
+    {
+      "trade_date": "2025-01-16",
+      "signal_action": "BUY",
+      "execution_date": "2025-01-17",
+      "equity": 100864.220132,
+      "shares": 108.0
+    },
+    {
+      "trade_date": "2025-01-17",
+      "signal_action": "BUY",
+      "execution_date": "2025-01-21",
+      "equity": null,
+      "shares": null
+    },
+    {
+      "trade_date": "2025-01-21",
+      "signal_action": "BUY",
+      "execution_date": "2025-01-22",
+      "equity": null,
+      "shares": null
+    },
+    {
+      "trade_date": "2025-01-22",
+      "signal_action": "BUY",
+      "execution_date": "2025-01-23",
+      "equity": null,
+      "shares": null
+    },
+    {
+      "trade_date": "2025-01-23",
+      "signal_action": "BUY",
+      "execution_date": "2025-01-24",
+      "equity": null,
+      "shares": null
+    },
+    {
+      "trade_date": "2025-01-24",
+      "signal_action": "BUY",
+      "execution_date": "2025-01-27",
+      "equity": null,
+      "shares": null
+    },
+    {
+      "trade_date": "2025-01-27",
+      "signal_action": "HOLD",
+      "execution_date": "2025-01-28",
+      "equity": null,
+      "shares": null
+    },
+    {
+      "trade_date": "2025-01-28",
+      "signal_action": "SELL",
+      "execution_date": "2025-01-29",
+      "equity": null,
+      "shares": null
+    },
+    {
+      "trade_date": "2025-01-29",
+      "signal_action": "BUY",
+      "execution_date": "2025-01-30",
+      "equity": null,
+      "shares": null
+    },
+    {
+      "trade_date": "2025-01-30",
+      "signal_action": "HOLD",
+      "execution_date": "2025-01-31",
+      "equity": null,
+      "shares": null
+    }
+  ]
+}

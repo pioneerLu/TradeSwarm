@@ -1,0 +1,133 @@
+Symbol: NVDA
+        Trade Date: 2025-01-07
+        Experiment ID: all_analysts
+        Enabled Analysts: market, news, sentiment, fundamentals
+        Export Mode: backtest
+
+        [Research Investment Plan]
+
+
+{
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "英伟达技术面多头信号明确叠加AI生态主导地位，基本面增速放缓尚未改变长期成长逻辑，监管与竞争风险已部分反映在估值中。",
+  "rationale": [
+    "技术面MACD金叉、布林带突破与多头排列形成共振，社交媒体65%积极情绪及机构增持验证市场共识，Blackwell架构商业化与跨行业应用拓展提供持续增长动能",
+    "2026财年65.5%营收增速仍高于行业均值，101.5% ROE与51.2% ROA证明盈利模式韧性，PEG比率0.721显示估值与增长匹配度尚可"
+  ],
+  "action_plan": [
+    "在147.17支撑位附近建立核心仓位，突破152.11阻力位后增加敞口",
+    "监控欧盟反垄断调查进展与台积电产能分配动态，同时跟踪云服务商订单稳定性及AI行业资本开支节奏"
+  ],
+  "notes_from_past_mistakes": [
+    "2021年AMD案例显示技术面超买背离需警惕深度回调，应避免过度追高",
+    "2024财年初曾低估地缘政治影响，需持续评估中国区业务风险敞口"
+  ]
+}
+
+        [Trader Investment Plan]
+
+
+{
+  "role": "trader",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "技术面RSI接近超买区域（69.62）叠加MACD金叉后柱状图高位扩张，显示动能强但存在背离风险",
+    "新闻面显示欧盟反垄断调查、中美地缘政治风险和AMD竞争加剧等多重不确定性因素并存"
+  ],
+  "action": "BUY",
+  "target_pct": 0.15,
+  "entry_type": "LIMIT",
+  "entry_price": 147.17,
+  "execution_window": "T+1_OPEN",
+  "summary": "在布林带中轨支撑位分批建仓，利用技术面多头排列与基本面成长性共振机会，同时通过限价单控制波动风险",
+  "risk_controls": {
+    "stop_loss_pct": -0.05,
+    "take_profit_pct": 0.10,
+    "invalidation": "若RSI突破70后未能维持或欧盟反垄断调查升级为实质性处罚",
+    "time_horizon": "1-2周内观察突破有效性"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.15,
+      "price_type": "LIMIT",
+      "price": 147.17
+    }
+  ],
+  "comment": "当前6.33%浮盈需设置移动止盈，同时注意Blackwell产能瓶颈可能导致的供应端波动，建议将总仓位控制在组合价值3%以内"
+}
+
+        [Risk Final Trade Decision]
+
+
+```json
+{
+  "role": "risk_manager",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "技术面多头共振（MACD金叉+布林带突破+均线多头排列）与基本面高增长（三年营收CAGR 100.3%）形成支撑，但RSI超买（69.62）和欧盟反垄断调查等风险因素并存",
+    "社交媒体积极情绪（65%）与机构增持形成正反馈，但PEG比率0.721的合理性依赖于60%+增速持续性，存在增长预期落空风险"
+  ],
+  "final_decision": "BUY",
+  "fine_rating": "Overweight",
+  "summary": "NVDA技术面多指标共振叠加AI生态主导地位，基本面高ROE/ROA与PEG合理性支撑估值，但需通过仓位管理和动态风控对冲监管风险与超买回调压力",
+  "rationale": [
+    "技术面多头排列与MACD金叉确认短期趋势，但RSI接近超买区域（69.62）需警惕回调风险",
+    "新闻面监管调查（欧盟）和地缘政治风险（中美）可能影响长期定价权，但当前PEG<1显示增长预期已部分反映"
+  ],
+  "position_size": 0.15,
+  "max_drawdown": "组合总价值3%以内",
+  "stop_loss": "若跌破147.17布林带支撑位或欧盟反垄断调查升级为实质性处罚",
+  "take_profit": "突破150.00心理关口后分批止盈，若RSI突破70且价格回撤至MA5下方则平仓",
+  "time_horizon": "1-2周内观察突破有效性，若Blackwell产能瓶颈缓解或监管风险缓释则延长至3个月",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "需注意2024年12月2日低点37.96美元的极端波动历史，避免过度杠杆",
+    "警惕2021年AMD超买后30%回调的教训，需设置动态止损而非固定比例"
+  ]
+}
+```
+
+        [Execution Payload]
+        {
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "stop_loss": null,
+  "take_profit": null,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "已持仓 19.9%，目标 15.0% 无显著增量，HOLD",
+  "is_exploratory": false,
+  "execution_date": "2025-01-08",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "技术面多头共振（MACD金叉+布林带突破+均线多头排列）与基本面高增长（三年营收CAGR 100.3%）形成支撑，但RSI超买（69.62）和欧盟反垄断调查等风险因素并存",
+    "社交媒体积极情绪（65%）与机构增持形成正反馈，但PEG比率0.721的合理性依赖于60%+增速持续性，存在增长预期落空风险"
+  ],
+  "skill_router_mode": "reflect",
+  "forced_selected_skill": "downtrend_skill",
+  "reflection_market_regime": "high_vol_uncertain",
+  "reflection_selected_skill": "high_vol_uncertain_skill",
+  "reflection_confidence": 0.75,
+  "reflection_evidence": [
+    "技术面RSI接近超买区域（69.62）叠加MACD金叉后柱状图高位扩张，显示动能强但存在背离风险",
+    "新闻面显示欧盟反垄断调查、中美地缘政治风险和AMD竞争加剧等多重不确定性因素并存"
+  ],
+  "date": "2025-01-07",
+  "symbol": "NVDA",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}

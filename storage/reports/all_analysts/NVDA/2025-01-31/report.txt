@@ -1,0 +1,143 @@
+Symbol: NVDA
+        Trade Date: 2025-01-31
+        Experiment ID: all_analysts
+        Enabled Analysts: market, news, sentiment, fundamentals
+        Export Mode: backtest
+
+        [Research Investment Plan]
+
+
+{
+  "role": "research_manager",
+  "decision": "HOLD",
+  "summary": "NVDA基本面与技术面呈现多空分歧，需等待关键支撑位有效性验证及AI生态合作落地进展。当前估值依赖AI需求持续性，短期波动性与机构资金流出构成风险，但长期增长逻辑未破。",
+  "rationale": [
+    "技术面空头排列与MACD动能扩大表明短期看跌趋势明确，但基本面ROE/ROA双超100%及PEG 0.71的估值安全边际形成多空对冲",
+    "情绪面显示技术社区认可生态价值与投资社区估值担忧并存，需观察机构持仓调整与市场波动性对股价的边际影响"
+  ],
+  "action_plan": [
+    "监控118.38美元支撑位突破情况与成交量变化，确认技术面反转信号",
+    "跟踪微软核能AI合作及SLB能源数字化项目的收入转化节奏，评估长期叙事兑现速度"
+  ],
+  "notes_from_past_mistakes": [
+    "2024Q4曾因过度依赖AI叙事忽略库存周期风险，导致回调时止损延迟",
+    "2025Q1初高杠杆买入后未设置动态止盈，错失技术性反弹窗口"
+  ]
+}
+
+        [Trader Investment Plan]
+
+
+{
+  "role": "trader",
+  "market_regime": "downtrend",
+  "selected_skill": "downtrend_skill",
+  "regime_confidence": 0.82,
+  "regime_evidence": [
+    "所有移动平均线呈空头排列（MA5 < MA10 < MA20 < MA30）",
+    "MACD深度负值且柱状图动能扩大，确认看跌动量",
+    "价格接近布林带下轨但未触发超卖（RSI=39.66），显示趋势延续性",
+    "OBV持续负值表明机构资金流出，支撑技术面看跌信号",
+    "当前持仓浮亏11.98%且未设止损，符合下跌趋势中的持有特征"
+  ],
+  "action": "HOLD",
+  "target_pct": 0.17,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "维持当前仓位但强化风控，等待118.38美元支撑有效性验证及微软/SLB合作收入转化信号。技术面趋势未破但基本面护城河稳固，需平衡短期风险与长期逻辑。",
+  "risk_controls": {
+    "stop_loss_pct": -15.0,
+    "take_profit_pct": 5.0,
+    "invalidation": "若118.38美元支撑位被有效跌破（收盘价突破）或微软核能AI合作获证收入落地",
+    "time_horizon": "7-14天（短期支撑测试周期）"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "HOLD",
+      "size_pct": 0.17,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "信心：中。当前持仓占比17%已接近downtrend_skill仓位上限，需严格监控止损位（118.38美元）和微软核能AI合作进展。历史教训显示需避免因叙事乐观而忽视动态止盈，建议反弹至MA5（127.63美元）时分批减仓。"
+}
+
+        [Risk Final Trade Decision]
+
+
+{
+  "role": "risk_manager",
+  "market_regime": "downtrend",
+  "selected_skill": "downtrend_skill",
+  "regime_confidence": 0.82,
+  "regime_evidence": [
+    "所有移动平均线呈空头排列（MA5 < MA10 < MA20 < MA30）",
+    "MACD深度负值且柱状图动能扩大，确认看跌动量",
+    "价格接近布林带下轨但未触发超卖（RSI=39.66），显示趋势延续性",
+    "OBV持续负值表明机构资金流出，支撑技术面看跌信号",
+    "当前持仓浮亏11.98%且未设止损，符合下跌趋势中的持有特征"
+  ],
+  "final_decision": "HOLD",
+  "fine_rating": "Underweight",
+  "summary": "维持下跌趋势策略但强化风控框架，基于技术面空头排列与机构资金流出设置动态止损，同时保留对AI生态扩展的结构性观察窗口。",
+  "rationale": [
+    "技术指标空头排列与MACD动能扩大形成趋势延续强信号，需优先防范支撑位失效风险",
+    "基本面高成长性与估值压力形成剪刀差，短期波动可能吞噬持仓弹性"
+  ],
+  "position_size": 0.2,
+  "max_drawdown": "最大回撤容忍度15%（基于118.38美元支撑位动态调整）",
+  "stop_loss": "若118.38美元支撑位有效跌破（收盘价突破）则触发-15%止损",
+  "take_profit": "反弹至MA5（127.63美元）时分批减仓50%，剩余仓位需同步出现OBV转正或RSI突破50才确认止盈",
+  "time_horizon": "7-14天（短期支撑测试周期）",
+  "risk_level": "HIGH",
+  "notes_from_past_mistakes": [
+    "需避免2024年Q4因过度依赖ROE指标导致的止损延迟风险",
+    "警惕2023年AI叙事初期因忽略MA排列信号造成的仓位过重教训"
+  ]
+}
+
+        [Execution Payload]
+        {
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "stop_loss": null,
+  "take_profit": null,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "Risk/Trader 决策为 HOLD",
+  "is_exploratory": false,
+  "execution_date": "2025-02-03",
+  "market_regime": "downtrend",
+  "selected_skill": "downtrend_skill",
+  "regime_confidence": 0.82,
+  "regime_evidence": [
+    "所有移动平均线呈空头排列（MA5 < MA10 < MA20 < MA30）",
+    "MACD深度负值且柱状图动能扩大，确认看跌动量",
+    "价格接近布林带下轨但未触发超卖（RSI=39.66），显示趋势延续性",
+    "OBV持续负值表明机构资金流出，支撑技术面看跌信号",
+    "当前持仓浮亏11.98%且未设止损，符合下跌趋势中的持有特征"
+  ],
+  "skill_router_mode": "reflect",
+  "forced_selected_skill": "downtrend_skill",
+  "reflection_market_regime": "downtrend",
+  "reflection_selected_skill": "downtrend_skill",
+  "reflection_confidence": 0.82,
+  "reflection_evidence": [
+    "所有移动平均线呈空头排列（MA5 < MA10 < MA20 < MA30）",
+    "MACD深度负值且柱状图动能扩大，确认看跌动量",
+    "价格接近布林带下轨但未触发超卖（RSI=39.66），显示趋势延续性",
+    "OBV持续负值表明机构资金流出，支撑技术面看跌信号",
+    "当前持仓浮亏11.98%且未设止损，符合下跌趋势中的持有特征"
+  ],
+  "date": "2025-01-31",
+  "symbol": "NVDA",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}

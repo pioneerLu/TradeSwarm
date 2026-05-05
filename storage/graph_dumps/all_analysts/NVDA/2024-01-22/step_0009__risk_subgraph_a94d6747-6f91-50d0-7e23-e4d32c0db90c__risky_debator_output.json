@@ -1,0 +1,16 @@
+{
+  "risk_summary": {
+    "risk_debate_state": {
+      "history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面多头排列与AI生态主导权形成双重共振，机构增持与分析师上调目标价印证长期价值，短期超买回调风险或成黄金布局窗口。\",\n  \"supporting_points\": [\n    \"技术指标显示MA多头排列+MACD动能扩张，结合OBV能量潮创新高，证明上涨趋势具备成交量支撑，历史数据显示多头信号在AI革命周期中具备强延续性\",\n    \"基本面维持55.6%净利率与966亿美元自由现金流，CUDA生态绑定全球85%AI开发者，Cadence等战略合作伙伴的协同效应形成技术护城河\"\n  ],\n  \"counter_arguments\": [\n    \"RSI超买被误解为风险信号，实为AI算力需求爆发导致的持续性突破，2026Q1库存增长反映供应链主动备货而非需求退潮\",\n    \"地缘政治风险已被市场部分定价，科技股波动率上升反而为高胜率交易提供机会，Meta与Broadcom合作未动摇Nvidia数据中心核心地位\"\n  ],\n  \"risk_assessment\": \"短期回调风险已被纳入技术支撑位（MA10/布林中轨）和机构持仓成本区间，当前估值（PE41.16）被三年100.5%营收CAGR合理支撑，AI革命的非线性增长特征将放大趋势延续收益\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.83\n}",
+      "risky_history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面多头排列与AI生态主导权形成双重共振，机构增持与分析师上调目标价印证长期价值，短期超买回调风险或成黄金布局窗口。\",\n  \"supporting_points\": [\n    \"技术指标显示MA多头排列+MACD动能扩张，结合OBV能量潮创新高，证明上涨趋势具备成交量支撑，历史数据显示多头信号在AI革命周期中具备强延续性\",\n    \"基本面维持55.6%净利率与966亿美元自由现金流，CUDA生态绑定全球85%AI开发者，Cadence等战略合作伙伴的协同效应形成技术护城河\"\n  ],\n  \"counter_arguments\": [\n    \"RSI超买被误解为风险信号，实为AI算力需求爆发导致的持续性突破，2026Q1库存增长反映供应链主动备货而非需求退潮\",\n    \"地缘政治风险已被市场部分定价，科技股波动率上升反而为高胜率交易提供机会，Meta与Broadcom合作未动摇Nvidia数据中心核心地位\"\n  ],\n  \"risk_assessment\": \"短期回调风险已被纳入技术支撑位（MA10/布林中轨）和机构持仓成本区间，当前估值（PE41.16）被三年100.5%营收CAGR合理支撑，AI革命的非线性增长特征将放大趋势延续收益\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.83\n}",
+      "safe_history": "",
+      "neutral_history": "",
+      "latest_speaker": "Risky",
+      "current_risky_response": "Risky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面多头排列与AI生态主导权形成双重共振，机构增持与分析师上调目标价印证长期价值，短期超买回调风险或成黄金布局窗口。\",\n  \"supporting_points\": [\n    \"技术指标显示MA多头排列+MACD动能扩张，结合OBV能量潮创新高，证明上涨趋势具备成交量支撑，历史数据显示多头信号在AI革命周期中具备强延续性\",\n    \"基本面维持55.6%净利率与966亿美元自由现金流，CUDA生态绑定全球85%AI开发者，Cadence等战略合作伙伴的协同效应形成技术护城河\"\n  ],\n  \"counter_arguments\": [\n    \"RSI超买被误解为风险信号，实为AI算力需求爆发导致的持续性突破，2026Q1库存增长反映供应链主动备货而非需求退潮\",\n    \"地缘政治风险已被市场部分定价，科技股波动率上升反而为高胜率交易提供机会，Meta与Broadcom合作未动摇Nvidia数据中心核心地位\"\n  ],\n  \"risk_assessment\": \"短期回调风险已被纳入技术支撑位（MA10/布林中轨）和机构持仓成本区间，当前估值（PE41.16）被三年100.5%营收CAGR合理支撑，AI革命的非线性增长特征将放大趋势延续收益\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.83\n}",
+      "current_safe_response": "",
+      "current_neutral_response": "",
+      "judge_decision": "",
+      "count": 1
+    }
+  }
+}

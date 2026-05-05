@@ -1,0 +1,135 @@
+Symbol: NVDA
+        Trade Date: 2025-01-27
+        Experiment ID: all_analysts
+        Enabled Analysts: market, news, sentiment, fundamentals
+        Export Mode: backtest
+
+        [Research Investment Plan]
+
+
+{
+  "role": "research_manager",
+  "decision": "HOLD",
+  "summary": "NVDA当前处于基本面强劲与技术面分歧并存的胶着状态，需等待能源AI合作商业化验证与估值合理性确认后再决策。",
+  "rationale": [
+    "牛方高估了战略合作到营收转化的确定性，熊方正确指出OBV负值与ADX弱趋势构成短期风险，但未否定长期AI基础设施需求",
+    "34倍PE估值虽被PEG(0.71)部分消化，但Gartner预测的LLM训练成本下降可能重塑硬件需求曲线，需观察2026Q4财报指引"
+  ],
+  "action_plan": [
+    "监控149.09美元布林带上轨突破有效性及成交量配合度，验证技术面多空信号",
+    "跟踪微软核能AI项目Q2测试进展与SLB数据中心订单落地节奏，评估战略叙事兑现速度"
+  ],
+  "notes_from_past_mistakes": [
+    "2024Q3曾误判HBM需求爆发持续性，需警惕当前能源行业AI渗透率假设的乐观偏差",
+    "2025年1月技术性回调中过早介入导致错过20日流动性陷阱，应等待明确支撑位企稳信号"
+  ]
+}
+
+        [Trader Investment Plan]
+
+
+{
+  "role": "trader",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.78,
+  "regime_evidence": [
+    "技术指标呈现明显分歧（MACD看涨 vs RSI中性偏弱/KDJ超买警示）",
+    "OBV持续负值与价格上涨形成背离，显示资金流出压力",
+    "新闻面显示战略扩展积极但估值合理性受质疑，市场对AI生态商业化的兑现速度存在分歧"
+  ],
+  "action": "HOLD",
+  "target_pct": 0.20,
+  "entry_type": "HOLD",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "NVDA处于基本面强劲与技术面分歧的胶着状态，维持现有仓位但控制在20%以内，等待布林带上轨突破确认或能源AI合作商业化进展验证后再决策。",
+  "risk_controls": {
+    "stop_loss_pct": -5.0,
+    "take_profit_pct": 5.0,
+    "invalidation": "若价格跌破139.33美元布林带中轨或137.62美元MA30支撑位，则触发止损；若突破149.09美元上轨并站稳，则转为顺势加仓信号",
+    "time_horizon": "2-4周（需结合Q4财报指引与能源行业合作落地节奏）"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "HOLD",
+      "size_pct": 0.20,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "当前4.76%浮盈需通过5%止盈保护，同时设置5%止损控制回撤。重点关注2026Q4财报对LLM成本下降预期的验证，以及微软核能AI项目Q2测试进展。若出现MA5企稳信号或OBV转正，可重新评估加仓机会。"
+}
+
+        [Risk Final Trade Decision]
+
+
+```json
+{
+  "role": "risk_manager",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "技术指标呈现明显分歧（MACD看涨 vs RSI中性偏弱/KDJ超买警示）",
+    "OBV持续负值与价格上涨形成背离，显示资金流出压力"
+  ],
+  "final_decision": "HOLD",
+  "fine_rating": "Hold",
+  "summary": "NVDA基本面强劲但技术面与资金流存在短期风险，维持现有仓位但严格控制风险敞口。需等待布林带中轨支撑有效性验证或能源AI商业化进展确认后再决策。",
+  "rationale": [
+    "技术面价格跌破MA5且OBV负值背离，显示短期动能衰竭风险",
+    "新闻面战略扩展积极但估值合理性受质疑，需观察商业化落地速度"
+  ],
+  "position_size": 0.2,
+  "max_drawdown": "5%（当前浮盈4.76%，需保护近期收益）",
+  "stop_loss": "若价格跌破139.33美元布林带中轨或137.62美元MA30支撑位，触发5%止损",
+  "take_profit": "盈利达到5%且出现趋势破坏信号（如MA5反压或OBV转负）时止盈，否则继续持有",
+  "time_horizon": "2-4周（需结合Q4财报指引与能源行业合作落地节奏）",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "需警惕2024年12月类似技术支撑失效后的连带抛压风险",
+    "避免重演2025年初因估值分歧导致的短期波动误判"
+  ]
+}
+```
+
+        [Execution Payload]
+        {
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "stop_loss": null,
+  "take_profit": null,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "Risk/Trader 决策为 HOLD",
+  "is_exploratory": false,
+  "execution_date": "2025-01-28",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "技术指标呈现明显分歧（MACD看涨 vs RSI中性偏弱/KDJ超买警示）",
+    "OBV持续负值与价格上涨形成背离，显示资金流出压力"
+  ],
+  "skill_router_mode": "reflect",
+  "forced_selected_skill": "downtrend_skill",
+  "reflection_market_regime": "high_vol_uncertain",
+  "reflection_selected_skill": "high_vol_uncertain_skill",
+  "reflection_confidence": 0.78,
+  "reflection_evidence": [
+    "技术指标呈现明显分歧（MACD看涨 vs RSI中性偏弱/KDJ超买警示）",
+    "OBV持续负值与价格上涨形成背离，显示资金流出压力",
+    "新闻面显示战略扩展积极但估值合理性受质疑，市场对AI生态商业化的兑现速度存在分歧"
+  ],
+  "date": "2025-01-27",
+  "symbol": "NVDA",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}

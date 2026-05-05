@@ -1,0 +1,79 @@
+节点: trader
+时间: 2026-04-30 00:00:00
+================================================================================
+
+最后一条消息:
+
+
+{
+  "role": "trader",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.78,
+  "regime_evidence": [
+    "ATR值从1.65升至2.745显示波动性显著放大",
+    "MACD柱状图首次转负且布林带缩口形成，技术面出现多空信号分歧",
+    "机构减持与AI需求强劲形成基本面矛盾信号",
+    "新闻数据时间戳异常（2026年4月）增加信息可信度不确定性"
+  ],
+  "action": "BUY",
+  "target_pct": 0.30,
+  "entry_type": "LIMIT",
+  "entry_price": 67.07,
+  "execution_window": "T+1_OPEN",
+  "summary": "在AI革命与量子计算突破驱动下，NVDA基本面强劲且技术调整接近关键支撑位。尽管存在估值压力与短期回调风险，但核心增长逻辑未被证伪，建议以20日均线支撑位挂限价单分批建仓。",
+  "risk_controls": {
+    "stop_loss_pct": -5.0,
+    "take_profit_pct": 10.0,
+    "invalidation": "若跌破65.37美元EMA26支撑位或出现AI需求负面数据则止损",
+    "time_horizon": "3-5个交易日"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.30,
+      "price_type": "LIMIT",
+      "price": 67.07
+    }
+  ],
+  "comment": "信心：中。当前波动率显著上升且信息存在时间戳异常，但技术面20日均线支撑明确，基本面AI需求刚性验证。需严格监控67.07美元支撑有效性及微软订单数据，若支撑失效则转为SELL。"
+}
+
+
+trader_investment_plan:
+================================================================================
+{
+  "role": "trader",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.78,
+  "regime_evidence": [
+    "ATR值从1.65升至2.745显示波动性显著放大",
+    "MACD柱状图首次转负且布林带缩口形成，技术面出现多空信号分歧",
+    "机构减持与AI需求强劲形成基本面矛盾信号",
+    "新闻数据时间戳异常（2026年4月）增加信息可信度不确定性"
+  ],
+  "action": "BUY",
+  "target_pct": 0.3,
+  "entry_type": "LIMIT",
+  "entry_price": 67.07,
+  "execution_window": "T+1_OPEN",
+  "summary": "在AI革命与量子计算突破驱动下，NVDA基本面强劲且技术调整接近关键支撑位。尽管存在估值压力与短期回调风险，但核心增长逻辑未被证伪，建议以20日均线支撑位挂限价单分批建仓。",
+  "risk_controls": {
+    "stop_loss_pct": -5.0,
+    "take_profit_pct": 10.0,
+    "invalidation": "若跌破65.37美元EMA26支撑位或出现AI需求负面数据则止损",
+    "time_horizon": "3-5个交易日"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.3,
+      "price_type": "LIMIT",
+      "price": 67.07
+    }
+  ],
+  "comment": "信心：中。当前波动率显著上升且信息存在时间戳异常，但技术面20日均线支撑明确，基本面AI需求刚性验证。需严格监控67.07美元支撑有效性及微软订单数据，若支撑失效则转为SELL。"
+}

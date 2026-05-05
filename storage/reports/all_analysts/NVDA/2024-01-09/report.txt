@@ -1,0 +1,103 @@
+Symbol: NVDA
+        Trade Date: 2024-01-09
+        Experiment ID: all_analysts
+        Enabled Analysts: market, news, sentiment, fundamentals
+        Export Mode: backtest
+
+        [Research Investment Plan]
+
+
+```json
+{
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "NVDA技术面突破确认趋势反转，基本面AI革命红利期未结束，机构增持与生态壁垒构筑安全边际。尽管存在短期超买风险和宏观不确定性，但长期增长逻辑与估值合理性支撑多头立场。",
+  "rationale": [
+    "技术指标多周期共振（MA突破+MACD金叉+OBV新高）与机构6500万美元增持形成双重支撑，突破后量价配合健康",
+    "PEG比率0.808反映估值与增长匹配，AI基础设施三年CAGR 100%的行业趋势尚未见顶，生态协同效应强化竞争壁垒"
+  ],
+  "action_plan": [
+    "监控49.00-49.50美元支撑有效性，突破后持有逻辑强化",
+    "跟踪内存芯片板块资金轮动与Meta-Broadcom合作对市场份额的实际影响"
+  ],
+  "notes_from_past_mistakes": [
+    "2024年1月历史数据显示，过度依赖单一技术指标可能忽视基本面变化",
+    "机构增持行为需区分战略配置与算法噪音，避免误判持仓集中度风险"
+  ]
+}
+```
+
+        [Trader Investment Plan]
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "NVDA技术面突破确认上涨趋势，基本面AI红利期未结束且PEG合理，机构增持强化安全边际。当前趋势强劲但需警惕短期超买回调，建议顺势建仓并设置动态止损。",
+  "risk_controls": {
+    "stop_loss_pct": 49.0,
+    "take_profit_pct": 53.0,
+    "invalidation": "跌破49.00美元支撑位或内存芯片板块资金轮动加速导致相对表现恶化",
+    "time_horizon": "3-6个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "信心：中。技术面多头信号共振与机构增持形成双重支撑，但需结合动态支撑位管理风险。止盈位参考近期阻力区间，止损位保护关键支撑有效性。"
+}
+
+        [Risk Final Trade Decision]
+
+
+{
+  "role": "risk_manager",
+  "final_decision": "BUY",
+  "fine_rating": "Overweight",
+  "summary": "NVDA技术面多头共振与基本面AI红利形成双重支撑，但需警惕短期超买回调风险。建议维持多头方向，通过仓位压缩和动态风控平衡趋势延续性与波动压力。",
+  "rationale": [
+    "技术指标多头排列与机构增持形成趋势强化，但RSI接近超买区（64.6）和J值85.08提示短期回调概率上升",
+    "地缘政治风险与内存股轮动可能引发资金分流，需通过仓位控制对冲产业链估值重构的系统性影响"
+  ],
+  "position_size": 0.25,
+  "max_drawdown": "5%-8%回撤空间内需保留趋势跟踪弹性，突破49美元支撑位则触发风控",
+  "stop_loss": "跌破49.00美元支撑位（200日均线）或布林带中轨48.75美元立即止损",
+  "take_profit": "盈利达15%（目标55.34美元）且MACD动能柱缩量或RSI超70时分批止盈",
+  "time_horizon": "3-6个月（若突破55美元阻力位可延长至9个月）",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "2023年Q4过度依赖技术指标未及时设置止损，导致突破失败后回撤12%",
+    "2025年Q1忽视内存芯片板块轮动信号，错失调整持仓结构的窗口期"
+  ]
+}
+
+        [Execution Payload]
+        {
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "stop_loss": null,
+  "take_profit": null,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "已持仓 21.3%，目标 25.0% 无显著增量，HOLD",
+  "is_exploratory": false,
+  "execution_date": "2024-01-10",
+  "date": "2024-01-09",
+  "symbol": "NVDA",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}

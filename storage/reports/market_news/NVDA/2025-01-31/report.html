@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>NVDA 2025-01-31 TradeSwarm Report</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 16mm;
+    }
+    body {
+      color: #172033;
+      font-family: "Microsoft YaHei", "Noto Sans CJK SC", "Segoe UI", Arial, sans-serif;
+      font-size: 12px;
+      line-height: 1.55;
+      margin: 0;
+    }
+    h1, h2, h3 {
+      color: #0f2a4f;
+      margin: 0;
+    }
+    h1 {
+      font-size: 26px;
+      letter-spacing: 0.02em;
+    }
+    h2 {
+      border-bottom: 1px solid #d9e2ef;
+      font-size: 16px;
+      margin-top: 22px;
+      padding-bottom: 6px;
+    }
+    .subtitle {
+      color: #53657d;
+      margin-top: 6px;
+    }
+    .meta-grid {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: repeat(2, 1fr);
+      margin-top: 18px;
+    }
+    .card {
+      background: #f7f9fc;
+      border: 1px solid #dce5f1;
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .label {
+      color: #607086;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .value {
+      color: #172033;
+      font-size: 13px;
+      margin-top: 3px;
+      word-break: break-word;
+    }
+    .section {
+      margin-top: 12px;
+    }
+    .pre {
+      background: #fbfcff;
+      border: 1px solid #dce5f1;
+      border-radius: 8px;
+      color: #1f2937;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 10.5px;
+      padding: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .badge {
+      background: #e8f1ff;
+      border: 1px solid #bfd7ff;
+      border-radius: 999px;
+      color: #174984;
+      display: inline-block;
+      font-size: 10px;
+      margin: 3px 4px 0 0;
+      padding: 2px 8px;
+    }
+    .footer {
+      border-top: 1px solid #d9e2ef;
+      color: #7a889a;
+      font-size: 10px;
+      margin-top: 26px;
+      padding-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>TradeSwarm 投研报告</h1>
+  <div class="subtitle">NVDA · 2025-01-31 · backtest</div>
+
+  <div class="meta-grid">
+    <div class="card">
+      <div class="label">Experiment</div>
+      <div class="value">market_news</div>
+    </div>
+    <div class="card">
+      <div class="label">Analysts</div>
+      <div class="value">market, news</div>
+    </div>
+    <div class="card">
+      <div class="label">LLM</div>
+      <div class="value">-</div>
+    </div>
+    <div class="card">
+      <div class="label">Strategy Skill</div>
+      <div class="value">reflect / downtrend_skill</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h2>市场状态与 Skill</h2>
+  <div class="section">
+    
+    <span class="badge">market_regime: downtrend</span>
+    
+    <span class="badge">selected_skill: downtrend_skill</span>
+    
+    <span class="badge">regime_confidence: 0.85</span>
+    
+    <span class="badge">skill_router_mode: reflect</span>
+    
+    <span class="badge">reflection_market_regime: downtrend</span>
+    
+    <span class="badge">reflection_selected_skill: downtrend_skill</span>
+    
+    <span class="badge">reflection_confidence: 0.85</span>
+    
+  </div>
+  
+
+  <h2>Research Manager 投资计划</h2>
+  <div class="pre">{
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "尽管短期技术面偏空，但NVDA的战略合作与AI生态扩展支撑长期价值，当前调整已接近关键支撑位，建议逢低布局。",
+  "rationale": [
+    "战略合作扩展AI应用场景：与微软在核能、SLB在石油天然气行业的合作显示技术正向高价值实体经济渗透，长期增长叙事完整",
+    "技术指标接近超卖区域：RSI(39.66)和KDJ(J值17.01)显示短期调整或接近尾声，118.38美元支撑位具备技术反弹基础"
+  ],
+  "action_plan": [
+    "重点关注118-120美元支撑区间的企稳信号，若出现缩量止跌可分批建仓",
+    "追踪微软/SLB合作进展及AI成本下降对需求的实际拉动，作为长期持仓依据"
+  ],
+  "notes_from_past_mistakes": [
+    "需警惕高波动环境下支撑位假突破风险，避免单一技术信号决策",
+    "能源行业合作收入兑现周期可能长于预期，需动态评估业绩贡献时间表"
+  ]
+}</div>
+
+  <h2>Trader 执行计划</h2>
+  <div class="pre">{
+  "role": "trader",
+  "market_regime": "downtrend",
+  "selected_skill": "downtrend_skill",
+  "regime_confidence": 0.85,
+  "regime_evidence": ["价格大幅低于所有主要移动平均线（MA5/10/20/30），形成空头排列", "MACD深度负值且柱状图扩大，显示看跌动量增强", "OBV持续为负表明资金流出，ADX显示-DI显著高于+DI确认下跌趋势", "股价从近期高点下跌15.4%，跌破关键支撑位126.79美元"],
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "entry_type": null,
+  "entry_price": null,
+  "execution_window": null,
+  "summary": "尽管长期基本面支撑存在，但当前技术面仍处于强烈下跌趋势中，建议等待更明确的反转信号再入场。",
+  "risk_controls": {
+    "stop_loss_pct": null,
+    "take_profit_pct": null,
+    "invalidation": "若价格有效突破127.63美元（MA5）并伴随成交量放大，可考虑小仓试探",
+    "time_horizon": "短期观望，中期关注基本面进展"
+  },
+  "order_plan": [],
+  "comment": "信心：中。虽然研究建议逢低布局，但当前技术趋势尚未反转，且波动性较高，建议保持谨慎。"
+}</div>
+
+  <h2>Risk Manager 风控裁决</h2>
+  <div class="pre">```json
+{
+  "role": "risk_manager",
+  "market_regime": "downtrend",
+  "selected_skill": "downtrend_skill",
+  "regime_confidence": 0.85,
+  "regime_evidence": [
+    "价格大幅低于所有主要移动平均线（MA5/10/20/30），形成空头排列",
+    "MACD深度负值且柱状图扩大，显示看跌动量增强",
+    "OBV持续为负表明资金流出，ADX显示-DI显著高于+DI确认下跌趋势",
+    "股价从近期高点下跌15.4%，跌破关键支撑位126.79美元"
+  ],
+  "final_decision": "HOLD",
+  "fine_rating": "Hold",
+  "summary": "NVDA当前处于强烈的技术性下跌趋势中，尽管战略合作带来长期利好，但短期技术面尚未出现明确反转信号，建议保持观望。",
+  "rationale": [
+    "技术指标全面恶化，价格跌破所有关键移动平均线，MACD和OBV显示下跌动能仍强",
+    "波动性较高（ATR 7.91），市场情绪脆弱，容易引发连锁止损"
+  ],
+  "position_size": 0.0,
+  "max_drawdown": "不适用，当前无仓位",
+  "stop_loss": "不适用，当前无仓位",
+  "take_profit": "不适用，当前无仓位",
+  "time_horizon": "短期观望，中期关注基本面进展和技术面反转信号",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "在下跌趋势中过早逆势建仓可能导致重大损失",
+    "忽视技术面恶化信号而依赖基本面长期利好可能增加短期风险"
+  ]
+}
+```</div>
+
+  <h2>最终执行载荷</h2>
+  <div class="pre">{
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "stop_loss": null,
+  "take_profit": null,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "Risk/Trader 决策为 HOLD",
+  "is_exploratory": false,
+  "execution_date": "2025-02-03",
+  "market_regime": "downtrend",
+  "selected_skill": "downtrend_skill",
+  "regime_confidence": 0.85,
+  "regime_evidence": [
+    "价格大幅低于所有主要移动平均线（MA5/10/20/30），形成空头排列",
+    "MACD深度负值且柱状图扩大，显示看跌动量增强",
+    "OBV持续为负表明资金流出，ADX显示-DI显著高于+DI确认下跌趋势",
+    "股价从近期高点下跌15.4%，跌破关键支撑位126.79美元"
+  ],
+  "skill_router_mode": "reflect",
+  "reflection_market_regime": "downtrend",
+  "reflection_selected_skill": "downtrend_skill",
+  "reflection_confidence": 0.85,
+  "reflection_evidence": [
+    "价格大幅低于所有主要移动平均线（MA5/10/20/30），形成空头排列",
+    "MACD深度负值且柱状图扩大，显示看跌动量增强",
+    "OBV持续为负表明资金流出，ADX显示-DI显著高于+DI确认下跌趋势",
+    "股价从近期高点下跌15.4%，跌破关键支撑位126.79美元"
+  ],
+  "date": "2025-01-31",
+  "symbol": "NVDA",
+  "experiment_id": "market_news",
+  "enabled_analysts": [
+    "market",
+    "news"
+  ]
+}</div>
+
+  <div class="footer">
+    Generated by TradeSwarm. Source artifacts: report.json / report.txt / report.html.
+  </div>
+</body>
+</html>

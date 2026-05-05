@@ -1,0 +1,130 @@
+Symbol: NVDA
+        Trade Date: 2025-02-19
+        Experiment ID: market_news
+        Enabled Analysts: market, news
+        Export Mode: backtest
+
+        [Research Investment Plan]
+        {
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "NVDA技术面呈现强劲多头排列，AI生态系统扩张的战略合作强化长期增长逻辑，短期超买风险可控。",
+  "rationale": [
+    "技术指标全面看涨：价格突破所有关键移动平均线形成多头排列，MACD黄金交叉与ADX趋势确认提供双重验证",
+    "战略合作深化护城河：与Lattice Semiconductor的物理AI合作及Coherent Corp的光学互连投资，直接解决AI集群带宽瓶颈"
+  ],
+  "action_plan": [
+    "关注技术面回调至支撑位（如MA5 135.45或MA20 131.12）的买入机会",
+    "密切跟踪成交量变化以确认突破有效性，特别是接近阻力位149.98时的量能表现"
+  ],
+  "notes_from_past_mistakes": [
+    "需警惕新闻数据时间戳异常可能带来的信息滞后风险",
+    "超买信号出现时需动态评估回调深度，避免追高"
+  ]
+}
+
+        [Trader Investment Plan]
+        {
+  "role": "trader",
+  "market_regime": "strong_uptrend",
+  "selected_skill": "strong_uptrend_skill",
+  "regime_confidence": 0.85,
+  "regime_evidence": ["价格突破所有关键移动平均线形成多头排列（MA5 > MA10 > MA20 > MA30）", "MACD黄金交叉与ADX趋势确认提供双重验证", "RSI从超卖区回升至中性偏强区域（62.44）", "OBV指标转为正值显示资金流入", "战略合作新闻强化长期增长逻辑"],
+  "action": "BUY",
+  "target_pct": 0.50,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "技术面多头排列与战略合作利好共振，中信心加仓跟随主趋势",
+  "risk_controls": {
+    "stop_loss_pct": -5.0,
+    "take_profit_pct": 10.0,
+    "invalidation": "价格跌破20日均线131.12且无法当日收复",
+    "time_horizon": "2-4周"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.50,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "信心：中。Alpha vs B&H落后但趋势未破坏，需通过仓位提升参与反弹"
+}
+
+        [Risk Final Trade Decision]
+        ```json
+{
+  "role": "risk_manager",
+  "market_regime": "strong_uptrend",
+  "selected_skill": "strong_uptrend_skill",
+  "regime_confidence": 0.8,
+  "regime_evidence": [
+    "价格突破所有关键移动平均线形成多头排列（MA5 > MA10 > MA20 > MA30）",
+    "MACD黄金交叉与ADX趋势确认提供双重验证",
+    "RSI从超卖区回升至中性偏强区域（62.44）",
+    "OBV指标转为正值显示资金流入",
+    "战略合作新闻强化长期增长逻辑"
+  ],
+  "final_decision": "BUY",
+  "fine_rating": "Overweight",
+  "summary": "NVDA技术面呈现强劲多头排列，战略合作利好长期增长，但需关注超买风险和新闻时间戳异常。建议适度加仓，跟随主趋势。",
+  "rationale": [
+    "技术指标全面看涨，但RSI和StochRSI接近超买区域，存在短期回调风险。",
+    "新闻数据时间戳异常（2026年3月）可能影响分析的时效性和可靠性。"
+  ],
+  "position_size": 0.4,
+  "max_drawdown": "可接受最大回撤为5%",
+  "stop_loss": "价格跌破20日均线131.12且无法当日收复",
+  "take_profit": "盈利达到10%且出现趋势破坏信号（如跌破短期均线/关键支撑）才止盈；否则继续持有或分批止盈",
+  "time_horizon": "2-4周",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "需警惕超买信号和成交量未充分放大的风险，避免在高位追涨。",
+    "新闻时间戳异常可能导致信息滞后，需谨慎验证其时效性和实际影响。"
+  ]
+}
+```
+
+        [Execution Payload]
+        {
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "stop_loss": null,
+  "take_profit": null,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "已持仓 39.8%，目标 40.0% 无显著增量，HOLD",
+  "is_exploratory": false,
+  "execution_date": "2025-02-20",
+  "market_regime": "strong_uptrend",
+  "selected_skill": "strong_uptrend_skill",
+  "regime_confidence": 0.8,
+  "regime_evidence": [
+    "价格突破所有关键移动平均线形成多头排列（MA5 > MA10 > MA20 > MA30）",
+    "MACD黄金交叉与ADX趋势确认提供双重验证",
+    "RSI从超卖区回升至中性偏强区域（62.44）",
+    "OBV指标转为正值显示资金流入",
+    "战略合作新闻强化长期增长逻辑"
+  ],
+  "skill_router_mode": "reflect",
+  "reflection_market_regime": "strong_uptrend",
+  "reflection_selected_skill": "strong_uptrend_skill",
+  "reflection_confidence": 0.85,
+  "reflection_evidence": [
+    "价格突破所有关键移动平均线形成多头排列（MA5 > MA10 > MA20 > MA30）",
+    "MACD黄金交叉与ADX趋势确认提供双重验证",
+    "RSI从超卖区回升至中性偏强区域（62.44）",
+    "OBV指标转为正值显示资金流入",
+    "战略合作新闻强化长期增长逻辑"
+  ],
+  "date": "2025-02-19",
+  "symbol": "NVDA",
+  "experiment_id": "market_news",
+  "enabled_analysts": [
+    "market",
+    "news"
+  ]
+}

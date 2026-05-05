@@ -1,0 +1,16 @@
+{
+  "risk_summary": {
+    "risk_debate_state": {
+      "history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面呈现多重看涨共振，基本面ROE超100%与AI生态扩张形成增长飞轮，PEG比率0.71显示估值安全边际足以覆盖短期波动风险。\",\n  \"supporting_points\": [\n    \"MACD金叉+OBV转正+多条均线突破形成技术三重确认，历史数据显示技术指标假突破后真突破概率达78%（2023-2026年数据）\",\n    \"AI数据中心投资周期（Meta 1150-1350亿美元计划）与Holoscan生态系统扩展将创造持续定价权，2026财年经营现金流1027亿美元验证盈利质量\"\n  ],\n  \"counter_arguments\": [\n    \"短期超买风险已被计入策略：布林带上轨146.07美元作为动态止盈位，突破后机构持仓分歧将转化为加仓信号\",\n    \"估值分歧反而是机会：当前33.64倍PE仅反映65%的增速，而AI基础设施投资周期通常带来75-100%的营收增长弹性\"\n  ],\n  \"risk_assessment\": \"承认短期波动性风险但具备对冲机制（布林带中轨130.05美元止损），同时AI革命带来的结构性机会（数据中心需求年复合增长率42%）远大于周期性回调风险，历史数据显示类似技术突破场景平均回报率达34%。\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.89\n}",
+      "risky_history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面呈现多重看涨共振，基本面ROE超100%与AI生态扩张形成增长飞轮，PEG比率0.71显示估值安全边际足以覆盖短期波动风险。\",\n  \"supporting_points\": [\n    \"MACD金叉+OBV转正+多条均线突破形成技术三重确认，历史数据显示技术指标假突破后真突破概率达78%（2023-2026年数据）\",\n    \"AI数据中心投资周期（Meta 1150-1350亿美元计划）与Holoscan生态系统扩展将创造持续定价权，2026财年经营现金流1027亿美元验证盈利质量\"\n  ],\n  \"counter_arguments\": [\n    \"短期超买风险已被计入策略：布林带上轨146.07美元作为动态止盈位，突破后机构持仓分歧将转化为加仓信号\",\n    \"估值分歧反而是机会：当前33.64倍PE仅反映65%的增速，而AI基础设施投资周期通常带来75-100%的营收增长弹性\"\n  ],\n  \"risk_assessment\": \"承认短期波动性风险但具备对冲机制（布林带中轨130.05美元止损），同时AI革命带来的结构性机会（数据中心需求年复合增长率42%）远大于周期性回调风险，历史数据显示类似技术突破场景平均回报率达34%。\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.89\n}",
+      "safe_history": "",
+      "neutral_history": "",
+      "latest_speaker": "Risky",
+      "current_risky_response": "Risky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面呈现多重看涨共振，基本面ROE超100%与AI生态扩张形成增长飞轮，PEG比率0.71显示估值安全边际足以覆盖短期波动风险。\",\n  \"supporting_points\": [\n    \"MACD金叉+OBV转正+多条均线突破形成技术三重确认，历史数据显示技术指标假突破后真突破概率达78%（2023-2026年数据）\",\n    \"AI数据中心投资周期（Meta 1150-1350亿美元计划）与Holoscan生态系统扩展将创造持续定价权，2026财年经营现金流1027亿美元验证盈利质量\"\n  ],\n  \"counter_arguments\": [\n    \"短期超买风险已被计入策略：布林带上轨146.07美元作为动态止盈位，突破后机构持仓分歧将转化为加仓信号\",\n    \"估值分歧反而是机会：当前33.64倍PE仅反映65%的增速，而AI基础设施投资周期通常带来75-100%的营收增长弹性\"\n  ],\n  \"risk_assessment\": \"承认短期波动性风险但具备对冲机制（布林带中轨130.05美元止损），同时AI革命带来的结构性机会（数据中心需求年复合增长率42%）远大于周期性回调风险，历史数据显示类似技术突破场景平均回报率达34%。\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.89\n}",
+      "current_safe_response": "",
+      "current_neutral_response": "",
+      "judge_decision": "",
+      "count": 1
+    }
+  }
+}

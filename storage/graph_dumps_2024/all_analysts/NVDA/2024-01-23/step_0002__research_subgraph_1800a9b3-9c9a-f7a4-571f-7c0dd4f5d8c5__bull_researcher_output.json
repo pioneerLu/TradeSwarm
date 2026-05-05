@@ -1,0 +1,12 @@
+{
+  "research_summary": {
+    "investment_debate_state": {
+      "history": "\nBull Analyst: \n\n{\n  \"role\": \"bull_researcher\",\n  \"stance\": \"bullish\",\n  \"summary\": \"NVDA在AI革命核心赛道占据结构性优势，技术面多头排列与机构增持形成共振，短期回调不改长期增长逻辑。\",\n  \"key_points\": [\n    \"AI基础设施需求持续爆发推动盈利能力维持高位（ROE 101.5%、净利率55.6%）\",\n    \"多头排列的移动平均线与MACD持续扩张验证趋势强度，机构持仓占比提升提供资金支撑\"\n  ],\n  \"risk_warnings\": [\n    \"RSI超买可能引发技术性回调\",\n    \"内存股票轮动反映供应链定价权转移风险\",\n    \"AMD/Broadcom等竞争者在定制芯片领域的突破\"\n  ],\n  \"recommendation\": \"BUY\",\n  \"confidence\": 0.85,\n  \"reasoning\": \"尽管RSI触及83.95和布林带超买可能引发短期震荡，但NVDA的财务指标（三年营收CAGR 100.2%、经营现金流1027亿美元）和行业地位（AI芯片市占率超80%）构成强支撑。机构投资者在股价上涨期间持续增持（Trust Co持仓增至6504万美元）显示长期资金认可度。竞争加剧和地缘风险已被部分定价，且其生态系统合作（如Cadence）和边缘计算布局形成护城河。当前PEG仅0.705表明估值相对增长仍具合理性，回调提供加仓机会。\"\n}",
+      "bull_history": "\nBull Analyst: \n\n{\n  \"role\": \"bull_researcher\",\n  \"stance\": \"bullish\",\n  \"summary\": \"NVDA在AI革命核心赛道占据结构性优势，技术面多头排列与机构增持形成共振，短期回调不改长期增长逻辑。\",\n  \"key_points\": [\n    \"AI基础设施需求持续爆发推动盈利能力维持高位（ROE 101.5%、净利率55.6%）\",\n    \"多头排列的移动平均线与MACD持续扩张验证趋势强度，机构持仓占比提升提供资金支撑\"\n  ],\n  \"risk_warnings\": [\n    \"RSI超买可能引发技术性回调\",\n    \"内存股票轮动反映供应链定价权转移风险\",\n    \"AMD/Broadcom等竞争者在定制芯片领域的突破\"\n  ],\n  \"recommendation\": \"BUY\",\n  \"confidence\": 0.85,\n  \"reasoning\": \"尽管RSI触及83.95和布林带超买可能引发短期震荡，但NVDA的财务指标（三年营收CAGR 100.2%、经营现金流1027亿美元）和行业地位（AI芯片市占率超80%）构成强支撑。机构投资者在股价上涨期间持续增持（Trust Co持仓增至6504万美元）显示长期资金认可度。竞争加剧和地缘风险已被部分定价，且其生态系统合作（如Cadence）和边缘计算布局形成护城河。当前PEG仅0.705表明估值相对增长仍具合理性，回调提供加仓机会。\"\n}",
+      "bear_history": "",
+      "current_response": "Bull Analyst: \n\n{\n  \"role\": \"bull_researcher\",\n  \"stance\": \"bullish\",\n  \"summary\": \"NVDA在AI革命核心赛道占据结构性优势，技术面多头排列与机构增持形成共振，短期回调不改长期增长逻辑。\",\n  \"key_points\": [\n    \"AI基础设施需求持续爆发推动盈利能力维持高位（ROE 101.5%、净利率55.6%）\",\n    \"多头排列的移动平均线与MACD持续扩张验证趋势强度，机构持仓占比提升提供资金支撑\"\n  ],\n  \"risk_warnings\": [\n    \"RSI超买可能引发技术性回调\",\n    \"内存股票轮动反映供应链定价权转移风险\",\n    \"AMD/Broadcom等竞争者在定制芯片领域的突破\"\n  ],\n  \"recommendation\": \"BUY\",\n  \"confidence\": 0.85,\n  \"reasoning\": \"尽管RSI触及83.95和布林带超买可能引发短期震荡，但NVDA的财务指标（三年营收CAGR 100.2%、经营现金流1027亿美元）和行业地位（AI芯片市占率超80%）构成强支撑。机构投资者在股价上涨期间持续增持（Trust Co持仓增至6504万美元）显示长期资金认可度。竞争加剧和地缘风险已被部分定价，且其生态系统合作（如Cadence）和边缘计算布局形成护城河。当前PEG仅0.705表明估值相对增长仍具合理性，回调提供加仓机会。\"\n}",
+      "judge_decision": "",
+      "count": 1
+    }
+  }
+}

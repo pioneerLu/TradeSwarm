@@ -1,0 +1,101 @@
+Symbol: NVDA
+        Trade Date: 2024-01-19
+        Experiment ID: all_analysts
+        Enabled Analysts: market, news, sentiment, fundamentals
+        Export Mode: backtest
+
+        [Research Investment Plan]
+
+
+{
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "NVDA在AI革命驱动下展现结构性增长动力，技术面多头排列与机构增持形成共振，短期超买风险不改长期强势逻辑。",
+  "rationale": [
+    "核心理由1：AI数据中心业务占营收78%且持续获得Meta、HPE等战略绑定，卓越的ROE(101.5%)和ROA(51.2%)维持历史高位，PEG比率0.705显示增长溢价合理。",
+    "核心理由2：技术面多头排列（MA5>MA10>MA20>MA30）叠加突破50美元心理关口，OBV能量潮持续攀升验证资金深度介入，机构投资者Trust Co. of Vermont增持1.2%股份佐证长期价值。"
+  ],
+  "action_plan": [
+    "关注57.66美元布林带上轨突破确认与55.78美元MA5支撑位回调机会，维持核心持仓并利用技术修复分批建仓",
+    "监控AI芯片需求持续性、AMD边缘计算产品落地速度及内存股轮动趋势，结合地缘政治风险动态调整仓位比例"
+  ],
+  "notes_from_past_mistakes": [
+    "2023年Q4曾因过度乐观库存管理出现短期回调，需警惕214亿美元存货占自由现金流22.1%的资金效率边际恶化风险",
+    "2024年初机构增持已被计入股价，需避免重复依赖单一持仓信号而忽视竞争格局变化"
+  ]
+}
+
+        [Trader Investment Plan]
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "顺势加仓AI核心标的，技术面多头排列与基本面高ROE/PEG共振，短期超买风险通过布林带上轨突破验证趋势延续性",
+  "risk_controls": {
+    "stop_loss_pct": -0.03,
+    "take_profit_pct": 0.08,
+    "invalidation": "若MA5支撑位55.78美元失守或出现AMD边缘AI产品重大突破的实质性新闻",
+    "time_horizon": "1-6个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "信心：高。当前技术面多头排列与机构增持形成双重支撑，基本面AI业务占比78%的结构性优势未变。需密切监控存货周转效率（当前占自由现金流22.1%）及Meta-Broadcom合作对定制芯片市场的潜在影响。"
+}
+
+        [Risk Final Trade Decision]
+
+
+{
+  "role": "risk_manager",
+  "final_decision": "BUY",
+  "fine_rating": "Overweight",
+  "summary": "NVDA技术面多头排列与基本面AI业务主导地位形成共振，但短期超买指标与内存股轮动风险需警惕。建议维持核心仓位但降低风险敞口，通过动态止盈与严格止损控制回撤。",
+  "rationale": [
+    "RSI(80.81)与StochRSI(95.41)同步超买叠加布林带接近上轨，短期回调概率达70%-78%",
+    "内存股轮动导致板块资金虹吸效应，美光(MU)两周涨幅超15%反映市场偏好转移风险"
+  ],
+  "position_size": 0.25,
+  "max_drawdown": "接受5%以内回撤，若跌破MA5支撑位(55.78)则触发止损",
+  "stop_loss": "跌破55.78美元支撑位或布林带中轨51.21美元（6.3%下行空间）",
+  "take_profit": "盈利达8%时分批止盈，保留30%仓位观察突破57.66美元阻力位后的趋势延续性",
+  "time_horizon": "1-6个月，若3个月内未突破57.66美元则重新评估",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "2023Q4曾因MA5支撑失效导致12%单周回撤，需避免重复过度依赖均线支撑",
+    "2025年初内存股轮动未被及时识别，造成板块内部资金分配失衡"
+  ]
+}
+
+        [Execution Payload]
+        {
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "stop_loss": null,
+  "take_profit": null,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "已持仓 50.6%，目标 25.0% 无显著增量，HOLD",
+  "is_exploratory": false,
+  "execution_date": "2024-01-22",
+  "date": "2024-01-19",
+  "symbol": "NVDA",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}

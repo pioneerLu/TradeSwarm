@@ -1,0 +1,265 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>NVDA 2025-02-27 TradeSwarm Report</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 16mm;
+    }
+    body {
+      color: #172033;
+      font-family: "Microsoft YaHei", "Noto Sans CJK SC", "Segoe UI", Arial, sans-serif;
+      font-size: 12px;
+      line-height: 1.55;
+      margin: 0;
+    }
+    h1, h2, h3 {
+      color: #0f2a4f;
+      margin: 0;
+    }
+    h1 {
+      font-size: 26px;
+      letter-spacing: 0.02em;
+    }
+    h2 {
+      border-bottom: 1px solid #d9e2ef;
+      font-size: 16px;
+      margin-top: 22px;
+      padding-bottom: 6px;
+    }
+    .subtitle {
+      color: #53657d;
+      margin-top: 6px;
+    }
+    .meta-grid {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: repeat(2, 1fr);
+      margin-top: 18px;
+    }
+    .card {
+      background: #f7f9fc;
+      border: 1px solid #dce5f1;
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .label {
+      color: #607086;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .value {
+      color: #172033;
+      font-size: 13px;
+      margin-top: 3px;
+      word-break: break-word;
+    }
+    .section {
+      margin-top: 12px;
+    }
+    .pre {
+      background: #fbfcff;
+      border: 1px solid #dce5f1;
+      border-radius: 8px;
+      color: #1f2937;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 10.5px;
+      padding: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .badge {
+      background: #e8f1ff;
+      border: 1px solid #bfd7ff;
+      border-radius: 999px;
+      color: #174984;
+      display: inline-block;
+      font-size: 10px;
+      margin: 3px 4px 0 0;
+      padding: 2px 8px;
+    }
+    .footer {
+      border-top: 1px solid #d9e2ef;
+      color: #7a889a;
+      font-size: 10px;
+      margin-top: 26px;
+      padding-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>TradeSwarm 投研报告</h1>
+  <div class="subtitle">NVDA · 2025-02-27 · backtest</div>
+
+  <div class="meta-grid">
+    <div class="card">
+      <div class="label">Experiment</div>
+      <div class="value">market_news</div>
+    </div>
+    <div class="card">
+      <div class="label">Analysts</div>
+      <div class="value">market, news</div>
+    </div>
+    <div class="card">
+      <div class="label">LLM</div>
+      <div class="value">-</div>
+    </div>
+    <div class="card">
+      <div class="label">Strategy Skill</div>
+      <div class="value">reflect / range_bound_skill</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h2>市场状态与 Skill</h2>
+  <div class="section">
+    
+    <span class="badge">market_regime: range_bound</span>
+    
+    <span class="badge">selected_skill: range_bound_skill</span>
+    
+    <span class="badge">regime_confidence: 0.75</span>
+    
+    <span class="badge">skill_router_mode: reflect</span>
+    
+    <span class="badge">reflection_market_regime: range_bound</span>
+    
+    <span class="badge">reflection_selected_skill: range_bound_skill</span>
+    
+    <span class="badge">reflection_confidence: 0.75</span>
+    
+  </div>
+  
+
+  <h2>Research Manager 投资计划</h2>
+  <div class="pre">{
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "NVDA技术面关键支撑位稳固且战略合作强化长期增长逻辑，短期调整提供买入机会。尽管存在资金流出等短期压力，但AI生态系统的领导地位和合作伙伴关系带来的增长潜力更为关键。",
+  "rationale": [
+    "技术面显示价格在MA20(129.96美元)获得强劲支撑，RSI(58.35)处于健康区间，MACD柱状图转正显示下跌动能减弱，市场已完成剧烈调整进入蓄势阶段。",
+    "与Lattice Semiconductor和Coherent Corp的战略合作扩展了物理AI和数据中心市场，强化生态系统护城河，数据中心基础设施投资持续增长直接利好NVDA硬件需求。"
+  ],
+  "action_plan": [
+    "关注价格在130美元支撑位的表现，确认支撑有效后考虑建立多头头寸。",
+    "密切关注战略合作伙伴关系的商业化进展和资金流向(OBV)的改善情况，作为后续加仓或调整的依据。"
+  ],
+  "notes_from_past_mistakes": [
+    "需警惕战略合作落地速度不及预期的风险，避免过度依赖长期叙事而忽视短期财务真空期的影响。",
+    "注意衍生品市场高股息收益率可能隐含的波动性风险，不宜单纯以此作为看涨信号。"
+  ]
+}</div>
+
+  <h2>Trader 执行计划</h2>
+  <div class="pre">{
+  "role": "trader",
+  "market_regime": "range_bound",
+  "selected_skill": "range_bound_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": ["价格在112.97-152.11美元区间内震荡，当前价格126.63美元接近区间下沿", "布林带收窄显示波动性降低，ATR从8.17下降至5.24表明市场进入整理阶段", "价格在MA20(129.96美元)附近获得支撑，但受阻于MA10(134.62美元)"],
+  "action": "BUY",
+  "target_pct": 0.25,
+  "entry_type": "LIMIT",
+  "entry_price": 126.50,
+  "execution_window": "NEXT_2_DAYS",
+  "summary": "NVDA处于区间震荡下沿，技术面支撑稳固且战略合作强化长期逻辑，适合在126.50美元附近分批买入。信心：中",
+  "risk_controls": {
+    "stop_loss_pct": 5.0,
+    "take_profit_pct": 10.0,
+    "invalidation": "价格跌破125美元支撑位或OBV资金流出加剧",
+    "time_horizon": "1-3个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.25,
+      "price_type": "LIMIT",
+      "price": 126.50
+    }
+  ],
+  "comment": "当前仓位亏损6.29%，但Alpha vs B&H仍有4.48%优势，本次加仓旨在降低平均成本并把握区间下沿机会。"
+}</div>
+
+  <h2>Risk Manager 风控裁决</h2>
+  <div class="pre">```json
+{
+  "role": "risk_manager",
+  "market_regime": "range_bound",
+  "selected_skill": "range_bound_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "价格在112.97-152.11美元区间内震荡，当前价格131.24美元位于区间中部",
+    "布林带收窄显示波动性降低，ATR从8.17下降至5.24表明市场进入整理阶段",
+    "价格在MA20(129.96美元)获得支撑，但受阻于MA10(134.62美元)，形成明确交易区间",
+    "OBV资金流向指标为负但改善，显示缺乏明确方向性资金流入"
+  ],
+  "final_decision": "BUY",
+  "fine_rating": "Overweight",
+  "summary": "NVDA处于区间震荡下沿，技术面支撑稳固且战略合作强化长期逻辑，适合在126.50美元附近分批买入。",
+  "rationale": [
+    "技术指标显示调整充分：价格在MA20(129.96美元)获强力支撑，RSI(58.35)远离超买区，MACD柱状图转正预示反弹在即，ATR波动率降至5.24提供低风险入场窗口",
+    "战略合作价值被低估：与Coherent Corp的数十亿美元光学互连订单将直接增厚业绩，Lattice合作打开物理AI新市场，Equinix数据中心扩张确保需求持续性"
+  ],
+  "position_size": 0.25,
+  "max_drawdown": "5%",
+  "stop_loss": "价格跌破125美元支撑位或OBV资金流出加剧",
+  "take_profit": "价格接近区间上沿144.02美元或出现趋势破坏信号（如跌破短期均线/关键支撑）",
+  "time_horizon": "1-3个月",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "1月27日单日暴跌23%显示关键支撑可能瞬间失效，需警惕类似情况重现",
+    "OBV资金流向指标为负，需密切关注资金流向变化"
+  ]
+}
+```</div>
+
+  <h2>最终执行载荷</h2>
+  <div class="pre">{
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "stop_loss": null,
+  "take_profit": null,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "已持仓 37.6%，目标 25.0% 无显著增量，HOLD",
+  "is_exploratory": false,
+  "execution_date": "2025-02-28",
+  "market_regime": "range_bound",
+  "selected_skill": "range_bound_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "价格在112.97-152.11美元区间内震荡，当前价格131.24美元位于区间中部",
+    "布林带收窄显示波动性降低，ATR从8.17下降至5.24表明市场进入整理阶段",
+    "价格在MA20(129.96美元)获得支撑，但受阻于MA10(134.62美元)，形成明确交易区间",
+    "OBV资金流向指标为负但改善，显示缺乏明确方向性资金流入"
+  ],
+  "skill_router_mode": "reflect",
+  "reflection_market_regime": "range_bound",
+  "reflection_selected_skill": "range_bound_skill",
+  "reflection_confidence": 0.75,
+  "reflection_evidence": [
+    "价格在112.97-152.11美元区间内震荡，波动幅度约34.7%，当前价格131.24美元位于区间中部",
+    "布林带收窄显示波动性降低，ATR从8.17下降至5.24表明市场进入整理阶段",
+    "价格在MA20(129.96美元)获得支撑，但受阻于MA10(134.62美元)，形成明确交易区间",
+    "OBV资金流向指标为负但改善，显示缺乏明确方向性资金流入"
+  ],
+  "date": "2025-02-27",
+  "symbol": "NVDA",
+  "experiment_id": "market_news",
+  "enabled_analysts": [
+    "market",
+    "news"
+  ]
+}</div>
+
+  <div class="footer">
+    Generated by TradeSwarm. Source artifacts: report.json / report.txt / report.html.
+  </div>
+</body>
+</html>

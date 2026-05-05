@@ -1,0 +1,72 @@
+节点: trader
+时间: 2026-04-28 00:00:00
+================================================================================
+
+最后一条消息:
+
+
+{
+  "role": "trader",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": ["技术面显示价格跌破所有主要均线且波动率显著上升", "基本面高增长与毛利率下降形成矛盾信号，机构持仓出现明显分化"],
+  "action": "BUY",
+  "target_pct": 0.10,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "基于AI生态绑定战略的机构增持与技术超跌共振，小仓参与短线修复，但需警惕估值分歧与供应链风险",
+  "risk_controls": {
+    "stop_loss_pct": -5,
+    "take_profit_pct": 10,
+    "invalidation": "若布林带下轨支撑失效或机构持仓进一步恶化则止损",
+    "time_horizon": "1-3个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.10,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "信心：中。技术面RSI超卖+KDJ金叉形成短线修复动能，但需结合微软核能改造商业化进展验证基本面支撑有效性"
+}
+
+
+trader_investment_plan:
+================================================================================
+{
+  "role": "trader",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "技术面显示价格跌破所有主要均线且波动率显著上升",
+    "基本面高增长与毛利率下降形成矛盾信号，机构持仓出现明显分化"
+  ],
+  "action": "BUY",
+  "target_pct": 0.1,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "基于AI生态绑定战略的机构增持与技术超跌共振，小仓参与短线修复，但需警惕估值分歧与供应链风险",
+  "risk_controls": {
+    "stop_loss_pct": -5,
+    "take_profit_pct": 10,
+    "invalidation": "若布林带下轨支撑失效或机构持仓进一步恶化则止损",
+    "time_horizon": "1-3个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.1,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "信心：中。技术面RSI超卖+KDJ金叉形成短线修复动能，但需结合微软核能改造商业化进展验证基本面支撑有效性"
+}

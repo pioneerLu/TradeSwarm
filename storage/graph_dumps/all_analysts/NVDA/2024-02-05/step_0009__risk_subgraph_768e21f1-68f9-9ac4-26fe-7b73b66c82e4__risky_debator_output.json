@@ -1,0 +1,16 @@
+{
+  "risk_summary": {
+    "risk_debate_state": {
+      "history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA的技术面多头排列与机构增持形成共振，AI行业结构性增长与量子计算突破提供长期叙事支撑，PEG估值洼地暗示上行空间远超短期超买风险。\",\n  \"supporting_points\": [\n    \"技术指标显示多头蓄势未尽：MA5/MA10/MA20持续多头排列，EMA双线金叉，OBV能量潮突破61亿确认资金持续流入\",\n    \"基本面与机构行为形成双重锚定：三年营收复合增长率100.8%的硬核数据+Trust Co. 6500万加仓行为，叠加TSMC 3nm产能满载的供应链验证\"\n  ],\n  \"counter_arguments\": [\n    \"RSI超买与+DI极端值并非顶部信号，而是AI行业需求爆发期的典型特征（参考2023Q3历史数据）\",\n    \"高估值已通过PEG 0.717获得定价合理性，55.6%净利率与101.5% ROE构成坚实的业绩安全边际\"\n  ],\n  \"risk_assessment\": \"短期技术性回调风险已被布林带通道和MA20支撑位对冲，机构增持与供应链满载数据证明需求刚性，量子计算突破带来的板块β收益可覆盖地缘政治α风险扰动\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.82\n}",
+      "risky_history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA的技术面多头排列与机构增持形成共振，AI行业结构性增长与量子计算突破提供长期叙事支撑，PEG估值洼地暗示上行空间远超短期超买风险。\",\n  \"supporting_points\": [\n    \"技术指标显示多头蓄势未尽：MA5/MA10/MA20持续多头排列，EMA双线金叉，OBV能量潮突破61亿确认资金持续流入\",\n    \"基本面与机构行为形成双重锚定：三年营收复合增长率100.8%的硬核数据+Trust Co. 6500万加仓行为，叠加TSMC 3nm产能满载的供应链验证\"\n  ],\n  \"counter_arguments\": [\n    \"RSI超买与+DI极端值并非顶部信号，而是AI行业需求爆发期的典型特征（参考2023Q3历史数据）\",\n    \"高估值已通过PEG 0.717获得定价合理性，55.6%净利率与101.5% ROE构成坚实的业绩安全边际\"\n  ],\n  \"risk_assessment\": \"短期技术性回调风险已被布林带通道和MA20支撑位对冲，机构增持与供应链满载数据证明需求刚性，量子计算突破带来的板块β收益可覆盖地缘政治α风险扰动\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.82\n}",
+      "safe_history": "",
+      "neutral_history": "",
+      "latest_speaker": "Risky",
+      "current_risky_response": "Risky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA的技术面多头排列与机构增持形成共振，AI行业结构性增长与量子计算突破提供长期叙事支撑，PEG估值洼地暗示上行空间远超短期超买风险。\",\n  \"supporting_points\": [\n    \"技术指标显示多头蓄势未尽：MA5/MA10/MA20持续多头排列，EMA双线金叉，OBV能量潮突破61亿确认资金持续流入\",\n    \"基本面与机构行为形成双重锚定：三年营收复合增长率100.8%的硬核数据+Trust Co. 6500万加仓行为，叠加TSMC 3nm产能满载的供应链验证\"\n  ],\n  \"counter_arguments\": [\n    \"RSI超买与+DI极端值并非顶部信号，而是AI行业需求爆发期的典型特征（参考2023Q3历史数据）\",\n    \"高估值已通过PEG 0.717获得定价合理性，55.6%净利率与101.5% ROE构成坚实的业绩安全边际\"\n  ],\n  \"risk_assessment\": \"短期技术性回调风险已被布林带通道和MA20支撑位对冲，机构增持与供应链满载数据证明需求刚性，量子计算突破带来的板块β收益可覆盖地缘政治α风险扰动\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.82\n}",
+      "current_safe_response": "",
+      "current_neutral_response": "",
+      "judge_decision": "",
+      "count": 1
+    }
+  }
+}

@@ -1,0 +1,104 @@
+Symbol: NVDA
+        Trade Date: 2024-02-01
+        Experiment ID: all_analysts
+        Enabled Analysts: market, news, sentiment, fundamentals
+        Export Mode: backtest
+
+        [Research Investment Plan]
+
+
+```json
+{
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "NVDA技术面维持强势多头排列且基本面增长动能充足，机构增持与分析师上调目标价强化长期逻辑，短期回调风险不改核心赛道主导地位。",
+  "rationale": [
+    "技术面显示ADX趋势强度指标维持74.73高位叠加OBV能量潮持续创新高，证明主升浪动能未衰竭且资金承接力充足，完美多头排列（5日>10日>20日>30日均线）与AI基础设施需求验证形成共振。",
+    "财务基本面呈现三年营收复合增长率100.8%、净利率55.6%的卓越表现，PEG比率0.717具备安全边际，存货增长112.3%与行业资本开支周期匹配，非需求透支而是供应链主动备货的必然结果。"
+  ],
+  "action_plan": [
+    "密切监控20日均线56.63美元支撑有效性及布林带上轨66.33美元阻力突破情况，结合MACD动能变化判断趋势延续性。",
+    "跟踪机构投资者持仓动态与分析师目标价调整，同时评估地缘政治风险对科技板块流动性的影响，优先关注AI生态扩展相关催化剂。"
+  ],
+  "notes_from_past_mistakes": [
+    "2023年Q4曾误判微软GPU采购的可持续性，需注意当前订单已透支未来6-9个月需求的潜在风险",
+    "2024年初因过度依赖RSI超买信号导致回调预警失准，应综合趋势指标（如ADX）与资金流（OBV）交叉验证"
+  ]
+}
+```
+
+        [Trader Investment Plan]
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "NVDA处于强趋势主升浪且基本面支撑强劲，当前回调风险不改长期逻辑，顺势加仓强化AI赛道核心仓位。",
+  "risk_controls": {
+    "stop_loss_pct": 56.63,
+    "take_profit_pct": 66.33,
+    "invalidation": "跌破20日均线56.63美元或MACD柱状图连续3日收窄",
+    "time_horizon": "3-6个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "当前持仓已浮盈23%，建议设置动态止盈（66.33美元）和止损（56.63美元）。PEG估值合理且机构持续加仓，需警惕微软订单透支风险，但技术面多头排列未破坏，维持高信心。"
+}
+
+        [Risk Final Trade Decision]
+
+
+{
+  "role": "risk_manager",
+  "final_decision": "BUY",
+  "fine_rating": "Overweight",
+  "summary": "NVDA处于AI基础设施核心赛道，技术面多头排列与基本面超预期增长共振，但需警惕估值透支与短期超买风险。建议维持多头方向，通过仓位分级和动态风控平衡趋势延续性与波动性。",
+  "rationale": [
+    "技术面多头动能（ADX 74.73）与基本面（三年营收复合增长100.8%）形成强支撑，但RSI超买（80.61）和存货高企（+112.3%）构成短期风险",
+    "地缘政治风险（美伊冲突）可能引发成长股估值收缩，需通过动态止损（56.63美元）和分批止盈（突破66.33美元后分阶段锁定收益）对冲非线性波动"
+  ],
+  "position_size": 0.20,
+  "max_drawdown": "接受15%-20%短期回撤，但需在跌破56.63美元时触发止损",
+  "stop_loss": "跌破20日均线56.63美元或MACD柱状图连续3日收窄时止损",
+  "take_profit": "突破66.33美元阻力位后分批止盈（首阶段30%、次阶段20%），若OBV能量潮出现死亡交叉则加速止盈",
+  "time_horizon": "3-6个月（突破66.33美元后可延长至12个月）",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "2023Q4微软订单透支风险需持续监控，避免过度依赖单一客户验证",
+    "2024年1月24日极端超买后的反弹动能显示市场对AI赛道的强支撑，但需警惕趋势末期的流动性陷阱",
+    "存货同比增幅112.3%已突破行业安全阈值，需跟踪季度库存周转率变化"
+  ]
+}
+
+        [Execution Payload]
+        {
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "stop_loss": null,
+  "take_profit": null,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "已持仓 53.5%，目标 20.0% 无显著增量，HOLD",
+  "is_exploratory": false,
+  "execution_date": "2024-02-02",
+  "date": "2024-02-01",
+  "symbol": "NVDA",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}

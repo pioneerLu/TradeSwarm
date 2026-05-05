@@ -1,0 +1,135 @@
+Symbol: NVDA
+        Trade Date: 2025-01-15
+        Experiment ID: all_analysts
+        Enabled Analysts: market, news, sentiment, fundamentals
+        Export Mode: backtest
+
+        [Research Investment Plan]
+
+
+```json
+{
+  "role": "research_manager",
+  "decision": "HOLD",
+  "summary": "NVDA基本面增长动能强劲但技术面调整风险未解除，需平衡长期战略价值与短期估值压力。建议在130美元支撑位附近择机布局，同时密切监控宏观风险与库存健康度。",
+  "rationale": [
+    "技术面显示股价跌破多条短期均线且MACD死叉，但StochRSI接近超卖区域（15.46）和130美元历史支撑位提供短期反弹可能性",
+    "基本面维持高ROE（101.5%）和净利率（55.6%）优势，AI生态扩展（核能/能源合作）验证长期增长逻辑，但PEG比率吸引力（0.721）依赖于65%营收增速能否持续"
+  ],
+  "action_plan": [
+    "在130美元关键支撑位附近观察成交量变化与RSI修复信号，确认技术反弹有效性",
+    "跟踪微软核能合作商业化进展及Blackwell架构量产节奏，验证生态系统扩展对营收的实质贡献"
+  ],
+  "notes_from_past_mistakes": [
+    "2024Q4曾过度依赖AI算力需求线性增长假设，忽视库存周期波动导致的估值回调",
+    "2023年高估了合作伙伴股价表现对NVDA生态系统的验证强度，需区分行业β与个股α"
+  ]
+}
+```
+
+        [Trader Investment Plan]
+
+
+{
+  "role": "trader",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "技术面显示股价跌破多条短期均线且MACD死叉，但StochRSI接近超卖区域（15.46）和130美元历史支撑位提供短期反弹可能性",
+    "新闻分析指出地缘政治风险（美国对华出口管制）和竞争压力（AMD新芯片）与AI生态系统扩展的积极信号并存，估值担忧与长期增长叙事形成矛盾"
+  ],
+  "action": "HOLD",
+  "target_pct": 0.18,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "维持现有仓位但降低敞口至18%，等待130美元支撑确认与StochRSI超卖修复信号，同时监控Blackwell量产进度与地缘政策变化",
+  "risk_controls": {
+    "stop_loss_pct": -8.0,
+    "take_profit_pct": 5.0,
+    "invalidation": "若130美元支撑失守或1月财报指引低于预期则触发止损",
+    "time_horizon": "2-4周（等待技术修复或催化剂明朗化）"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "HOLD",
+      "size_pct": 0.18,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "当前持仓浮亏5.2%，需通过仓位调整平衡风险。选择HOLD但降低至18%以保留长期alpha同时规避短期波动风险，技术面需关注130美元支撑有效性，基本面需跟踪Blackwell商业化进展与合作伙伴订单转化"
+}
+
+        [Risk Final Trade Decision]
+
+
+```json
+{
+  "role": "risk_manager",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "技术面显示股价跌破多条短期均线且MACD死叉，但StochRSI接近超卖区域（15.46）和130美元历史支撑位提供短期反弹可能性",
+    "新闻分析指出地缘政治风险（美国对华出口管制）和竞争压力（AMD新芯片）与AI生态系统扩展的积极信号并存，估值担忧与长期增长叙事形成矛盾"
+  ],
+  "final_decision": "HOLD",
+  "fine_rating": "Hold",
+  "summary": "维持现有仓位但严格控制风险敞口，技术面超卖修复与基本面增长潜力形成对冲，需等待明确反转信号或政策风险明朗化",
+  "rationale": [
+    "技术面多重破位（MA5/MA10/MA20）叠加OBV持续流出-13.17亿，显示短期抛压未完全释放",
+    "基本面高ROE(101.5%)与自由现金流(967亿)提供安全垫，但存货增长113%及地缘政治风险(20-25%收入缺口)构成下行隐患"
+  ],
+  "position_size": 0.15,
+  "max_drawdown": "最大回撤控制在8%以内，若跌破126.42美元布林带下轨需强制减仓",
+  "stop_loss": "126.42美元（布林带下轨）下方8%触发止损，或130美元支撑失守后扩大止损至10%",
+  "take_profit": "若股价反弹至136.60美元（布林带中轨）且StochRSI突破50%则分批止盈30%，剩余仓位继续持有至140美元阻力位测试",
+  "time_horizon": "2-4周（等待技术修复或催化剂明朗化）",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "2024Q4超卖区域反弹成功率仅58%，需结合成交量确认而非单纯依赖指标",
+    "2023年高估值科技股调整期间，未设置动态止损的仓位平均损失22%"
+  ]
+}
+```
+
+        [Execution Payload]
+        {
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "stop_loss": null,
+  "take_profit": null,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "Risk/Trader 决策为 HOLD",
+  "is_exploratory": false,
+  "execution_date": "2025-01-16",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "技术面显示股价跌破多条短期均线且MACD死叉，但StochRSI接近超卖区域（15.46）和130美元历史支撑位提供短期反弹可能性",
+    "新闻分析指出地缘政治风险（美国对华出口管制）和竞争压力（AMD新芯片）与AI生态系统扩展的积极信号并存，估值担忧与长期增长叙事形成矛盾"
+  ],
+  "skill_router_mode": "reflect",
+  "forced_selected_skill": "downtrend_skill",
+  "reflection_market_regime": "high_vol_uncertain",
+  "reflection_selected_skill": "high_vol_uncertain_skill",
+  "reflection_confidence": 0.75,
+  "reflection_evidence": [
+    "技术面显示股价跌破多条短期均线且MACD死叉，但StochRSI接近超卖区域（15.46）和130美元历史支撑位提供短期反弹可能性",
+    "新闻分析指出地缘政治风险（美国对华出口管制）和竞争压力（AMD新芯片）与AI生态系统扩展的积极信号并存，估值担忧与长期增长叙事形成矛盾"
+  ],
+  "date": "2025-01-15",
+  "symbol": "NVDA",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}

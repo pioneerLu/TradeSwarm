@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>NVDA 2025-02-11 TradeSwarm Report</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 16mm;
+    }
+    body {
+      color: #172033;
+      font-family: "Microsoft YaHei", "Noto Sans CJK SC", "Segoe UI", Arial, sans-serif;
+      font-size: 12px;
+      line-height: 1.55;
+      margin: 0;
+    }
+    h1, h2, h3 {
+      color: #0f2a4f;
+      margin: 0;
+    }
+    h1 {
+      font-size: 26px;
+      letter-spacing: 0.02em;
+    }
+    h2 {
+      border-bottom: 1px solid #d9e2ef;
+      font-size: 16px;
+      margin-top: 22px;
+      padding-bottom: 6px;
+    }
+    .subtitle {
+      color: #53657d;
+      margin-top: 6px;
+    }
+    .meta-grid {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: repeat(2, 1fr);
+      margin-top: 18px;
+    }
+    .card {
+      background: #f7f9fc;
+      border: 1px solid #dce5f1;
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .label {
+      color: #607086;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .value {
+      color: #172033;
+      font-size: 13px;
+      margin-top: 3px;
+      word-break: break-word;
+    }
+    .section {
+      margin-top: 12px;
+    }
+    .pre {
+      background: #fbfcff;
+      border: 1px solid #dce5f1;
+      border-radius: 8px;
+      color: #1f2937;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 10.5px;
+      padding: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .badge {
+      background: #e8f1ff;
+      border: 1px solid #bfd7ff;
+      border-radius: 999px;
+      color: #174984;
+      display: inline-block;
+      font-size: 10px;
+      margin: 3px 4px 0 0;
+      padding: 2px 8px;
+    }
+    .footer {
+      border-top: 1px solid #d9e2ef;
+      color: #7a889a;
+      font-size: 10px;
+      margin-top: 26px;
+      padding-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>TradeSwarm 投研报告</h1>
+  <div class="subtitle">NVDA · 2025-02-11 · backtest</div>
+
+  <div class="meta-grid">
+    <div class="card">
+      <div class="label">Experiment</div>
+      <div class="value">all_analysts</div>
+    </div>
+    <div class="card">
+      <div class="label">Analysts</div>
+      <div class="value">market, news, sentiment, fundamentals</div>
+    </div>
+    <div class="card">
+      <div class="label">LLM</div>
+      <div class="value">-</div>
+    </div>
+    <div class="card">
+      <div class="label">Strategy Skill</div>
+      <div class="value">reflect / downtrend_skill</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h2>市场状态与 Skill</h2>
+  <div class="section">
+    
+    <span class="badge">market_regime: high_vol_uncertain</span>
+    
+    <span class="badge">selected_skill: high_vol_uncertain_skill</span>
+    
+    <span class="badge">regime_confidence: 0.72</span>
+    
+    <span class="badge">skill_router_mode: reflect</span>
+    
+    <span class="badge">forced_selected_skill: downtrend_skill</span>
+    
+    <span class="badge">reflection_market_regime: high_vol_uncertain</span>
+    
+    <span class="badge">reflection_selected_skill: high_vol_uncertain_skill</span>
+    
+    <span class="badge">reflection_confidence: 0.72</span>
+    
+  </div>
+  
+
+  <h2>Research Manager 投资计划</h2>
+  <div class="pre">
+
+{
+  "role": "research_manager",
+  "decision": "HOLD",
+  "summary": "NVDA处于技术性反弹与基本面增速放缓的博弈期，AI生态扩张提供长期支撑但短期估值压力与库存风险需警惕。市场需突破149.35美元阻力位或出现明确趋势信号才能形成决策依据。",
+  "rationale": [
+    "技术面反弹缺乏成交量确认且MACD零轴上方持续性存疑，同时基本面显示营收增速腰斩与库存激增形成下行风险对冲",
+    "AI基础设施投资热潮与生态系统优势维持长期叙事韧性，但华为竞争加剧与估值体系失衡构成关键不确定性"
+  ],
+  "action_plan": [
+    "监控149.35美元布林带上轨突破有效性及成交量配合度，确认趋势反转信号",
+    "跟踪Meta资本支出执行进度与华为950PR芯片商业化进展，评估AI需求端与竞争格局变化"
+  ],
+  "notes_from_past_mistakes": [
+    "2024年Q4曾误判AI算力需求持续性，需警惕当前市场对2026年光学互连投资的预期兑现周期",
+    "2025年初机构持仓分化时未充分重视库存预警信号，导致后续回调应对滞后"
+  ]
+}</div>
+
+  <h2>Trader 执行计划</h2>
+  <div class="pre">
+
+{
+  "role": "trader",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.72,
+  "regime_evidence": [
+    "技术面MACD零轴上方持续性存疑且RSI未突破50",
+    "基本面营收增速腰斩(65.5%)与库存激增112.3%",
+    "新闻时间戳异常与华为竞争威胁形成信息不确定性",
+    "ATR高位(8.08)显示多空博弈激烈"
+  ],
+  "action": "HOLD",
+  "target_pct": 0.099,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "维持当前仓位并设置动态止损，等待149.35美元阻力突破或华为竞争影响的实质性落地，控制高波动环境下的下行风险",
+  "risk_controls": {
+    "stop_loss_pct": -0.05,
+    "take_profit_pct": 0.10,
+    "invalidation": "若价格跌破130.87美元布林中轨或出现华为950PR芯片实质性订单替代",
+    "time_horizon": "1-2周内重新评估"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "HOLD",
+      "size_pct": 0.099,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "当前持仓比例与组合占比匹配，需密切跟踪Meta资本支出执行与布林带中轨防守有效性，利用ATR(8.08)设置5%止损位"
+}</div>
+
+  <h2>Risk Manager 风控裁决</h2>
+  <div class="pre">
+
+{
+  "role": "risk_manager",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.72,
+  "regime_evidence": [
+    "技术面呈现短期金叉与布林带中轨突破但MACD零轴上方持续性存疑",
+    "基本面显示营收增速从114%放缓至65.5%且库存激增112.3%",
+    "新闻时间戳异常与华为竞争威胁形成信息不确定性",
+    "RSI(45.28)未突破50且ATR维持高位显示多空博弈激烈"
+  ],
+  "final_decision": "HOLD",
+  "fine_rating": "Hold",
+  "summary": "维持当前仓位并设置动态止损，等待149.35美元阻力突破或华为竞争影响的实质性落地，控制高波动环境下的下行风险",
+  "rationale": [
+    "技术面短期反弹信号（金叉、布林带中轨突破）与基本面增速换挡形成剪刀差，需同步验证阻力位突破有效性",
+    "新闻时间戳异常与华为竞争威胁构成信息不确定性，但机构持仓分化（Community Trust增持4.7%）显示结构性支撑"
+  ],
+  "position_size": 0.099,
+  "max_drawdown": "接受最大回撤5%以控制布林带中轨支撑失效风险",
+  "stop_loss": "若价格跌破130.87美元布林带中轨触发止损",
+  "take_profit": "盈利达到10%且突破149.35美元阻力位时止盈，否则继续持有",
+  "time_horizon": "1-2周内重新评估，若未突破149.35美元或跌破130.87美元需调整策略",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "需警惕2026财年毛利率下降4个百分点（75.0%→71.1%）的持续性风险",
+    "避免单纯依赖未验证的2026年光学互连投资预期，需结合季度财报库存去化进展"
+  ]
+}</div>
+
+  <h2>最终执行载荷</h2>
+  <div class="pre">{
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "stop_loss": null,
+  "take_profit": null,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "Risk/Trader 决策为 HOLD",
+  "is_exploratory": false,
+  "execution_date": "2025-02-12",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.72,
+  "regime_evidence": [
+    "技术面呈现短期金叉与布林带中轨突破但MACD零轴上方持续性存疑",
+    "基本面显示营收增速从114%放缓至65.5%且库存激增112.3%",
+    "新闻时间戳异常与华为竞争威胁形成信息不确定性",
+    "RSI(45.28)未突破50且ATR维持高位显示多空博弈激烈"
+  ],
+  "skill_router_mode": "reflect",
+  "forced_selected_skill": "downtrend_skill",
+  "reflection_market_regime": "high_vol_uncertain",
+  "reflection_selected_skill": "high_vol_uncertain_skill",
+  "reflection_confidence": 0.72,
+  "reflection_evidence": [
+    "技术面呈现短期金叉与布林带中轨突破但MACD零轴上方持续性存疑",
+    "基本面显示营收增速从114%放缓至65.5%且库存激增112.3%",
+    "新闻时间戳异常与华为竞争威胁形成信息不确定性",
+    "RSI(45.28)未突破50且ATR维持高位显示多空博弈激烈"
+  ],
+  "date": "2025-02-11",
+  "symbol": "NVDA",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}</div>
+
+  <div class="footer">
+    Generated by TradeSwarm. Source artifacts: report.json / report.txt / report.html.
+  </div>
+</body>
+</html>

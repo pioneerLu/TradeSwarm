@@ -1,0 +1,65 @@
+{
+  "symbol": "NVDA",
+  "export_mode": "rating",
+  "start_date": "2024-02-21",
+  "end_date": "2024-02-21",
+  "experiment_id": "appendix_2024_02_21_all",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ],
+  "llm": {
+    "provider": "siliconflow",
+    "profile": "qwen3_32b",
+    "model_name": "Qwen/Qwen3-32B",
+    "temperature": 0.1,
+    "base_url": "https://api.siliconflow.cn/v1"
+  },
+  "strategy_skills": {
+    "mode": "reflect",
+    "fallback_mode": "off",
+    "force_skill": null
+  },
+  "input_position": {
+    "current_position_pct": 0.0,
+    "source": "cli"
+  },
+  "by_date": {
+    "2024-02-21": {
+      "date": "2024-02-21",
+      "symbol": "NVDA",
+      "export_mode": "rating",
+      "research_decision": "BUY",
+      "fine_rating": "Overweight",
+      "final_decision": "BUY",
+      "risk_level": "MEDIUM",
+      "market_regime": "high_vol_uncertain",
+      "selected_skill": "high_vol_uncertain_skill",
+      "regime_confidence": 0.75,
+      "regime_evidence": [
+        "ATR值从1.65升至2.745显示波动性显著放大",
+        "新闻数据时间戳异常（2026年4月）增加信息可信度不确定性"
+      ],
+      "skill_router_mode": "reflect",
+      "forced_selected_skill": null,
+      "reflection_market_regime": "high_vol_uncertain",
+      "reflection_selected_skill": "high_vol_uncertain_skill",
+      "reflection_confidence": 0.78,
+      "reflection_evidence": [
+        "ATR值从1.65升至2.745显示波动性显著放大",
+        "MACD柱状图首次转负且布林带缩口形成，技术面出现多空信号分歧",
+        "机构减持与AI需求强劲形成基本面矛盾信号",
+        "新闻数据时间戳异常（2026年4月）增加信息可信度不确定性"
+      ],
+      "experiment_id": "appendix_2024_02_21_all",
+      "enabled_analysts": [
+        "market",
+        "news",
+        "sentiment",
+        "fundamentals"
+      ]
+    }
+  }
+}

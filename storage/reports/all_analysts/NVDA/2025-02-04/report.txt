@@ -1,0 +1,134 @@
+Symbol: NVDA
+        Trade Date: 2025-02-04
+        Experiment ID: all_analysts
+        Enabled Analysts: market, news, sentiment, fundamentals
+        Export Mode: backtest
+
+        [Research Investment Plan]
+
+
+{
+  "role": "research_manager",
+  "decision": "SELL",
+  "summary": "NVDA技术面空头排列与机构持仓分歧形成双重压力，库存激增暴露需求验证风险。尽管AI生态扩张提供长期支撑，但当前估值已透支未来增长潜力，供应链瓶颈可能加剧短期调整。",
+  "rationale": [
+    "技术指标显示空头动能持续增强（MACD柱状体扩大、OBV净流出1.86B），股价跌破布林带下轨后需测试110美元心理支撑位，超卖状态未形成有效反弹信号",
+    "基本面显示214亿美元库存同比激增143%，与Meta等客户资本支出承诺存在兑现时差，PEG0.71的估值安全边际依赖台积电产能扩张，而当前92%利用率已形成交付瓶颈"
+  ],
+  "action_plan": [
+    "监控112-116美元支撑区域有效性，特别关注110美元心理关口突破后的技术性抛压规模",
+    "跟踪台积电产能利用率更新与HBM4量产进度，验证供应链瓶颈是否触发机构共识的估值修正预期"
+  ],
+  "notes_from_past_mistakes": [
+    "2024年AI泡沫破裂前出现类似管理层减持与机构增持背离现象，需警惕当前估值逻辑的脆弱性",
+    "历史数据显示半导体企业库存周转天数突破90天后，PEG估值修正幅度通常超过40%"
+  ]
+}
+
+        [Trader Investment Plan]
+
+
+{
+  "role": "trader",
+  "market_regime": "downtrend",
+  "selected_skill": "downtrend_skill",
+  "regime_confidence": 0.82,
+  "regime_evidence": [
+    "技术指标空头动能持续增强（MACD柱状体扩大/OBV净流出1.86B）",
+    "库存激增143%暴露需求验证风险，PEG估值依赖未兑现的供应链扩张"
+  ],
+  "action": "SELL",
+  "target_pct": 0.15,
+  "entry_type": "TODAY_CLOSE",
+  "entry_price": null,
+  "execution_window": "TODAY_CLOSE",
+  "summary": "技术面空头排列与库存风险形成双重压力，当前16.99%浮亏已触发止损逻辑，需优先保护本金并等待趋势反转信号",
+  "risk_controls": {
+    "stop_loss_pct": 0.05,
+    "take_profit_pct": 0.10,
+    "invalidation": "若110美元支撑位失守且库存周转天数突破90天",
+    "time_horizon": "短期（1-2周）"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "SELL",
+      "size_pct": 0.15,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "当前组合Alpha vs B&H为10.99%显示策略有效性，但NVDA持仓已拖累组合表现。建议分批减仓至15%以下，保留部分头寸观察110美元支撑有效性与库存风险释放程度"
+}
+
+        [Risk Final Trade Decision]
+
+
+{
+  "role": "risk_manager",
+  "market_regime": "downtrend",
+  "selected_skill": "downtrend_skill",
+  "regime_confidence": 0.82,
+  "regime_evidence": [
+    "技术指标空头动能持续增强（MACD柱状体扩大/OBV净流出1.86B）",
+    "库存激增143%暴露需求验证风险，PEG估值依赖未兑现的供应链扩张"
+  ],
+  "final_decision": "SELL",
+  "fine_rating": "Underweight",
+  "summary": "NVDA技术面空头排列与库存风险形成双重压力，当前16.99%浮亏已触发止损逻辑。建议分批减仓至15%以下，保留部分头寸观察110美元支撑有效性与库存风险释放程度。",
+  "rationale": [
+    "技术指标空头动能持续增强（MACD柱状体扩大/OBV净流出1.86B）与基本面库存风险形成共振，支撑位失效概率较高",
+    "机构持仓分化（Community Trust增持4.7% vs Diversified Trust减持1.9%）反映估值重构初期特征，需优先保护本金"
+  ],
+  "position_size": 0.15,
+  "max_drawdown": "单日回撤控制在5%以内",
+  "stop_loss": "若110美元支撑位失守或库存周转天数突破90天，立即执行止损",
+  "take_profit": "反弹至122.77美元（MA5）且MACD收窄时分批止盈10%",
+  "time_horizon": "短期（1-2周）",
+  "risk_level": "HIGH",
+  "notes_from_past_mistakes": [
+    "需警惕台积电产能瓶颈引发的交付延迟风险",
+    "避免在技术面主导下跌时过度依赖PEG安全边际",
+    "历史数据显示支撑位失效后可能触发流动性踩踏"
+  ]
+}
+
+        [Execution Payload]
+        {
+  "action": "SELL",
+  "target_pct": 0.0,
+  "stop_loss": "若110美元支撑位失守或库存周转天数突破90天，立即执行止损",
+  "take_profit": "反弹至122.77美元（MA5）且MACD收窄时分批止盈10%",
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "技术面空头排列与库存风险形成双重压力，当前16.99%浮亏已触发止损逻辑，需优先保护本金并等待趋势反转信号；注意：文本仓位提示≈17% 与 target_pct=0% 不一致，以 target_pct 为准",
+  "is_exploratory": false,
+  "execution_date": "2025-02-05",
+  "cancel_pending_orders": true,
+  "market_regime": "downtrend",
+  "selected_skill": "downtrend_skill",
+  "regime_confidence": 0.82,
+  "regime_evidence": [
+    "技术指标空头动能持续增强（MACD柱状体扩大/OBV净流出1.86B）",
+    "库存激增143%暴露需求验证风险，PEG估值依赖未兑现的供应链扩张"
+  ],
+  "skill_router_mode": "reflect",
+  "forced_selected_skill": "downtrend_skill",
+  "reflection_market_regime": "downtrend",
+  "reflection_selected_skill": "downtrend_skill",
+  "reflection_confidence": 0.82,
+  "reflection_evidence": [
+    "技术指标全面看跌（MA空头排列/MACD死叉/OBV净流出1.86B）",
+    "机构持仓呈现明显分化（Community Trust增持 vs Diversified Trust减持）",
+    "库存激增143%暴露需求验证风险，PEG估值安全边际受供应链瓶颈制约"
+  ],
+  "date": "2025-02-04",
+  "symbol": "NVDA",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}

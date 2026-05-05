@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>NVDA 2025-02-14 TradeSwarm Report</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 16mm;
+    }
+    body {
+      color: #172033;
+      font-family: "Microsoft YaHei", "Noto Sans CJK SC", "Segoe UI", Arial, sans-serif;
+      font-size: 12px;
+      line-height: 1.55;
+      margin: 0;
+    }
+    h1, h2, h3 {
+      color: #0f2a4f;
+      margin: 0;
+    }
+    h1 {
+      font-size: 26px;
+      letter-spacing: 0.02em;
+    }
+    h2 {
+      border-bottom: 1px solid #d9e2ef;
+      font-size: 16px;
+      margin-top: 22px;
+      padding-bottom: 6px;
+    }
+    .subtitle {
+      color: #53657d;
+      margin-top: 6px;
+    }
+    .meta-grid {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: repeat(2, 1fr);
+      margin-top: 18px;
+    }
+    .card {
+      background: #f7f9fc;
+      border: 1px solid #dce5f1;
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .label {
+      color: #607086;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .value {
+      color: #172033;
+      font-size: 13px;
+      margin-top: 3px;
+      word-break: break-word;
+    }
+    .section {
+      margin-top: 12px;
+    }
+    .pre {
+      background: #fbfcff;
+      border: 1px solid #dce5f1;
+      border-radius: 8px;
+      color: #1f2937;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 10.5px;
+      padding: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .badge {
+      background: #e8f1ff;
+      border: 1px solid #bfd7ff;
+      border-radius: 999px;
+      color: #174984;
+      display: inline-block;
+      font-size: 10px;
+      margin: 3px 4px 0 0;
+      padding: 2px 8px;
+    }
+    .footer {
+      border-top: 1px solid #d9e2ef;
+      color: #7a889a;
+      font-size: 10px;
+      margin-top: 26px;
+      padding-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>TradeSwarm 投研报告</h1>
+  <div class="subtitle">NVDA · 2025-02-14 · backtest</div>
+
+  <div class="meta-grid">
+    <div class="card">
+      <div class="label">Experiment</div>
+      <div class="value">market_news</div>
+    </div>
+    <div class="card">
+      <div class="label">Analysts</div>
+      <div class="value">market, news</div>
+    </div>
+    <div class="card">
+      <div class="label">LLM</div>
+      <div class="value">-</div>
+    </div>
+    <div class="card">
+      <div class="label">Strategy Skill</div>
+      <div class="value">reflect / range_bound_skill</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h2>市场状态与 Skill</h2>
+  <div class="section">
+    
+    <span class="badge">market_regime: range_bound</span>
+    
+    <span class="badge">selected_skill: range_bound_skill</span>
+    
+    <span class="badge">regime_confidence: 0.75</span>
+    
+    <span class="badge">skill_router_mode: reflect</span>
+    
+    <span class="badge">reflection_market_regime: range_bound</span>
+    
+    <span class="badge">reflection_selected_skill: range_bound_skill</span>
+    
+    <span class="badge">reflection_confidence: 0.75</span>
+    
+  </div>
+  
+
+  <h2>Research Manager 投资计划</h2>
+  <div class="pre">{
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "技术面短期动能改善与基本面战略合作形成共振，尽管存在阻力位挑战，但长期增长逻辑清晰。",
+  "rationale": [
+    "技术指标显示短期反弹动能增强（MACD转正、均线金叉、站稳布林带中轨），虽需突破140美元阻力但趋势向好",
+    "战略合作扩展至物理AI和光学互连领域（即使时间戳异常，合作事实可被交叉验证），强化长期生态系统壁垒"
+  ],
+  "action_plan": [
+    "关注135-140美元区间的量价配合情况，突破140美元可视为技术面确认信号",
+    "密切跟踪Lattice和Coherent合作进展，验证物理AI与光学互连的商业化进度"
+  ],
+  "notes_from_past_mistakes": [
+    "避免过度依赖单一技术指标（如RSI），需综合量价与多指标确认趋势",
+    "对数据异常保持警惕但不应全盘否定有效信息，需通过其他渠道验证关键事实"
+  ]
+}</div>
+
+  <h2>Trader 执行计划</h2>
+  <div class="pre">{
+  "role": "trader",
+  "market_regime": "range_bound",
+  "selected_skill": "range_bound_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": ["股价在130.77（布林带中轨）至140.00（心理关口）之间波动，尚未形成明确趋势突破", "技术指标显示短期动能改善（MACD转正、均线金叉）但中期趋势仍偏弱（RSI低于50、ADX趋势强度弱）", "成交量在反弹过程中相对温和，缺乏确认趋势反转的足够买盘力量"],
+  "action": "BUY",
+  "target_pct": 0.20,
+  "entry_type": "LIMIT",
+  "entry_price": 130.77,
+  "execution_window": "NEXT_2_DAYS",
+  "summary": "在区间下沿附近低吸，短期动能改善与基本面利好形成共振，但需控制仓位应对区间震荡风险。信心：中",
+  "risk_controls": {
+    "stop_loss_pct": 5.0,
+    "take_profit_pct": 8.0,
+    "invalidation": "股价跌破130.77支撑位且日内无反抽",
+    "time_horizon": "1-2周"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.20,
+      "price_type": "LIMIT",
+      "price": 130.77
+    }
+  ],
+  "comment": "当前仓位较低且靠近支撑位，风险收益比合理，避免在区间上沿追高"
+}</div>
+
+  <h2>Risk Manager 风控裁决</h2>
+  <div class="pre">```json
+{
+  "role": "risk_manager",
+  "market_regime": "range_bound",
+  "selected_skill": "range_bound_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "股价在130.77（布林带中轨）至140.00（心理关口）之间波动，尚未形成明确趋势突破",
+    "技术指标显示短期动能改善（MACD转正、均线金叉）但中期趋势仍偏弱（RSI低于50、ADX趋势强度弱）",
+    "成交量在反弹过程中相对温和，缺乏确认趋势反转的足够买盘力量"
+  ],
+  "final_decision": "BUY",
+  "fine_rating": "Overweight",
+  "summary": "NVDA处于技术反弹阶段，短期动能改善与战略合作利好形成共振，但中期趋势尚未确认反转，建议在区间下沿附近低吸，控制仓位应对区间震荡风险。",
+  "rationale": [
+    "技术面呈现多重看涨信号：MACD柱状图转正、5/10日均线金叉、股价站稳布林带中轨，短期反弹动能强劲",
+    "战略合作实质性推进（物理AI与光学互连）验证长期增长逻辑，但新闻数据时间戳异常需警惕"
+  ],
+  "position_size": 0.2,
+  "max_drawdown": "5%",
+  "stop_loss": "股价跌破130.77支撑位且日内无反抽",
+  "take_profit": "股价接近140.00阻力位且出现动能减弱信号（如RSI超买或成交量萎缩）",
+  "time_horizon": "1-2周",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "避免在区间上沿追高，需等待更明确的突破信号",
+    "警惕新闻数据时间戳异常可能带来的误判风险"
+  ]
+}
+```</div>
+
+  <h2>最终执行载荷</h2>
+  <div class="pre">{
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "stop_loss": null,
+  "take_profit": null,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "已持仓 15.1%，目标 20.0% 无显著增量，HOLD",
+  "is_exploratory": false,
+  "execution_date": "2025-02-18",
+  "market_regime": "range_bound",
+  "selected_skill": "range_bound_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "股价在130.77（布林带中轨）至140.00（心理关口）之间波动，尚未形成明确趋势突破",
+    "技术指标显示短期动能改善（MACD转正、均线金叉）但中期趋势仍偏弱（RSI低于50、ADX趋势强度弱）",
+    "成交量在反弹过程中相对温和，缺乏确认趋势反转的足够买盘力量"
+  ],
+  "skill_router_mode": "reflect",
+  "reflection_market_regime": "range_bound",
+  "reflection_selected_skill": "range_bound_skill",
+  "reflection_confidence": 0.75,
+  "reflection_evidence": [
+    "股价在130.77（布林带中轨）至140.00（心理关口）之间波动，尚未形成明确趋势突破",
+    "技术指标显示短期动能改善（MACD转正、均线金叉）但中期趋势仍偏弱（RSI低于50、ADX趋势强度弱）",
+    "成交量在反弹过程中相对温和，缺乏确认趋势反转的足够买盘力量"
+  ],
+  "date": "2025-02-14",
+  "symbol": "NVDA",
+  "experiment_id": "market_news",
+  "enabled_analysts": [
+    "market",
+    "news"
+  ]
+}</div>
+
+  <div class="footer">
+    Generated by TradeSwarm. Source artifacts: report.json / report.txt / report.html.
+  </div>
+</body>
+</html>

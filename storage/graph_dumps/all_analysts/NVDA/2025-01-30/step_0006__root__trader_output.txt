@@ -1,0 +1,77 @@
+节点: trader
+时间: 2026-04-28 00:00:00
+================================================================================
+
+最后一条消息:
+
+
+{
+  "role": "trader",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.78,
+  "regime_evidence": [
+    "技术面空头排列叠加RSI/CCI超卖形成多空博弈",
+    "微软核能合作等战略落地存在执行不确定性",
+    "机构持仓调整与散户情绪分化导致短期波动加剧"
+  ],
+  "action": "HOLD",
+  "target_pct": 0.17,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "维持当前仓位等待技术支撑确认与战略落地验证，利用高波动性设置动态止盈止损",
+  "risk_controls": {
+    "stop_loss_pct": -8.21,
+    "take_profit_pct": 10.0,
+    "invalidation": "若121.59美元支撑失效或微软核能合作进展不及预期则转为SELL",
+    "time_horizon": "2-4周内验证技术反弹与战略执行"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "HOLD",
+      "size_pct": 0.17,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "当前持仓已反映Alpha策略超额收益，需避免因短期超卖追加杠杆。重点监控121.59美元支撑有效性与合作伙伴技术整合进展，利用布林带波动区间设置10%止盈位与支撑破位止损"
+}
+
+
+trader_investment_plan:
+================================================================================
+{
+  "role": "trader",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.78,
+  "regime_evidence": [
+    "技术面空头排列叠加RSI/CCI超卖形成多空博弈",
+    "微软核能合作等战略落地存在执行不确定性",
+    "机构持仓调整与散户情绪分化导致短期波动加剧"
+  ],
+  "action": "HOLD",
+  "target_pct": 0.17,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "维持当前仓位等待技术支撑确认与战略落地验证，利用高波动性设置动态止盈止损",
+  "risk_controls": {
+    "stop_loss_pct": -8.21,
+    "take_profit_pct": 10.0,
+    "invalidation": "若121.59美元支撑失效或微软核能合作进展不及预期则转为SELL",
+    "time_horizon": "2-4周内验证技术反弹与战略执行"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "HOLD",
+      "size_pct": 0.17,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "当前持仓已反映Alpha策略超额收益，需避免因短期超卖追加杠杆。重点监控121.59美元支撑有效性与合作伙伴技术整合进展，利用布林带波动区间设置10%止盈位与支撑破位止损"
+}

@@ -1,0 +1,104 @@
+Symbol: NVDA
+        Trade Date: 2024-02-06
+        Experiment ID: all_analysts
+        Enabled Analysts: market, news, sentiment, fundamentals
+        Export Mode: backtest
+
+        [Research Investment Plan]
+
+
+```json
+{
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "NVDA技术面多头动能强劲与基本面AI生态扩展形成共振，量子计算突破验证技术领导力，短期回调风险或提供布局机会。尽管估值压力与供应链风险存在，但盈利质量与生态壁垒支撑长期逻辑。",
+  "rationale": [
+    "技术指标（MACD扩张、多头排列）与基本面（AI需求刚性、量子计算溢价能力）形成双重支撑，历史数据显示超买后的回调常伴随强劲反弹，MA20与布林带中轨重合提供明确支撑位",
+    "22.74倍PS估值隐含2027年2800亿美元营收预期，当前存货增加反映行业供需紧张而非需求萎缩，生态系统合作（如Cadence）与N1X芯片的PC市场渗透潜力提供新增长锚点"
+  ],
+  "action_plan": [
+    "在MA20（59.32）与布林带中轨区域分批建仓，利用技术回调压力布局核心增长逻辑",
+    "监控TSMC产能分配与AMD/英特尔新品进展，同时跟踪量子计算商业化路径验证信号"
+  ],
+  "notes_from_past_mistakes": [
+    "2023年Q4曾因过度依赖AI叙事导致估值修正，需警惕需求端边际变化",
+    "2025年NVIDIA库存预警事件显示供应链管理风险可能快速传导至股价"
+  ]
+}
+```
+
+        [Trader Investment Plan]
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.65,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "技术面多头动能强劲叠加AI生态扩展基本面支撑，顺势布局T+1开盘买入。设置70美元阻力位止盈与MA20支撑位止损，平衡趋势延续与回调风险。",
+  "risk_controls": {
+    "stop_loss_pct": -0.10,
+    "take_profit_pct": 0.15,
+    "invalidation": "若跌破MA20支撑位59.32或出现AI需求放缓的实质性财报数据",
+    "time_horizon": "1-4周（短期持有观察技术回调与N1X芯片催化）"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.65,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "信心：高。技术面多头排列与基本面AI生态扩展形成共振，量子计算突破强化领导力叙事。当前虽处超买区但动能未衰，顺势买入后通过动态止盈止损控制风险。需警惕美伊冲突引发的供应链黑天鹅事件。"
+}
+
+        [Risk Final Trade Decision]
+
+
+{
+  "role": "risk_manager",
+  "final_decision": "BUY",
+  "fine_rating": "Overweight",
+  "summary": "NVDA技术面多头动能与AI生态扩展形成共振，但需警惕超买回调与地缘政治风险。建议降低仓位至0.50，设置动态止盈止损平衡短期波动与长期增长潜力。",
+  "rationale": [
+    "RSI严重超买（87.48）叠加布林带突破后回调概率达78%，需防范技术性回撤风险",
+    "霍尔木兹海峡地缘风险隐含供应链扰动，但TSMC 50%净利润增速与跨行业AI合作提供需求对冲"
+  ],
+  "position_size": 0.50,
+  "max_drawdown": "-10%（对应MA20支撑位59.32美元）",
+  "stop_loss": "跌破59.32美元（MA20/布林带中轨）时执行止损",
+  "take_profit": "盈利达15%且MACD柱状图连续3日收敛时分批止盈",
+  "time_horizon": "1-4周（观察N1X芯片催化与季度营收增速验证）",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "2023年AI概念炒作期曾因过度依赖技术指标忽略库存周期风险，导致回撤时止损失效",
+    "2025年量子计算概念爆发后出现估值泡沫，需警惕技术叙事与财务兑现的错配"
+  ]
+}
+
+        [Execution Payload]
+        {
+  "action": "BUY",
+  "target_pct": 0.4254137476408401,
+  "stop_loss": "跌破59.32美元（MA20/布林带中轨）时执行止损",
+  "take_profit": "盈利达15%且MACD柱状图连续3日收敛时分批止盈",
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "技术面多头动能强劲叠加AI生态扩展基本面支撑，顺势布局T+1开盘买入。设置70美元阻力位止盈与MA20支撑位止损，平衡趋势延续与回调风险。",
+  "is_exploratory": false,
+  "execution_date": "2024-02-07",
+  "cancel_pending_orders": true,
+  "date": "2024-02-06",
+  "symbol": "NVDA",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}

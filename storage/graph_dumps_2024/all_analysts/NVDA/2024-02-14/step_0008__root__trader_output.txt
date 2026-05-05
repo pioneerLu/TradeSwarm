@@ -1,0 +1,61 @@
+节点: trader
+时间: 2026-04-25 00:00:00
+================================================================================
+
+最后一条消息:
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.65,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "技术面多头排列与AI生态扩张形成双重支撑，当前盈利41.69%已锁定收益，继续顺势加仓捕捉量子计算突破与供应链验证带来的长期价值",
+  "risk_controls": {
+    "stop_loss_pct": 0.03,
+    "take_profit_pct": 0.33,
+    "invalidation": "跌破MA5支撑位71.21或出现AI需求放缓的实质性财报数据",
+    "time_horizon": "3-6个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.65,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "信心：高。当前估值虽高但PEG合理，需警惕短期超买回调风险（3%止损），同时跟踪量子计算商业化进展与Microsoft等客户的资本开支延续性"
+}
+
+
+trader_investment_plan:
+================================================================================
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.65,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "技术面多头排列与AI生态扩张形成双重支撑，当前盈利41.69%已锁定收益，继续顺势加仓捕捉量子计算突破与供应链验证带来的长期价值",
+  "risk_controls": {
+    "stop_loss_pct": 0.03,
+    "take_profit_pct": 0.33,
+    "invalidation": "跌破MA5支撑位71.21或出现AI需求放缓的实质性财报数据",
+    "time_horizon": "3-6个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.65,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "信心：高。当前估值虽高但PEG合理，需警惕短期超买回调风险（3%止损），同时跟踪量子计算商业化进展与Microsoft等客户的资本开支延续性"
+}

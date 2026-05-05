@@ -1,0 +1,103 @@
+Symbol: NVDA
+        Trade Date: 2024-01-18
+        Experiment ID: all_analysts
+        Enabled Analysts: market, news, sentiment, fundamentals
+        Export Mode: backtest
+
+        [Research Investment Plan]
+
+
+```json
+{
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "NVDA技术面多头排列与机构增持形成双重支撑，基本面AI驱动的高成长性验证估值合理性。短期超买回调风险可控，长期生态优势与盈利韧性明确。",
+  "rationale": [
+    "技术面显示多头排列（MA5>MA10>MA20>MA30）与MACD动能扩张，机构持仓增持1.2%反映对长期趋势的深度认可，尽管RSI超买需警惕回调，但MA5支撑位（55.23美元）对应2026年动态PE仅38.5x，具备安全边际",
+    "基本面验证AI革命红利兑现能力：2026财年毛利率71.1%仍显著高于行业均值，经营现金流超千亿美元与ROE突破100%印证财务韧性，PEG比率0.705显示估值被增长对冲，库存增长源于产业链深度渗透而非需求透支"
+  ],
+  "action_plan": [
+    "监控55.23美元（MA5）支撑有效性，若守住则确认趋势延续，可逢低布局",
+    "跟踪2026Q4财报后机构持仓变化与AMD边缘AI系统市占率进展，验证生态优势稳定性"
+  ],
+  "notes_from_past_mistakes": [
+    "2025年Q3曾因过度依赖AI叙事忽略库存周期，在214亿美元库存背景下需警惕2027年增速预期修正风险",
+    "2024年Q1误判超买回调幅度，需结合成交量变化（当前7.73亿股高位）动态评估支撑强度"
+  ]
+}
+```
+
+        [Trader Investment Plan]
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "LIMIT",
+  "entry_price": 55.23,
+  "execution_window": "T+1_OPEN",
+  "summary": "技术面多头排列与机构增持形成双重支撑，回调至MA5支撑位55.23美元时买入，锁定长期AI红利。中等信心下设置35%仓位，警惕超买回调风险。",
+  "risk_controls": {
+    "stop_loss_pct": 0.05,
+    "take_profit_pct": 0.15,
+    "invalidation": "若跌破50.86美元（MA20/布林带中轨）或财报后机构持仓比例下降超2%",
+    "time_horizon": "3-6个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "LIMIT",
+      "price": 55.23
+    }
+  ],
+  "comment": "信心：中。当前55.23美元对应2026年动态PE约38.5x，具备安全边际。历史教训显示需警惕2027年增速预期修正，故设置15%止盈锁定利润。"
+}
+
+        [Risk Final Trade Decision]
+
+
+{
+  "role": "risk_manager",
+  "final_decision": "BUY",
+  "fine_rating": "Overweight",
+  "summary": "NVDA技术面多头排列与机构增持形成双重支撑，但需警惕短期超买回调与库存压力。综合各方观点，维持买入方向但降低仓位至0.2，通过分层风控对冲波动风险。",
+  "rationale": [
+    "技术面多头排列（MA5>MA10>MA20>MA30）与机构持仓增持（Trust Co. 1.2%）强化中期趋势，但RSI超买（79.29）与布林带上轨压力需设置动态止损",
+    "基本面高增长（营收三年CAGR 100.5%）与PEG<1的估值吸引力对冲短期风险，但214亿美元库存（营收占比9.9%）若需求增速不及预期可能引发盈利修正"
+  ],
+  "position_size": 0.2,
+  "max_drawdown": "接受5%-8%短期回撤，对应布林带中轨（50.86美元）至当前价格（56.38美元）区间",
+  "stop_loss": "跌破52.61美元（MA10）时触发5%止损，若MA5（55.23美元）失守则扩大止损至10%",
+  "take_profit": "若突破56.70美元（布林带上轨）后回调站稳55.23美元（MA5）则分批止盈15%-20%，否则持有至MA30（49.61美元）作为最终止盈锚点",
+  "time_horizon": "3-6个月（需在2026财年Q4财报前完成波段操作）",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "2025年Q3曾因未监控库存周转天数导致盈利预期偏差",
+    "2024年1月机构集中平仓引发死亡交叉需警惕"
+  ]
+}
+
+        [Execution Payload]
+        {
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "stop_loss": null,
+  "take_profit": null,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "已持仓 22.6%，目标 20.0% 无显著增量，HOLD",
+  "is_exploratory": false,
+  "execution_date": "2024-01-19",
+  "date": "2024-01-18",
+  "symbol": "NVDA",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}

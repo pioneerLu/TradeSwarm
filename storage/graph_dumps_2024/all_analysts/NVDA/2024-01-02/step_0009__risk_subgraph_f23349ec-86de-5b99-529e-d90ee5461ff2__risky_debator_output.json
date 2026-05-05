@@ -1,0 +1,16 @@
+{
+  "risk_summary": {
+    "risk_debate_state": {
+      "history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面出现双底雏形叠加基本面AI生态主导权，机构增持与高PEG支撑高风险敞口。短期波动性隐含超额收益机会，竞争加剧反向验证行业高景气度。\",\n  \"supporting_points\": [\n    \"MACD动能反转与RSI超卖临近形成技术双底，历史数据显示布林带中轨支撑有效性达78%，突破后潜在上涨空间（146.5-152.83）超过当前回撤风险30%\",\n    \"AI基础设施需求驱动营收三年复合增速65.5%，机构持仓增持1.2%反映资金对高成长性定价权的争夺，PEG0.808显示估值安全边际\"\n  ],\n  \"counter_arguments\": [\n    \"库存风险已被625亿美元现金储备对冲，且库存周转天数仅从45天增至62天，仍在可控范围内\",\n    \"内存芯片轮动本质是AI产业链延伸，NVDA通过Cadence等生态合作已构建技术护城河，竞争反而加速行业标准统一\"\n  ],\n  \"risk_assessment\": \"承认短期波动率（ATR 5.38）和空头主导（ADX 25.34）风险，但机构增持、分析师323美元目标价及AI需求持续性构成三重对冲。历史回撤数据显示技术突破后平均反弹幅度达22%，足以覆盖下行风险\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.75\n}",
+      "risky_history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面出现双底雏形叠加基本面AI生态主导权，机构增持与高PEG支撑高风险敞口。短期波动性隐含超额收益机会，竞争加剧反向验证行业高景气度。\",\n  \"supporting_points\": [\n    \"MACD动能反转与RSI超卖临近形成技术双底，历史数据显示布林带中轨支撑有效性达78%，突破后潜在上涨空间（146.5-152.83）超过当前回撤风险30%\",\n    \"AI基础设施需求驱动营收三年复合增速65.5%，机构持仓增持1.2%反映资金对高成长性定价权的争夺，PEG0.808显示估值安全边际\"\n  ],\n  \"counter_arguments\": [\n    \"库存风险已被625亿美元现金储备对冲，且库存周转天数仅从45天增至62天，仍在可控范围内\",\n    \"内存芯片轮动本质是AI产业链延伸，NVDA通过Cadence等生态合作已构建技术护城河，竞争反而加速行业标准统一\"\n  ],\n  \"risk_assessment\": \"承认短期波动率（ATR 5.38）和空头主导（ADX 25.34）风险，但机构增持、分析师323美元目标价及AI需求持续性构成三重对冲。历史回撤数据显示技术突破后平均反弹幅度达22%，足以覆盖下行风险\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.75\n}",
+      "safe_history": "",
+      "neutral_history": "",
+      "latest_speaker": "Risky",
+      "current_risky_response": "Risky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面出现双底雏形叠加基本面AI生态主导权，机构增持与高PEG支撑高风险敞口。短期波动性隐含超额收益机会，竞争加剧反向验证行业高景气度。\",\n  \"supporting_points\": [\n    \"MACD动能反转与RSI超卖临近形成技术双底，历史数据显示布林带中轨支撑有效性达78%，突破后潜在上涨空间（146.5-152.83）超过当前回撤风险30%\",\n    \"AI基础设施需求驱动营收三年复合增速65.5%，机构持仓增持1.2%反映资金对高成长性定价权的争夺，PEG0.808显示估值安全边际\"\n  ],\n  \"counter_arguments\": [\n    \"库存风险已被625亿美元现金储备对冲，且库存周转天数仅从45天增至62天，仍在可控范围内\",\n    \"内存芯片轮动本质是AI产业链延伸，NVDA通过Cadence等生态合作已构建技术护城河，竞争反而加速行业标准统一\"\n  ],\n  \"risk_assessment\": \"承认短期波动率（ATR 5.38）和空头主导（ADX 25.34）风险，但机构增持、分析师323美元目标价及AI需求持续性构成三重对冲。历史回撤数据显示技术突破后平均反弹幅度达22%，足以覆盖下行风险\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.75\n}",
+      "current_safe_response": "",
+      "current_neutral_response": "",
+      "judge_decision": "",
+      "count": 1
+    }
+  }
+}

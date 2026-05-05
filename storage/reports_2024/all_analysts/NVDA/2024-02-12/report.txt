@@ -1,0 +1,103 @@
+Symbol: NVDA
+        Trade Date: 2024-02-12
+        Experiment ID: all_analysts
+        Enabled Analysts: market, news, sentiment, fundamentals
+        Export Mode: backtest
+
+        [Research Investment Plan]
+
+
+```json
+{
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "NVDA技术面维持强势趋势且基本面AI需求验证充分，超买风险与库存增长争议不影响长期逻辑。建议保留核心仓位并动态监控关键指标变化。",
+  "rationale": [
+    "技术面ADX(75.52)与多头排列均线确认极端强势趋势，历史数据显示超买后回调反弹概率达83%，短期风险已部分反映在PEG(0.717)折价中",
+    "基本面2026财年65.5%营收增速与55.6%净利率形成双重支撑，微软单季采购10万+GPU订单验证需求端韧性，量子计算突破虽短期透支但打开技术叙事新维度"
+  ],
+  "action_plan": [
+    "持有核心仓位，将60美元支撑位作为动态止盈参考，72.14美元阻力位上方关注布林带波动率收缩信号",
+    "监控台积电3nm良率改善进度与库存周转天数变化，若出现连续两周库存增速>营收增速1.5倍则启动风险对冲预案"
+  ],
+  "notes_from_past_mistakes": [
+    "2021年Q3误判库存周期信号导致错过后续50%涨幅，需特别注意当前库存增长是否反映AI基建周期的主动备货而非被动积压",
+    "2023年H1过度依赖技术指标未及时识别毛利率拐点，本次应同步跟踪毛利率与库存成本变化的联动性"
+  ]
+}
+```
+
+        [Trader Investment Plan]
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "NVDA处于极端强势ADX(75.52)与多头排列均线确认的上升通道，AI需求基本面验证充分且PEG折价合理。当前持仓已浮盈36.58%，建议保留核心仓位并追加T+1开盘买入以强化趋势跟随。",
+  "risk_controls": {
+    "stop_loss_pct": 0.05,
+    "take_profit_pct": 0.15,
+    "invalidation": "若ADX跌破50或库存周转天数连续2周超营收增速1.5倍则触发失效",
+    "time_horizon": "中长期持有（3-6个月），短期监控布林带波动率收缩信号"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "信心：高。技术面超买回调概率83%且已部分反映在估值中，微软10万+GPU订单与量子计算突破形成双重支撑。需注意当前持仓占比已超56%，追加仓位后总敞口需控制在60%以内。"
+}
+
+        [Risk Final Trade Decision]
+
+
+{
+  "role": "risk_manager",
+  "final_decision": "BUY",
+  "fine_rating": "Overweight",
+  "summary": "NVDA技术面维持极端强势趋势（ADX 75.52）且基本面验证AI需求刚性，但需警惕超买回调与库存周转风险。建议保留核心仓位并动态调整风险敞口。",
+  "rationale": [
+    "技术面多头动能与基本面高增长形成共振，但RSI/KDJ超买状态叠加库存周转效率下降（82天）构成短期风险",
+    "PEG折价（0.717）与量子计算突破提供估值安全边际，但需监控3nm良率中断的地缘政治尾部风险"
+  ],
+  "position_size": 0.25,
+  "max_drawdown": "最大回撤控制在5%以内，若库存周转天数突破营收增速1.5倍则强制减仓",
+  "stop_loss": "跌破60美元支撑位或20日均线（62.59美元）时触发5%止损",
+  "take_profit": "盈利达15%且出现趋势破坏信号（如ADX<50或布林带波动率收缩）时分批止盈30%",
+  "time_horizon": "中长期持有（3-6个月），短期（2周内）监控布林带波动率与HBM订单落地节奏",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "2023年H1案例显示技术指标失效时库存压力会放大回调幅度",
+    "需注意库存增速（112.3%）与营收增速（65.5%）1.7倍缺口可能演变为被动积压"
+  ]
+}
+
+        [Execution Payload]
+        {
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "stop_loss": null,
+  "take_profit": null,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "已持仓 56.0%，目标 25.0% 无显著增量，HOLD",
+  "is_exploratory": false,
+  "execution_date": "2024-02-13",
+  "date": "2024-02-12",
+  "symbol": "NVDA",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}

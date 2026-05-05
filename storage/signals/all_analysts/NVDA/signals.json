@@ -1,0 +1,217 @@
+{
+  "symbol": "NVDA",
+  "export_mode": "backtest",
+  "start_date": "2025-01-02",
+  "end_date": "2025-01-08",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ],
+  "signals": {
+    "2025-01-02": {
+      "action": "BUY",
+      "target_pct": 0.2,
+      "stop_loss": "若跌破126.82美元支撑位或欧盟反垄断调查升级则止损离场",
+      "take_profit": "突破137美元阻力位后分阶段止盈，首阶段目标140美元",
+      "entry_type": "LIMIT",
+      "entry_price": 129.5,
+      "reason": "基于技术面支撑位130美元附近逢低布局，结合基本面高成长性与AI长期趋势，等待突破信号确认。",
+      "is_exploratory": false,
+      "execution_date": "2025-01-03",
+      "date": "2025-01-02",
+      "symbol": "NVDA",
+      "experiment_id": "all_analysts",
+      "enabled_analysts": [
+        "market",
+        "news",
+        "sentiment",
+        "fundamentals"
+      ]
+    },
+    "2025-01-03": {
+      "action": "BUY",
+      "target_pct": 0.2,
+      "stop_loss": "跌破127美元布林带下轨触发止损",
+      "take_profit": "突破140美元心理关口后分批止盈，第一目标146美元",
+      "entry_type": "MKT_OPEN",
+      "entry_price": null,
+      "reason": "基于Blackwell架构订单落地和AI需求支撑，结合技术面调整后反弹信号，在127-140美元区间分批建仓。利用布林带中轨支撑和MACD动能改善布局中期趋势确认机会。",
+      "is_exploratory": false,
+      "execution_date": "2025-01-06",
+      "date": "2025-01-03",
+      "symbol": "NVDA",
+      "experiment_id": "all_analysts",
+      "enabled_analysts": [
+        "market",
+        "news",
+        "sentiment",
+        "fundamentals"
+      ]
+    },
+    "2025-01-06": {
+      "action": "BUY",
+      "target_pct": 0.2,
+      "stop_loss": "跌破136.97美元布林带中轨或OBV重新转负时止损",
+      "take_profit": "突破146.49美元阻力位后分批止盈，目标150美元（心理阻力位）",
+      "entry_type": "MKT_OPEN",
+      "entry_price": null,
+      "reason": "技术面显示多头排列与MACD金叉形成明确买入信号，基本面维持高ROE与AI生态优势支撑长期逻辑，社交媒体情绪积极强化趋势延续性。建议顺势建仓并设置动态止损。",
+      "is_exploratory": false,
+      "execution_date": "2025-01-07",
+      "date": "2025-01-06",
+      "symbol": "NVDA",
+      "experiment_id": "all_analysts",
+      "enabled_analysts": [
+        "market",
+        "news",
+        "sentiment",
+        "fundamentals"
+      ]
+    },
+    "2025-01-07": {
+      "action": "BUY",
+      "target_pct": 0.2,
+      "stop_loss": "跌破137.19支撑位或出现MACD死叉时平仓",
+      "take_profit": "突破152.11阻力位后分批止盈，目标10%短期收益",
+      "entry_type": "MKT_OPEN",
+      "entry_price": null,
+      "reason": "技术面显示多头排列与MACD金叉确认上涨趋势，基本面AI需求爆发支撑增长潜力，社交媒体情绪持续积极。建议以35%仓位分批建仓，关注150/152阻力位突破有效性。",
+      "is_exploratory": false,
+      "execution_date": "2025-01-08",
+      "date": "2025-01-07",
+      "symbol": "NVDA",
+      "experiment_id": "all_analysts",
+      "enabled_analysts": [
+        "market",
+        "news",
+        "sentiment",
+        "fundamentals"
+      ]
+    },
+    "2025-01-08": {
+      "action": "BUY",
+      "target_pct": 0.2,
+      "stop_loss": "137.08美元支撑位失效（跌破135美元）立即止损",
+      "take_profit": "突破149.38美元近期高点后分阶段止盈（首阶段8%目标）",
+      "entry_type": "MKT_OPEN",
+      "entry_price": null,
+      "reason": "技术面显示中期趋势仍积极，基本面维持高增长与盈利能力，社交媒体情绪强烈看涨。关键支撑位137.08美元若有效可提供买入机会，优先考虑T+1开盘介入。",
+      "is_exploratory": false,
+      "execution_date": "2025-01-10",
+      "date": "2025-01-08",
+      "symbol": "NVDA",
+      "experiment_id": "all_analysts",
+      "enabled_analysts": [
+        "market",
+        "news",
+        "sentiment",
+        "fundamentals"
+      ]
+    }
+  },
+  "by_execution_date": {
+    "2025-01-03": {
+      "action": "BUY",
+      "target_pct": 0.2,
+      "stop_loss": "若跌破126.82美元支撑位或欧盟反垄断调查升级则止损离场",
+      "take_profit": "突破137美元阻力位后分阶段止盈，首阶段目标140美元",
+      "entry_type": "LIMIT",
+      "entry_price": 129.5,
+      "reason": "基于技术面支撑位130美元附近逢低布局，结合基本面高成长性与AI长期趋势，等待突破信号确认。",
+      "is_exploratory": false,
+      "execution_date": "2025-01-03",
+      "date": "2025-01-02",
+      "symbol": "NVDA",
+      "experiment_id": "all_analysts",
+      "enabled_analysts": [
+        "market",
+        "news",
+        "sentiment",
+        "fundamentals"
+      ]
+    },
+    "2025-01-06": {
+      "action": "BUY",
+      "target_pct": 0.2,
+      "stop_loss": "跌破127美元布林带下轨触发止损",
+      "take_profit": "突破140美元心理关口后分批止盈，第一目标146美元",
+      "entry_type": "MKT_OPEN",
+      "entry_price": null,
+      "reason": "基于Blackwell架构订单落地和AI需求支撑，结合技术面调整后反弹信号，在127-140美元区间分批建仓。利用布林带中轨支撑和MACD动能改善布局中期趋势确认机会。",
+      "is_exploratory": false,
+      "execution_date": "2025-01-06",
+      "date": "2025-01-03",
+      "symbol": "NVDA",
+      "experiment_id": "all_analysts",
+      "enabled_analysts": [
+        "market",
+        "news",
+        "sentiment",
+        "fundamentals"
+      ]
+    },
+    "2025-01-07": {
+      "action": "BUY",
+      "target_pct": 0.2,
+      "stop_loss": "跌破136.97美元布林带中轨或OBV重新转负时止损",
+      "take_profit": "突破146.49美元阻力位后分批止盈，目标150美元（心理阻力位）",
+      "entry_type": "MKT_OPEN",
+      "entry_price": null,
+      "reason": "技术面显示多头排列与MACD金叉形成明确买入信号，基本面维持高ROE与AI生态优势支撑长期逻辑，社交媒体情绪积极强化趋势延续性。建议顺势建仓并设置动态止损。",
+      "is_exploratory": false,
+      "execution_date": "2025-01-07",
+      "date": "2025-01-06",
+      "symbol": "NVDA",
+      "experiment_id": "all_analysts",
+      "enabled_analysts": [
+        "market",
+        "news",
+        "sentiment",
+        "fundamentals"
+      ]
+    },
+    "2025-01-08": {
+      "action": "BUY",
+      "target_pct": 0.2,
+      "stop_loss": "跌破137.19支撑位或出现MACD死叉时平仓",
+      "take_profit": "突破152.11阻力位后分批止盈，目标10%短期收益",
+      "entry_type": "MKT_OPEN",
+      "entry_price": null,
+      "reason": "技术面显示多头排列与MACD金叉确认上涨趋势，基本面AI需求爆发支撑增长潜力，社交媒体情绪持续积极。建议以35%仓位分批建仓，关注150/152阻力位突破有效性。",
+      "is_exploratory": false,
+      "execution_date": "2025-01-08",
+      "date": "2025-01-07",
+      "symbol": "NVDA",
+      "experiment_id": "all_analysts",
+      "enabled_analysts": [
+        "market",
+        "news",
+        "sentiment",
+        "fundamentals"
+      ]
+    },
+    "2025-01-10": {
+      "action": "BUY",
+      "target_pct": 0.2,
+      "stop_loss": "137.08美元支撑位失效（跌破135美元）立即止损",
+      "take_profit": "突破149.38美元近期高点后分阶段止盈（首阶段8%目标）",
+      "entry_type": "MKT_OPEN",
+      "entry_price": null,
+      "reason": "技术面显示中期趋势仍积极，基本面维持高增长与盈利能力，社交媒体情绪强烈看涨。关键支撑位137.08美元若有效可提供买入机会，优先考虑T+1开盘介入。",
+      "is_exploratory": false,
+      "execution_date": "2025-01-10",
+      "date": "2025-01-08",
+      "symbol": "NVDA",
+      "experiment_id": "all_analysts",
+      "enabled_analysts": [
+        "market",
+        "news",
+        "sentiment",
+        "fundamentals"
+      ]
+    }
+  }
+}

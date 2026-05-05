@@ -1,0 +1,12 @@
+{
+  "research_summary": {
+    "investment_debate_state": {
+      "history": "\nBull Analyst: \n\n{\n  \"role\": \"bull_researcher\",\n  \"stance\": \"bullish\",\n  \"summary\": \"NVDA正处于由AI革命驱动的长期牛市周期中，技术指标多头排列与生态系统扩张形成共振，短期回调风险不改核心逻辑。\",\n  \"key_points\": [\n    \"AI芯片需求与量子计算突破形成双重技术驱动，TSMC订单验证供应链韧性\",\n    \"多头排列的均线体系（MA5/10/20）叠加ADX 77.69的极强趋势指标，技术面支撑持续上涨\"\n  ],\n  \"risk_warnings\": [\n    \"RSI超买可能引发技术性回调\",\n    \"机构小幅减持反映估值敏感性\"\n  ],\n  \"recommendation\": \"BUY\",\n  \"confidence\": 0.75,\n  \"reasoning\": \"1. 基本面层面：NVDA作为AI基础设施核心供应商，2026财年营收三年复合增长率达100.3%，ROE超100%的盈利能力构筑护城河。2. 技术面层面：MA多头排列与MACD柱状图扩张（4.50）形成黄金交叉，布林带宽度适中显示趋势延续性强。3. 生态系统扩展：与Cadence的AI机器人合作及Caterpillar的间接需求验证，证明AI应用从云端向边缘计算和传统工业渗透。4. 风险对冲：当前PE60倍的估值虽高，但PEG0.717显示增长溢价合理，且机构减持仅1.5%不影响长期持仓逻辑。短期回调至MA10（65.39）或提供加仓机会。\"\n}",
+      "bull_history": "\nBull Analyst: \n\n{\n  \"role\": \"bull_researcher\",\n  \"stance\": \"bullish\",\n  \"summary\": \"NVDA正处于由AI革命驱动的长期牛市周期中，技术指标多头排列与生态系统扩张形成共振，短期回调风险不改核心逻辑。\",\n  \"key_points\": [\n    \"AI芯片需求与量子计算突破形成双重技术驱动，TSMC订单验证供应链韧性\",\n    \"多头排列的均线体系（MA5/10/20）叠加ADX 77.69的极强趋势指标，技术面支撑持续上涨\"\n  ],\n  \"risk_warnings\": [\n    \"RSI超买可能引发技术性回调\",\n    \"机构小幅减持反映估值敏感性\"\n  ],\n  \"recommendation\": \"BUY\",\n  \"confidence\": 0.75,\n  \"reasoning\": \"1. 基本面层面：NVDA作为AI基础设施核心供应商，2026财年营收三年复合增长率达100.3%，ROE超100%的盈利能力构筑护城河。2. 技术面层面：MA多头排列与MACD柱状图扩张（4.50）形成黄金交叉，布林带宽度适中显示趋势延续性强。3. 生态系统扩展：与Cadence的AI机器人合作及Caterpillar的间接需求验证，证明AI应用从云端向边缘计算和传统工业渗透。4. 风险对冲：当前PE60倍的估值虽高，但PEG0.717显示增长溢价合理，且机构减持仅1.5%不影响长期持仓逻辑。短期回调至MA10（65.39）或提供加仓机会。\"\n}",
+      "bear_history": "",
+      "current_response": "Bull Analyst: \n\n{\n  \"role\": \"bull_researcher\",\n  \"stance\": \"bullish\",\n  \"summary\": \"NVDA正处于由AI革命驱动的长期牛市周期中，技术指标多头排列与生态系统扩张形成共振，短期回调风险不改核心逻辑。\",\n  \"key_points\": [\n    \"AI芯片需求与量子计算突破形成双重技术驱动，TSMC订单验证供应链韧性\",\n    \"多头排列的均线体系（MA5/10/20）叠加ADX 77.69的极强趋势指标，技术面支撑持续上涨\"\n  ],\n  \"risk_warnings\": [\n    \"RSI超买可能引发技术性回调\",\n    \"机构小幅减持反映估值敏感性\"\n  ],\n  \"recommendation\": \"BUY\",\n  \"confidence\": 0.75,\n  \"reasoning\": \"1. 基本面层面：NVDA作为AI基础设施核心供应商，2026财年营收三年复合增长率达100.3%，ROE超100%的盈利能力构筑护城河。2. 技术面层面：MA多头排列与MACD柱状图扩张（4.50）形成黄金交叉，布林带宽度适中显示趋势延续性强。3. 生态系统扩展：与Cadence的AI机器人合作及Caterpillar的间接需求验证，证明AI应用从云端向边缘计算和传统工业渗透。4. 风险对冲：当前PE60倍的估值虽高，但PEG0.717显示增长溢价合理，且机构减持仅1.5%不影响长期持仓逻辑。短期回调至MA10（65.39）或提供加仓机会。\"\n}",
+      "judge_decision": "",
+      "count": 1
+    }
+  }
+}

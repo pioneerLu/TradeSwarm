@@ -1,0 +1,33 @@
+{
+  "symbol": "NVDA",
+  "export_mode": "rating",
+  "start_date": "2026-02-13",
+  "end_date": "2026-02-13",
+  "experiment_id": "smoke_apps_model_override",
+  "enabled_analysts": [
+    "market"
+  ],
+  "llm": {
+    "provider": "siliconflow",
+    "profile": null,
+    "model_name": "THUDM/glm-4-9b-chat",
+    "temperature": 0.2,
+    "base_url": "https://api.siliconflow.cn/v1"
+  },
+  "input_position": {
+    "current_position_pct": 0.35,
+    "source": "cli"
+  },
+  "by_date": {
+    "2026-02-13": {
+      "date": "2026-02-13",
+      "symbol": "NVDA",
+      "export_mode": "rating",
+      "research_decision": null,
+      "fine_rating": null,
+      "final_decision": null,
+      "risk_level": null,
+      "reason": "Error code: 403 - {'code': 30003, 'message': 'Model disabled.', 'data': None}"
+    }
+  }
+}

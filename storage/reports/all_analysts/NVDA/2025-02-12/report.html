@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>NVDA 2025-02-12 TradeSwarm Report</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 16mm;
+    }
+    body {
+      color: #172033;
+      font-family: "Microsoft YaHei", "Noto Sans CJK SC", "Segoe UI", Arial, sans-serif;
+      font-size: 12px;
+      line-height: 1.55;
+      margin: 0;
+    }
+    h1, h2, h3 {
+      color: #0f2a4f;
+      margin: 0;
+    }
+    h1 {
+      font-size: 26px;
+      letter-spacing: 0.02em;
+    }
+    h2 {
+      border-bottom: 1px solid #d9e2ef;
+      font-size: 16px;
+      margin-top: 22px;
+      padding-bottom: 6px;
+    }
+    .subtitle {
+      color: #53657d;
+      margin-top: 6px;
+    }
+    .meta-grid {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: repeat(2, 1fr);
+      margin-top: 18px;
+    }
+    .card {
+      background: #f7f9fc;
+      border: 1px solid #dce5f1;
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .label {
+      color: #607086;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .value {
+      color: #172033;
+      font-size: 13px;
+      margin-top: 3px;
+      word-break: break-word;
+    }
+    .section {
+      margin-top: 12px;
+    }
+    .pre {
+      background: #fbfcff;
+      border: 1px solid #dce5f1;
+      border-radius: 8px;
+      color: #1f2937;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 10.5px;
+      padding: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .badge {
+      background: #e8f1ff;
+      border: 1px solid #bfd7ff;
+      border-radius: 999px;
+      color: #174984;
+      display: inline-block;
+      font-size: 10px;
+      margin: 3px 4px 0 0;
+      padding: 2px 8px;
+    }
+    .footer {
+      border-top: 1px solid #d9e2ef;
+      color: #7a889a;
+      font-size: 10px;
+      margin-top: 26px;
+      padding-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>TradeSwarm 投研报告</h1>
+  <div class="subtitle">NVDA · 2025-02-12 · backtest</div>
+
+  <div class="meta-grid">
+    <div class="card">
+      <div class="label">Experiment</div>
+      <div class="value">all_analysts</div>
+    </div>
+    <div class="card">
+      <div class="label">Analysts</div>
+      <div class="value">market, news, sentiment, fundamentals</div>
+    </div>
+    <div class="card">
+      <div class="label">LLM</div>
+      <div class="value">-</div>
+    </div>
+    <div class="card">
+      <div class="label">Strategy Skill</div>
+      <div class="value">reflect / downtrend_skill</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h2>市场状态与 Skill</h2>
+  <div class="section">
+    
+    <span class="badge">market_regime: high_vol_uncertain</span>
+    
+    <span class="badge">selected_skill: high_vol_uncertain_skill</span>
+    
+    <span class="badge">regime_confidence: 0.72</span>
+    
+    <span class="badge">skill_router_mode: reflect</span>
+    
+    <span class="badge">forced_selected_skill: downtrend_skill</span>
+    
+    <span class="badge">reflection_market_regime: high_vol_uncertain</span>
+    
+    <span class="badge">reflection_selected_skill: high_vol_uncertain_skill</span>
+    
+    <span class="badge">reflection_confidence: 0.72</span>
+    
+  </div>
+  
+
+  <h2>Research Manager 投资计划</h2>
+  <div class="pre">
+
+{
+  "role": "research_manager",
+  "decision": "HOLD",
+  "summary": "NVDA技术修复信号与基本面矛盾并存，AI生态扩张叙事与盈利质量下滑形成对冲，建议观望关键突破信号与基本面验证",
+  "rationale": [
+    "技术面呈现短期金叉与RSI超卖反弹，但OBV持续流出和MA20下降趋势显示多头动能不足",
+    "基本面ROE/净利率维持高位支撑估值，但毛利率连续下滑4%及存货增速超营收增速暴露需求透支风险"
+  ],
+  "action_plan": [
+    "监控133.53美元阻力位突破有效性与MA20趋势反转信号",
+    "跟踪Meta等合作伙伴AI投资落地进度及华为/AMD技术竞争动态"
+  ],
+  "notes_from_past_mistakes": [
+    "2026年时间戳数据存在倒灌风险，需交叉验证事件真实性",
+    "2025年Q4财报显示MA20下降趋势未改，警惕技术性反弹陷阱",
+    "历史经验表明AI叙事驱动的高估值股易受季度指引影响，需关注2026财年毛利率持续性"
+  ]
+}</div>
+
+  <h2>Trader 执行计划</h2>
+  <div class="pre">
+
+{
+  "role": "trader",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.72,
+  "regime_evidence": [
+    "技术面ADX<30弱趋势叠加ATR 7.83高波动性",
+    "基本面毛利率连续下滑4%与ROE高位形成矛盾信号",
+    "2026年时间戳倒灌新闻引发信息可靠性争议"
+  ],
+  "action": "HOLD",
+  "target_pct": 0.20,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "NVDA处于技术修复与基本面验证的观察期，高波动性下维持20%仓位等待133.53阻力位突破确认或MA20趋势反转信号，警惕时间戳异常信息干扰决策",
+  "risk_controls": {
+    "stop_loss_pct": -10.0,
+    "take_profit_pct": 15.0,
+    "invalidation": "若股价跌破116.62美元支撑位或突破147.17美元阻力位但无法维持3日均线多头排列",
+    "time_horizon": "2周内"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "HOLD",
+      "size_pct": 0.20,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "当前持仓成本与现价持平，需重点验证AI生态合作（Lattice/Coherent）的实际商业转化效果，同时监控2026财年毛利率是否企稳，时间戳异常事件需人工交叉验证"
+}</div>
+
+  <h2>Risk Manager 风控裁决</h2>
+  <div class="pre">
+
+```json
+{
+  "role": "risk_manager",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.72,
+  "regime_evidence": [
+    "技术面ADX<30弱趋势叠加ATR 7.83高波动性",
+    "基本面毛利率连续下滑4%与ROE高位形成矛盾信号",
+    "2026年时间戳倒灌新闻引发信息可靠性争议"
+  ],
+  "final_decision": "HOLD",
+  "fine_rating": "Hold",
+  "summary": "NVDA处于技术修复与基本面验证的观察期，高波动性下维持20%仓位等待133.53阻力位突破确认或MA20趋势反转信号，警惕时间戳异常信息干扰决策",
+  "rationale": [
+    "技术面MACD转正但OBV持续流出，显示多空动能尚未达成平衡",
+    "基本面存货增速（112.3%）超过营收增速（65.5%）暴露需求透支风险"
+  ],
+  "position_size": 0.2,
+  "max_drawdown": "最大回撤控制在10%以内",
+  "stop_loss": "若股价跌破116.62美元支撑位或MA20（130.85）形成死叉则止损",
+  "take_profit": "突破133.53阻力位且MA5/MA10/MA20形成多头排列时分批止盈",
+  "time_horizon": "2周内完成技术面验证或突破",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "需警惕2026财年毛利率结构性恶化风险（71.1% vs 峰值75%）",
+    "避免将时间戳异常的未来新闻误判为当前利好"
+  ]
+}
+```</div>
+
+  <h2>最终执行载荷</h2>
+  <div class="pre">{
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "stop_loss": null,
+  "take_profit": null,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "Risk/Trader 决策为 HOLD",
+  "is_exploratory": false,
+  "execution_date": "2025-02-13",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.72,
+  "regime_evidence": [
+    "技术面ADX<30弱趋势叠加ATR 7.83高波动性",
+    "基本面毛利率连续下滑4%与ROE高位形成矛盾信号",
+    "2026年时间戳倒灌新闻引发信息可靠性争议"
+  ],
+  "skill_router_mode": "reflect",
+  "forced_selected_skill": "downtrend_skill",
+  "reflection_market_regime": "high_vol_uncertain",
+  "reflection_selected_skill": "high_vol_uncertain_skill",
+  "reflection_confidence": 0.72,
+  "reflection_evidence": [
+    "技术指标显示ADX<30趋势弱+高ATR波动性（7.83）形成震荡市特征",
+    "基本面出现营收增速放缓（65.5% vs 前期114.2%）与毛利率下降（71.1% vs 75.0%）的矛盾信号",
+    "新闻数据存在2026年时间戳倒灌的可靠性风险，形成信息不确定性"
+  ],
+  "date": "2025-02-12",
+  "symbol": "NVDA",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}</div>
+
+  <div class="footer">
+    Generated by TradeSwarm. Source artifacts: report.json / report.txt / report.html.
+  </div>
+</body>
+</html>

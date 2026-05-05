@@ -1,0 +1,25 @@
+{
+  "symbol": "NVDA",
+  "export_mode": "rating",
+  "start_date": "2025-01-23",
+  "end_date": "2025-01-23",
+  "experiment_id": "tmp_NVDA_2025-01-23_20260410_160819",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ],
+  "by_date": {
+    "2025-01-23": {
+      "date": "2025-01-23",
+      "symbol": "NVDA",
+      "export_mode": "rating",
+      "research_decision": null,
+      "fine_rating": null,
+      "final_decision": null,
+      "risk_level": null,
+      "reason": "模板文件不存在: E:\\agent_proj\\TradeSwarm\\tradingagents\\agents\\pre_open\\trader\\prompt.j2，且未提供 fallback_prompt"
+    }
+  }
+}

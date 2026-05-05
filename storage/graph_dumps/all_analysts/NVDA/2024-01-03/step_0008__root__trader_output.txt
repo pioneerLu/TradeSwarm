@@ -1,0 +1,61 @@
+节点: trader
+时间: 2026-04-24 00:00:00
+================================================================================
+
+最后一条消息:
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "LIMIT",
+  "entry_price": 137.32,
+  "execution_window": "T+1_OPEN",
+  "summary": "基于技术面中轨支撑修复信号与机构增持共振，以布林带中轨137.32为锚点挂单。基本面高ROE与AI生态主导权提供安全边际，但需警惕内存芯片轮动风险。",
+  "risk_controls": {
+    "stop_loss_pct": 0.05,
+    "take_profit_pct": 0.15,
+    "invalidation": "若Meta-Broadcom合作导致定制芯片需求实质性转移，或库存周转率连续2周恶化则止损",
+    "time_horizon": "1-3个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "LIMIT",
+      "price": 137.32
+    }
+  ],
+  "comment": "信心：中。当前价137.44接近中轨支撑位，LIMIT单确保在关键位建仓。OBV三周收窄佐证空头衰竭，但需等待MACD零轴穿越确认趋势反转。"
+}
+
+
+trader_investment_plan:
+================================================================================
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "LIMIT",
+  "entry_price": 137.32,
+  "execution_window": "T+1_OPEN",
+  "summary": "基于技术面中轨支撑修复信号与机构增持共振，以布林带中轨137.32为锚点挂单。基本面高ROE与AI生态主导权提供安全边际，但需警惕内存芯片轮动风险。",
+  "risk_controls": {
+    "stop_loss_pct": 0.05,
+    "take_profit_pct": 0.15,
+    "invalidation": "若Meta-Broadcom合作导致定制芯片需求实质性转移，或库存周转率连续2周恶化则止损",
+    "time_horizon": "1-3个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "LIMIT",
+      "price": 137.32
+    }
+  ],
+  "comment": "信心：中。当前价137.44接近中轨支撑位，LIMIT单确保在关键位建仓。OBV三周收窄佐证空头衰竭，但需等待MACD零轴穿越确认趋势反转。"
+}

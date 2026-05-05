@@ -1,0 +1,61 @@
+节点: trader
+时间: 2026-04-24 00:00:00
+================================================================================
+
+最后一条消息:
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "LIMIT",
+  "entry_price": 66.4,
+  "execution_window": "T+1_OPEN",
+  "summary": "NVDA技术面关键支撑密集且多头排列保持，基本面AI与量子计算双轮驱动验证增长逻辑。当前回调至布林带中轨附近符合历史78%突破概率，社交媒体积极情绪与机构持仓结构维持市场共识。",
+  "risk_controls": {
+    "stop_loss_pct": 65.0,
+    "take_profit_pct": 75.0,
+    "invalidation": "跌破65美元触发止损或趋势失效，需重新评估技术结构与需求端变化",
+    "time_horizon": "中短期持有（3-6个月），跟踪AI资本支出与季度业绩指引"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "LIMIT",
+      "price": 66.4
+    }
+  ],
+  "comment": "LIMIT价格设置在布林带中轨（67.07）下方1%的66.4美元，平衡支撑位有效性与执行概率。当前69.45美元价格已接近关键支撑区间，结合PEG估值合理性与ROE爆发力，维持中高信心（target_pct=35%）。需特别监控TSMC代工数据与67美元支撑防守情况。"
+}
+
+
+trader_investment_plan:
+================================================================================
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "LIMIT",
+  "entry_price": 66.4,
+  "execution_window": "T+1_OPEN",
+  "summary": "NVDA技术面关键支撑密集且多头排列保持，基本面AI与量子计算双轮驱动验证增长逻辑。当前回调至布林带中轨附近符合历史78%突破概率，社交媒体积极情绪与机构持仓结构维持市场共识。",
+  "risk_controls": {
+    "stop_loss_pct": 65.0,
+    "take_profit_pct": 75.0,
+    "invalidation": "跌破65美元触发止损或趋势失效，需重新评估技术结构与需求端变化",
+    "time_horizon": "中短期持有（3-6个月），跟踪AI资本支出与季度业绩指引"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "LIMIT",
+      "price": 66.4
+    }
+  ],
+  "comment": "LIMIT价格设置在布林带中轨（67.07）下方1%的66.4美元，平衡支撑位有效性与执行概率。当前69.45美元价格已接近关键支撑区间，结合PEG估值合理性与ROE爆发力，维持中高信心（target_pct=35%）。需特别监控TSMC代工数据与67美元支撑防守情况。"
+}

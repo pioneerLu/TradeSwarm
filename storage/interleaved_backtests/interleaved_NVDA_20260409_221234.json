@@ -1,0 +1,49 @@
+{
+  "symbol": "NVDA",
+  "start_date": "2025-02-01",
+  "end_date": "2025-02-05",
+  "experiment_id": "market_news",
+  "initial_cash": 100000.0,
+  "final_portfolio_state": {
+    "total_value": 100000.0,
+    "cash": 100000.0,
+    "positions_value": 0.0,
+    "total_return": 0.0
+  },
+  "final_position": null,
+  "trading_days": 2,
+  "signals_count": 2,
+  "daily_results": [
+    {
+      "trade_date": "2025-02-03",
+      "signal_action": "HOLD",
+      "execution_date": "2025-02-04",
+      "equity": null,
+      "shares": null
+    },
+    {
+      "trade_date": "2025-02-04",
+      "signal_action": "HOLD",
+      "execution_date": "2025-02-05",
+      "equity": null,
+      "shares": null
+    }
+  ],
+  "data_coverage": {
+    "custom_csv_path": "E:\\agent_proj\\TradeSwarm\\lean_workspace\\data\\custom\\nvda_daily.csv",
+    "required_days": 2,
+    "covered_days": 2,
+    "missing_days": 0,
+    "missing_dates": [],
+    "coverage_ratio": 1.0,
+    "auto_download_performed": true
+  },
+  "snapshot_coverage": {
+    "missing_snapshot_days": [
+      "2025-02-03",
+      "2025-02-04"
+    ],
+    "missing_snapshot_count": 2,
+    "snapshot_coverage_ratio": 0.0
+  }
+}

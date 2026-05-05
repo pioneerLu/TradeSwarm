@@ -1,0 +1,131 @@
+Symbol: NVDA
+        Trade Date: 2025-02-10
+        Experiment ID: all_analysts
+        Enabled Analysts: market, news, sentiment, fundamentals
+        Export Mode: backtest
+
+        [Research Investment Plan]
+
+
+{
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "NVIDIA在AI基础设施扩张与财务健康度方面形成双重支撑，技术面超跌反弹信号明确，尽管存在估值分歧与竞争压力，但长期增长逻辑未被证伪。",
+  "rationale": [
+    "基本面维持高成长性：2026财年营收增速65.5%验证AI芯片需求刚性，ROE 101.5%与自由现金流966亿美元构成估值安全垫",
+    "技术面与机构行为共振：布林带下轨突破后RSI超卖+KDJ金叉形成短线修复动能，Community Trust增持4.7%强化市场对其生态绑定战略的认可"
+  ],
+  "action_plan": [
+    "监控布林带下轨支撑有效性与MACD动能变化，结合机构持仓动态捕捉技术修复窗口",
+    "跟踪微软核能改造商业化进展及Coherent光学互连订单落地速度，验证合作伙伴关系对营收的实质性贡献"
+  ],
+  "notes_from_past_mistakes": [
+    "2024年Q3曾过度依赖技术指标抄底，忽视库存预警信号导致判断失误",
+    "2025年初高估AMD竞争威胁，未充分考虑NVIDIA生态系统的协同效应"
+  ]
+}
+
+        [Trader Investment Plan]
+
+
+{
+  "role": "trader",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": ["技术面显示价格跌破所有主要均线且波动率显著上升", "基本面高增长与毛利率下降形成矛盾信号，机构持仓出现明显分化"],
+  "action": "BUY",
+  "target_pct": 0.10,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "基于AI生态绑定战略的机构增持与技术超跌共振，小仓参与短线修复，但需警惕估值分歧与供应链风险",
+  "risk_controls": {
+    "stop_loss_pct": -5,
+    "take_profit_pct": 10,
+    "invalidation": "若布林带下轨支撑失效或机构持仓进一步恶化则止损",
+    "time_horizon": "1-3个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.10,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "信心：中。技术面RSI超卖+KDJ金叉形成短线修复动能，但需结合微软核能改造商业化进展验证基本面支撑有效性"
+}
+
+        [Risk Final Trade Decision]
+
+
+```json
+{
+  "role": "risk_manager",
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "技术面显示价格跌破所有主要均线且波动率显著上升",
+    "基本面高增长与毛利率下降形成矛盾信号，机构持仓出现明显分化"
+  ],
+  "final_decision": "BUY",
+  "fine_rating": "Overweight",
+  "summary": "在AI生态绑定战略支撑下，技术超跌与机构增持共振提供短线修复机会，但需严格控制仓位并设置动态止损。当前高波动与不确定性要求风险对冲措施。",
+  "rationale": [
+    "技术面RSI超卖+KDJ金叉形成短线修复动能，但需警惕布林带下轨支撑失效风险（112.97-116.62美元）",
+    "基本面高增长（营收三年CAGR 100.5%）与估值压力（PE 34.12倍）形成矛盾，需通过仓位控制平衡风险收益比"
+  ],
+  "position_size": 0.15,
+  "max_drawdown": "最大回撤控制在5%以内（110美元止损线）",
+  "stop_loss": "若跌破112.97美元关键支撑位或布林带下轨，则执行5%止损",
+  "take_profit": "盈利达到10%（目标124.26美元）且出现趋势破坏信号（如跌破50日均线）时分批止盈",
+  "time_horizon": "1-3个月（需在微软核能改造商业化进展前重新评估）",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "需警惕超卖区域反弹失败概率（历史数据显示42%）",
+    "库存激增（214亿美元）可能对现金流形成潜在压力"
+  ]
+}
+```
+
+        [Execution Payload]
+        {
+  "action": "BUY",
+  "target_pct": 0.1,
+  "stop_loss": "若跌破112.97美元关键支撑位或布林带下轨，则执行5%止损",
+  "take_profit": "盈利达到10%（目标124.26美元）且出现趋势破坏信号（如跌破50日均线）时分批止盈",
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "基于AI生态绑定战略的机构增持与技术超跌共振，小仓参与短线修复，但需警惕估值分歧与供应链风险",
+  "is_exploratory": false,
+  "execution_date": "2025-02-11",
+  "cancel_pending_orders": true,
+  "market_regime": "high_vol_uncertain",
+  "selected_skill": "high_vol_uncertain_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "技术面显示价格跌破所有主要均线且波动率显著上升",
+    "基本面高增长与毛利率下降形成矛盾信号，机构持仓出现明显分化"
+  ],
+  "skill_router_mode": "reflect",
+  "forced_selected_skill": "downtrend_skill",
+  "reflection_market_regime": "high_vol_uncertain",
+  "reflection_selected_skill": "high_vol_uncertain_skill",
+  "reflection_confidence": 0.75,
+  "reflection_evidence": [
+    "技术面显示价格跌破所有主要均线且波动率显著上升",
+    "基本面高增长与毛利率下降形成矛盾信号，机构持仓出现明显分化"
+  ],
+  "date": "2025-02-10",
+  "symbol": "NVDA",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}

@@ -1,0 +1,264 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>NVDA 2025-01-16 TradeSwarm Report</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 16mm;
+    }
+    body {
+      color: #172033;
+      font-family: "Microsoft YaHei", "Noto Sans CJK SC", "Segoe UI", Arial, sans-serif;
+      font-size: 12px;
+      line-height: 1.55;
+      margin: 0;
+    }
+    h1, h2, h3 {
+      color: #0f2a4f;
+      margin: 0;
+    }
+    h1 {
+      font-size: 26px;
+      letter-spacing: 0.02em;
+    }
+    h2 {
+      border-bottom: 1px solid #d9e2ef;
+      font-size: 16px;
+      margin-top: 22px;
+      padding-bottom: 6px;
+    }
+    .subtitle {
+      color: #53657d;
+      margin-top: 6px;
+    }
+    .meta-grid {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: repeat(2, 1fr);
+      margin-top: 18px;
+    }
+    .card {
+      background: #f7f9fc;
+      border: 1px solid #dce5f1;
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .label {
+      color: #607086;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .value {
+      color: #172033;
+      font-size: 13px;
+      margin-top: 3px;
+      word-break: break-word;
+    }
+    .section {
+      margin-top: 12px;
+    }
+    .pre {
+      background: #fbfcff;
+      border: 1px solid #dce5f1;
+      border-radius: 8px;
+      color: #1f2937;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 10.5px;
+      padding: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .badge {
+      background: #e8f1ff;
+      border: 1px solid #bfd7ff;
+      border-radius: 999px;
+      color: #174984;
+      display: inline-block;
+      font-size: 10px;
+      margin: 3px 4px 0 0;
+      padding: 2px 8px;
+    }
+    .footer {
+      border-top: 1px solid #d9e2ef;
+      color: #7a889a;
+      font-size: 10px;
+      margin-top: 26px;
+      padding-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>TradeSwarm 投研报告</h1>
+  <div class="subtitle">NVDA · 2025-01-16 · backtest</div>
+
+  <div class="meta-grid">
+    <div class="card">
+      <div class="label">Experiment</div>
+      <div class="value">market_news</div>
+    </div>
+    <div class="card">
+      <div class="label">Analysts</div>
+      <div class="value">market, news</div>
+    </div>
+    <div class="card">
+      <div class="label">LLM</div>
+      <div class="value">-</div>
+    </div>
+    <div class="card">
+      <div class="label">Strategy Skill</div>
+      <div class="value">reflect / range_bound_skill</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h2>市场状态与 Skill</h2>
+  <div class="section">
+    
+    <span class="badge">market_regime: range_bound</span>
+    
+    <span class="badge">selected_skill: range_bound_skill</span>
+    
+    <span class="badge">regime_confidence: 0.7</span>
+    
+    <span class="badge">skill_router_mode: reflect</span>
+    
+    <span class="badge">reflection_market_regime: range_bound</span>
+    
+    <span class="badge">reflection_selected_skill: range_bound_skill</span>
+    
+    <span class="badge">reflection_confidence: 0.7</span>
+    
+  </div>
+  
+
+  <h2>Research Manager 投资计划</h2>
+  <div class="pre">{
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "尽管短期技术面偏弱，但NVDA在AI生态系统的持续扩张和能源行业的新增长点提供了强劲的长期动力，当前调整是买入机会。",
+  "rationale": [
+    "AI生态系统向能源行业扩张（微软核能合作、SLB解决方案）创造新增长维度，技术领先地位和高质量合作伙伴关系构建护城河。",
+    "短期技术调整已部分消化估值压力，KDJ显示超卖迹象提供买入窗口，当前股价接近布林带中轨和MA5形成双重支撑，下跌空间有限。"
+  ],
+  "action_plan": [
+    "关注关键支撑位135.41美元（MA5）和126.58美元（布林带下轨）的防守情况。",
+    "密切跟踪微软/SLB等合作伙伴的AI解决方案商业化进展，以及能源行业AI应用收入贡献。"
+  ],
+  "notes_from_past_mistakes": [
+    "需警惕市场波动可能持续压制短期股价表现，以及地缘政治风险对供应链的潜在影响。"
+  ]
+}</div>
+
+  <h2>Trader 执行计划</h2>
+  <div class="pre">{
+  "role": "trader",
+  "market_regime": "range_bound",
+  "selected_skill": "range_bound_skill",
+  "regime_confidence": 0.7,
+  "regime_evidence": ["股价在126.82-153.08美元区间内波动，接近布林带中轨136.70美元", "技术指标呈现分化信号：趋势指标偏弱但动量指标中性，显示缺乏明确方向", "成交量模式显示价格下跌时放量而上涨时缩量，符合区间震荡特征", "关键支撑位135.41美元（MA5）和阻力位138.34美元（MA10）形成短期交易区间"],
+  "action": "BUY",
+  "target_pct": 0.25,
+  "entry_type": "LIMIT",
+  "entry_price": 131.50,
+  "execution_window": "NEXT_2_DAYS",
+  "summary": "在区间震荡中逢低买入，当前股价接近MA5支撑位且KDJ显示超卖迹象，风险收益比合理。",
+  "risk_controls": {
+    "stop_loss_pct": 5.0,
+    "take_profit_pct": 8.0,
+    "invalidation": "股价跌破126.58美元（布林带下轨）或MA5支撑失效",
+    "time_horizon": "1-3周"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.25,
+      "price_type": "LIMIT",
+      "price": 131.50
+    }
+  ],
+  "comment": "信心：中。虽然短期技术面偏弱，但AI生态系统扩张和能源行业新增长点提供长期支撑，当前调整是分批买入机会。"
+}</div>
+
+  <h2>Risk Manager 风控裁决</h2>
+  <div class="pre">```json
+{
+  "role": "risk_manager",
+  "market_regime": "range_bound",
+  "selected_skill": "range_bound_skill",
+  "regime_confidence": 0.7,
+  "regime_evidence": [
+    "股价在126.82-153.08美元区间内波动，接近布林带中轨136.70美元",
+    "技术指标呈现分化信号：趋势指标偏弱但动量指标中性，显示缺乏明确方向",
+    "成交量模式显示价格下跌时放量而上涨时缩量，符合区间震荡特征",
+    "关键支撑位135.41美元（MA5）和阻力位138.34美元（MA10）形成短期交易区间"
+  ],
+  "final_decision": "BUY",
+  "fine_rating": "Overweight",
+  "summary": "NVDA处于区间震荡阶段，短期技术面偏弱但长期基本面强劲，建议在支撑位附近分批买入。",
+  "rationale": [
+    "技术指标显示股价接近关键支撑位，KDJ指标显示超卖迹象，短期调整已部分消化估值压力。",
+    "NVDA与微软和SLB的合作标志着AI技术向能源行业的重大扩展，长期增长动力强劲。"
+  ],
+  "position_size": 0.25,
+  "max_drawdown": "5%",
+  "stop_loss": "股价跌破126.58美元（布林带下轨）或MA5支撑失效",
+  "take_profit": "股价接近区间上沿138.34美元（MA10）或风险收益比明显恶化时执行",
+  "time_horizon": "1-3周",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "高估值科技股在宏观压力下可能长期低于关键支撑位，需警惕市场情绪变化。",
+    "OBV资金流出与价格上涨背离是危险信号，需密切关注资金流向。"
+  ]
+}
+```</div>
+
+  <h2>最终执行载荷</h2>
+  <div class="pre">{
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "stop_loss": null,
+  "take_profit": null,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "已持仓 48.3%，目标 25.0% 无显著增量，HOLD",
+  "is_exploratory": false,
+  "execution_date": "2025-01-17",
+  "market_regime": "range_bound",
+  "selected_skill": "range_bound_skill",
+  "regime_confidence": 0.7,
+  "regime_evidence": [
+    "股价在126.82-153.08美元区间内波动，接近布林带中轨136.70美元",
+    "技术指标呈现分化信号：趋势指标偏弱但动量指标中性，显示缺乏明确方向",
+    "成交量模式显示价格下跌时放量而上涨时缩量，符合区间震荡特征",
+    "关键支撑位135.41美元（MA5）和阻力位138.34美元（MA10）形成短期交易区间"
+  ],
+  "skill_router_mode": "reflect",
+  "reflection_market_regime": "range_bound",
+  "reflection_selected_skill": "range_bound_skill",
+  "reflection_confidence": 0.7,
+  "reflection_evidence": [
+    "股价在126.82-153.08美元区间内波动，接近布林带中轨136.70美元",
+    "技术指标呈现分化信号：趋势指标偏弱但动量指标中性，显示缺乏明确方向",
+    "成交量模式显示价格下跌时放量而上涨时缩量，符合区间震荡特征",
+    "关键支撑位135.41美元（MA5）和阻力位138.34美元（MA10）形成短期交易区间"
+  ],
+  "date": "2025-01-16",
+  "symbol": "NVDA",
+  "experiment_id": "market_news",
+  "enabled_analysts": [
+    "market",
+    "news"
+  ]
+}</div>
+
+  <div class="footer">
+    Generated by TradeSwarm. Source artifacts: report.json / report.txt / report.html.
+  </div>
+</body>
+</html>

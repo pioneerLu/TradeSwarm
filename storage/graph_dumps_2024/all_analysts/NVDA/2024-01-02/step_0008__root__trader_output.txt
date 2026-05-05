@@ -1,0 +1,61 @@
+节点: trader
+时间: 2026-04-25 00:00:00
+================================================================================
+
+最后一条消息:
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.30,
+  "entry_type": "LIMIT",
+  "entry_price": 137.36,
+  "execution_window": "T+1_OPEN",
+  "summary": "在布林带中轨支撑位挂单捕捉技术反弹，但需警惕库存风险与竞争加剧。信心中等，目标30%仓位。",
+  "risk_controls": {
+    "stop_loss_pct": 0.05,
+    "take_profit_pct": 0.02,
+    "invalidation": "若跌破128.21美元支撑位或库存周转天数恶化触发清仓",
+    "time_horizon": "中短期（2-4周）"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.30,
+      "price_type": "LIMIT",
+      "price": 137.36
+    }
+  ],
+  "comment": "LIMIT单设置在布林带中轨（137.36）与当前价（137.44）几乎持平，符合高波动环境下不偏离趋势的约束。若MACD柱状图持续转正且RSI突破50，则视为有效支撑确认；反之需警惕空头主导趋势延续。"
+}
+
+
+trader_investment_plan:
+================================================================================
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.3,
+  "entry_type": "LIMIT",
+  "entry_price": 137.36,
+  "execution_window": "T+1_OPEN",
+  "summary": "在布林带中轨支撑位挂单捕捉技术反弹，但需警惕库存风险与竞争加剧。信心中等，目标30%仓位。",
+  "risk_controls": {
+    "stop_loss_pct": 0.05,
+    "take_profit_pct": 0.02,
+    "invalidation": "若跌破128.21美元支撑位或库存周转天数恶化触发清仓",
+    "time_horizon": "中短期（2-4周）"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.3,
+      "price_type": "LIMIT",
+      "price": 137.36
+    }
+  ],
+  "comment": "LIMIT单设置在布林带中轨（137.36）与当前价（137.44）几乎持平，符合高波动环境下不偏离趋势的约束。若MACD柱状图持续转正且RSI突破50，则视为有效支撑确认；反之需警惕空头主导趋势延续。"
+}

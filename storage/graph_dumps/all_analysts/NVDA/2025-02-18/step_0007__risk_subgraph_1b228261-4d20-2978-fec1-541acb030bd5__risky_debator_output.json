@@ -1,0 +1,16 @@
+{
+  "risk_summary": {
+    "risk_debate_state": {
+      "history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面多头排列叠加AI需求爆发的基本面支撑，高增长预期与估值合理性形成双重驱动。超买风险可通过动态止盈管理，而战略级合作伙伴关系和行业护城河能覆盖短期波动。\",\n  \"supporting_points\": [\n    \"技术指标显示多头动能持续增强（MA多头排列+MACD金叉+OBV转正），结合基本面三年营收CAGR 100.6%和ROE 101.5%的行业顶尖表现，形成高胜率交易窗口\",\n    \"AI基础设施投资热潮（Equinix等合作伙伴扩张）与物理AI生态整合（Lattice/Coherent合作）构建技术壁垒，PEG 0.71的估值安全边际可覆盖竞争加剧和供应链风险\"\n  ],\n  \"counter_arguments\": [\n    \"短期超买信号（RSI 69.70）恰反映市场对AI叙事的强共识，历史数据显示2025年初回调后仍维持7.9%上轨突破空间，技术修正风险可控\",\n    \"机构持仓分化（2.53亿美元内部人减持）反映逢低建仓机会而非看空信号，高流动比率（3.91）和1027亿美元经营现金流证明基本面承接力\"\n  ],\n  \"risk_assessment\": \"承认短期超买和地缘政治风险，但布林带中轨支撑（131.04美元）有效性已通过2025年2月反弹验证，且AI芯片需求（Meta/Google资本支出计划）和生态系统锁定效应（CUDA平台）提供中期安全边际。动态调整止盈位可管理波动率。\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.89\n}",
+      "risky_history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面多头排列叠加AI需求爆发的基本面支撑，高增长预期与估值合理性形成双重驱动。超买风险可通过动态止盈管理，而战略级合作伙伴关系和行业护城河能覆盖短期波动。\",\n  \"supporting_points\": [\n    \"技术指标显示多头动能持续增强（MA多头排列+MACD金叉+OBV转正），结合基本面三年营收CAGR 100.6%和ROE 101.5%的行业顶尖表现，形成高胜率交易窗口\",\n    \"AI基础设施投资热潮（Equinix等合作伙伴扩张）与物理AI生态整合（Lattice/Coherent合作）构建技术壁垒，PEG 0.71的估值安全边际可覆盖竞争加剧和供应链风险\"\n  ],\n  \"counter_arguments\": [\n    \"短期超买信号（RSI 69.70）恰反映市场对AI叙事的强共识，历史数据显示2025年初回调后仍维持7.9%上轨突破空间，技术修正风险可控\",\n    \"机构持仓分化（2.53亿美元内部人减持）反映逢低建仓机会而非看空信号，高流动比率（3.91）和1027亿美元经营现金流证明基本面承接力\"\n  ],\n  \"risk_assessment\": \"承认短期超买和地缘政治风险，但布林带中轨支撑（131.04美元）有效性已通过2025年2月反弹验证，且AI芯片需求（Meta/Google资本支出计划）和生态系统锁定效应（CUDA平台）提供中期安全边际。动态调整止盈位可管理波动率。\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.89\n}",
+      "safe_history": "",
+      "neutral_history": "",
+      "latest_speaker": "Risky",
+      "current_risky_response": "Risky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面多头排列叠加AI需求爆发的基本面支撑，高增长预期与估值合理性形成双重驱动。超买风险可通过动态止盈管理，而战略级合作伙伴关系和行业护城河能覆盖短期波动。\",\n  \"supporting_points\": [\n    \"技术指标显示多头动能持续增强（MA多头排列+MACD金叉+OBV转正），结合基本面三年营收CAGR 100.6%和ROE 101.5%的行业顶尖表现，形成高胜率交易窗口\",\n    \"AI基础设施投资热潮（Equinix等合作伙伴扩张）与物理AI生态整合（Lattice/Coherent合作）构建技术壁垒，PEG 0.71的估值安全边际可覆盖竞争加剧和供应链风险\"\n  ],\n  \"counter_arguments\": [\n    \"短期超买信号（RSI 69.70）恰反映市场对AI叙事的强共识，历史数据显示2025年初回调后仍维持7.9%上轨突破空间，技术修正风险可控\",\n    \"机构持仓分化（2.53亿美元内部人减持）反映逢低建仓机会而非看空信号，高流动比率（3.91）和1027亿美元经营现金流证明基本面承接力\"\n  ],\n  \"risk_assessment\": \"承认短期超买和地缘政治风险，但布林带中轨支撑（131.04美元）有效性已通过2025年2月反弹验证，且AI芯片需求（Meta/Google资本支出计划）和生态系统锁定效应（CUDA平台）提供中期安全边际。动态调整止盈位可管理波动率。\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.89\n}",
+      "current_safe_response": "",
+      "current_neutral_response": "",
+      "judge_decision": "",
+      "count": 1
+    }
+  }
+}

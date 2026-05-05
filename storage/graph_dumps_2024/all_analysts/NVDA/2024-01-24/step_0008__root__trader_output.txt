@@ -1,0 +1,61 @@
+节点: trader
+时间: 2026-04-25 00:00:00
+================================================================================
+
+最后一条消息:
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.70,
+  "entry_type": "LIMIT",
+  "entry_price": 55.0,
+  "execution_window": "T+1_OPEN",
+  "summary": "基于AI革命驱动的基本面与技术面共振，机构增持与分析师上调目标价印证长期逻辑，当前回调至合理区间分批加仓。",
+  "risk_controls": {
+    "stop_loss_pct": 0.10,
+    "take_profit_pct": 0.30,
+    "invalidation": "若RSI跌破70且布林带中轨失守，或美伊冲突升级导致行业资金抽离",
+    "time_horizon": "中长期持有（3-6个月），短期监控回调支撑有效性"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "LIMIT",
+      "price": 55.0
+    }
+  ],
+  "comment": "信心：高。当前技术面多头排列与基本面高增长共振，但需警惕超买回调风险。LIMIT价格设置在55美元（较现价-8%），结合布林带中轨支撑与历史回调规律，预计短期波动后仍能延续趋势。止损设在52.83美元（MA20），保护核心支撑位。"
+}
+
+
+trader_investment_plan:
+================================================================================
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.7,
+  "entry_type": "LIMIT",
+  "entry_price": 55.0,
+  "execution_window": "T+1_OPEN",
+  "summary": "基于AI革命驱动的基本面与技术面共振，机构增持与分析师上调目标价印证长期逻辑，当前回调至合理区间分批加仓。",
+  "risk_controls": {
+    "stop_loss_pct": 0.1,
+    "take_profit_pct": 0.3,
+    "invalidation": "若RSI跌破70且布林带中轨失守，或美伊冲突升级导致行业资金抽离",
+    "time_horizon": "中长期持有（3-6个月），短期监控回调支撑有效性"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "LIMIT",
+      "price": 55.0
+    }
+  ],
+  "comment": "信心：高。当前技术面多头排列与基本面高增长共振，但需警惕超买回调风险。LIMIT价格设置在55美元（较现价-8%），结合布林带中轨支撑与历史回调规律，预计短期波动后仍能延续趋势。止损设在52.83美元（MA20），保护核心支撑位。"
+}

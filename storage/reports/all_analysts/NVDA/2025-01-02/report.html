@@ -1,0 +1,281 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>NVDA 2025-01-02 TradeSwarm Report</title>
+  <style>
+    @page {
+      size: A4;
+      margin: 18mm 16mm;
+    }
+    body {
+      color: #172033;
+      font-family: "Microsoft YaHei", "Noto Sans CJK SC", "Segoe UI", Arial, sans-serif;
+      font-size: 12px;
+      line-height: 1.55;
+      margin: 0;
+    }
+    h1, h2, h3 {
+      color: #0f2a4f;
+      margin: 0;
+    }
+    h1 {
+      font-size: 26px;
+      letter-spacing: 0.02em;
+    }
+    h2 {
+      border-bottom: 1px solid #d9e2ef;
+      font-size: 16px;
+      margin-top: 22px;
+      padding-bottom: 6px;
+    }
+    .subtitle {
+      color: #53657d;
+      margin-top: 6px;
+    }
+    .meta-grid {
+      display: grid;
+      gap: 8px;
+      grid-template-columns: repeat(2, 1fr);
+      margin-top: 18px;
+    }
+    .card {
+      background: #f7f9fc;
+      border: 1px solid #dce5f1;
+      border-radius: 10px;
+      padding: 12px 14px;
+    }
+    .label {
+      color: #607086;
+      font-size: 10px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .value {
+      color: #172033;
+      font-size: 13px;
+      margin-top: 3px;
+      word-break: break-word;
+    }
+    .section {
+      margin-top: 12px;
+    }
+    .pre {
+      background: #fbfcff;
+      border: 1px solid #dce5f1;
+      border-radius: 8px;
+      color: #1f2937;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 10.5px;
+      padding: 12px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .badge {
+      background: #e8f1ff;
+      border: 1px solid #bfd7ff;
+      border-radius: 999px;
+      color: #174984;
+      display: inline-block;
+      font-size: 10px;
+      margin: 3px 4px 0 0;
+      padding: 2px 8px;
+    }
+    .footer {
+      border-top: 1px solid #d9e2ef;
+      color: #7a889a;
+      font-size: 10px;
+      margin-top: 26px;
+      padding-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>TradeSwarm 投研报告</h1>
+  <div class="subtitle">NVDA · 2025-01-02 · backtest</div>
+
+  <div class="meta-grid">
+    <div class="card">
+      <div class="label">Experiment</div>
+      <div class="value">all_analysts</div>
+    </div>
+    <div class="card">
+      <div class="label">Analysts</div>
+      <div class="value">market, news, sentiment, fundamentals</div>
+    </div>
+    <div class="card">
+      <div class="label">LLM</div>
+      <div class="value">-</div>
+    </div>
+    <div class="card">
+      <div class="label">Strategy Skill</div>
+      <div class="value">reflect / downtrend_skill</div>
+    </div>
+  </div>
+
+  
+
+  
+  <h2>市场状态与 Skill</h2>
+  <div class="section">
+    
+    <span class="badge">market_regime: range_bound</span>
+    
+    <span class="badge">selected_skill: range_bound_skill</span>
+    
+    <span class="badge">regime_confidence: 0.75</span>
+    
+    <span class="badge">skill_router_mode: reflect</span>
+    
+    <span class="badge">forced_selected_skill: downtrend_skill</span>
+    
+    <span class="badge">reflection_market_regime: range_bound</span>
+    
+    <span class="badge">reflection_selected_skill: range_bound_skill</span>
+    
+    <span class="badge">reflection_confidence: 0.72</span>
+    
+  </div>
+  
+
+  <h2>Research Manager 投资计划</h2>
+  <div class="pre">
+
+{
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "英伟达基本面维持高成长性与盈利能力，技术面显示关键支撑位有效性，AI结构性增长与Blackwell产品周期提供中长期动能。尽管存在监管与供应链风险，但估值合理性与现金流健康度构成安全边际。",
+  "rationale": [
+    "2026财年ROE(101.5%)、净利率(55.6%)及经营现金流(1027亿美元)验证核心竞争力，PEG(0.721)显示估值与成长性匹配",
+    "技术指标显示130美元支撑位有效性(12月17日126.82低点后反弹)，MACD柱状图转正与布林带收窄预示震荡后突破概率提升"
+  ],
+  "action_plan": [
+    "监控130美元支撑有效性与137美元阻力突破，结合MACD金叉信号捕捉趋势反转机会",
+    "跟踪欧盟反垄断调查进展与Blackwell量产节奏，验证技术优势向市场份额转化能力"
+  ],
+  "notes_from_past_mistakes": [
+    "2024Q4曾误判AI算力需求弹性，需警惕开源模型普及导致的硬件需求边际递减风险",
+    "2023年末高估供应链瓶颈影响，当前CoWoS产能分配已获优先保障但多元化进度仍需观察"
+  ]
+}</div>
+
+  <h2>Trader 执行计划</h2>
+  <div class="pre">
+
+{
+  "role": "trader",
+  "market_regime": "range_bound",
+  "selected_skill": "range_bound_skill",
+  "regime_confidence": 0.72,
+  "regime_evidence": [
+    "价格在130-140美元区间形成震荡平台且未出现有效突破",
+    "技术指标呈现矛盾信号（MA死叉但MACD柱状图转正，RSI回升但未突破50中轴）"
+  ],
+  "action": "BUY",
+  "target_pct": 0.20,
+  "entry_type": "LIMIT",
+  "entry_price": 130.00,
+  "execution_window": "T+1_OPEN",
+  "summary": "在130美元支撑位分批建仓，利用震荡区间捕捉技术修复机会，同时监控Blackwell量产进度与监管风险进展",
+  "risk_controls": {
+    "stop_loss_pct": -5.0,
+    "take_profit_pct": 8.0,
+    "invalidation": "若跌破126.82美元前低或欧盟反垄断调查升级导致股价跳空下跌",
+    "time_horizon": "1-2周内验证支撑有效性及突破方向"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.15,
+      "price_type": "LIMIT",
+      "price": 130.00
+    },
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.05,
+      "price_type": "LIMIT",
+      "price": 127.89
+    }
+  ],
+  "comment": "信心：中。当前估值已反映大部分乐观预期，但技术面支撑有效性与产品周期拐点提供安全边际。分层建仓可平衡风险与潜在突破收益，需密切跟踪137美元阻力位能否放量突破。"
+}</div>
+
+  <h2>Risk Manager 风控裁决</h2>
+  <div class="pre">
+
+```json
+{
+  "role": "risk_manager",
+  "market_regime": "range_bound",
+  "selected_skill": "range_bound_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "价格在130-140美元区间持续震荡1个月且未突破",
+    "技术指标矛盾（MA死叉但MACD柱状图转正，RSI回升但未突破50中轴）"
+  ],
+  "final_decision": "BUY",
+  "fine_rating": "Hold",
+  "summary": "维持震荡区间交易策略，分批建仓130美元支撑位，但严格控制仓位规模并强化止损规则。需密切跟踪Blackwell量产进度与监管风险进展，避免过度暴露于估值修复风险。",
+  "rationale": [
+    "技术面显示130美元支撑位多次验证有效，但OBV持续负值表明资金流出压力未完全解除",
+    "基本面高ROE(101.5%)与现金流优势提供支撑，但存货(214亿美元)和应收账款(384亿美元)增速分别达112.6%和66.8%构成潜在风险"
+  ],
+  "position_size": 0.15,
+  "max_drawdown": "最大可接受回撤5%（对应126.82美元支撑位）",
+  "stop_loss": "若跌破126.82美元前低或欧盟反垄断调查升级导致股价跳空下跌则止损",
+  "take_profit": "盈利达到8%且突破137美元阻力位并放量（成交量>2.5亿股）时止盈，否则继续持有",
+  "time_horizon": "1-2周内验证支撑有效性及突破方向",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "2024年Q4曾因忽视供应链风险导致止损触发",
+    "2025年初需警惕高估值与宏观利率政策的复合冲击"
+  ]
+}
+```</div>
+
+  <h2>最终执行载荷</h2>
+  <div class="pre">{
+  "action": "BUY",
+  "target_pct": 0.15,
+  "stop_loss": "若跌破126.82美元前低或欧盟反垄断调查升级导致股价跳空下跌则止损",
+  "take_profit": "盈利达到8%且突破137美元阻力位并放量（成交量>2.5亿股）时止盈，否则继续持有",
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "在130美元支撑位分批建仓，利用震荡区间捕捉技术修复机会，同时监控Blackwell量产进度与监管风险进展；LIMIT 偏离 3.2%，自动改 MKT_OPEN",
+  "is_exploratory": false,
+  "execution_date": "2025-01-03",
+  "cancel_pending_orders": true,
+  "market_regime": "range_bound",
+  "selected_skill": "range_bound_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "价格在130-140美元区间持续震荡1个月且未突破",
+    "技术指标矛盾（MA死叉但MACD柱状图转正，RSI回升但未突破50中轴）"
+  ],
+  "skill_router_mode": "reflect",
+  "forced_selected_skill": "downtrend_skill",
+  "reflection_market_regime": "range_bound",
+  "reflection_selected_skill": "range_bound_skill",
+  "reflection_confidence": 0.72,
+  "reflection_evidence": [
+    "价格在130-140美元区间形成震荡平台且未出现有效突破",
+    "技术指标呈现矛盾信号（MA死叉但MACD柱状图转正，RSI回升但未突破50中轴）"
+  ],
+  "date": "2025-01-02",
+  "symbol": "NVDA",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}</div>
+
+  <div class="footer">
+    Generated by TradeSwarm. Source artifacts: report.json / report.txt / report.html.
+  </div>
+</body>
+</html>

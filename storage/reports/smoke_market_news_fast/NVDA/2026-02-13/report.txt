@@ -1,0 +1,95 @@
+Symbol: NVDA
+        Trade Date: 2026-02-13
+        Experiment ID: smoke_market_news_fast
+        Enabled Analysts: market, news
+        Export Mode: rating
+
+        [Research Investment Plan]
+
+
+{
+  "role": "research_manager",
+  "decision": "HOLD",
+  "summary": "NVDA短期技术面修复与AI战略投资形成支撑，但高波动性、竞争压力及宏观不确定性构成风险，需等待突破信号与需求验证。",
+  "rationale": [
+    "技术面短期多头信号（MACD金叉、5日均线转上）与OpenAI投资强化AI生态位形成正向共振，但布林带收敛和ADX<25表明趋势未确立",
+    "亚马逊自研芯片的长期替代风险与PPI抑制降息预期的宏观压力尚未被充分定价，美光HBM4售罄反映的供应链瓶颈可能限制需求落地速度"
+  ],
+  "action_plan": [
+    "监控190美元阻力位突破有效性及成交量持续性，确认趋势反转信号",
+    "跟踪OpenAI芯片采购动态与亚马逊Trainium 2商业化进展，评估AI需求与竞争格局变化"
+  ],
+  "notes_from_past_mistakes": [
+    "2025年Q4曾误判AI算力需求弹性，需警惕当前市场对HBM4产能瓶颈的忽视",
+    "2024年亚马逊Graviton芯片发布时NVDA股价未立即承压，但12-18个月后云服务客户采购占比下降3-5%，替代周期需重新建模"
+  ]
+}
+
+        [Trader Investment Plan]
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "LIMIT",
+  "entry_price": 185.52,
+  "execution_window": "T+1_OPEN",
+  "summary": "技术面显示MACD金叉与布林带中轨支撑形成短期买点，但需警惕亚马逊自研芯片带来的长期竞争风险。选择在关键支撑位185.52美元附近分批建仓，等待突破190美元阻力位确认趋势反转。",
+  "risk_controls": {
+    "stop_loss_pct": 0.08,
+    "take_profit_pct": 0.12,
+    "invalidation": "若无法突破190美元阻力位或跌破174.39美元支撑位则止损离场",
+    "time_horizon": "2-4周"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "LIMIT",
+      "price": 185.52
+    }
+  ],
+  "comment": "需特别关注OpenAI投资带来的战略协同效应与亚马逊自研芯片的商业化进度，同时监控PPI数据对市场风险偏好的影响。建议采用分批建仓策略，首次建仓后若突破196.64布林带上轨可追加20%仓位。"
+}
+
+        [Risk Final Trade Decision]
+
+
+{
+  "role": "risk_manager",
+  "final_decision": "BUY",
+  "fine_rating": "Overweight",
+  "summary": "NVDA技术面出现MACD金叉与布林带中轨支撑共振，叠加OpenAI战略投资强化AI生态位，但需警惕亚马逊自研芯片与宏观利率风险。建议在关键支撑位分批建仓并动态调整仓位。",
+  "rationale": [
+    "技术面突破190美元阻力位确认前存在震荡损耗风险，需通过仓位控制对冲不确定性",
+    "亚马逊自研芯片替代周期存在提前可能，且PPI粘性或限制成长股估值扩张空间"
+  ],
+  "position_size": 0.2,
+  "max_drawdown": "不超过组合净值的8%",
+  "stop_loss": "跌破174.39美元布林带下轨或连续3日收于185.52美元下方",
+  "take_profit": "突破196.64美元布林带上轨后分批止盈，首阶段目标190美元阻力位",
+  "time_horizon": "2-4周，若突破失败则缩短至1周",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "2024年HBM3产能瓶颈曾导致AI芯片股集体回调15-20%",
+    "2025年Q4 NVDA空头持仓增加18%后，技术突破失败引发程序化抛售"
+  ]
+}
+
+        [Execution Payload]
+        {
+  "date": "2026-02-13",
+  "symbol": "NVDA",
+  "export_mode": "rating",
+  "research_decision": "HOLD",
+  "fine_rating": "Overweight",
+  "final_decision": "BUY",
+  "risk_level": "MEDIUM",
+  "experiment_id": "smoke_market_news_fast",
+  "enabled_analysts": [
+    "market",
+    "news"
+  ]
+}

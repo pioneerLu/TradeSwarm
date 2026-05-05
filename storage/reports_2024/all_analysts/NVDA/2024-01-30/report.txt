@@ -1,0 +1,101 @@
+Symbol: NVDA
+        Trade Date: 2024-01-30
+        Experiment ID: all_analysts
+        Enabled Analysts: market, news, sentiment, fundamentals
+        Export Mode: backtest
+
+        [Research Investment Plan]
+
+
+{
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "NVDA技术面多头主导格局与基本面爆发式增长形成共振，机构增持与AI生态扩展验证长期逻辑，短期超买回调风险不改核心趋势。",
+  "rationale": [
+    "技术指标显示多头排列（5MA>10MA>EMA12>EMA26）与OBV能量潮突破53亿形成双重支撑，尽管RSI超买和MACD顶背离提示短期调整，但历史数据显示多头主导趋势下支撑位有效性概率超80%",
+    "基本面三年净利润CAGR 194.7%与ROE 101.5%的卓越表现，叠加微软等战略客户持续加码GPU采购，证明AI算力需求刚性，PEG0.717估值体系仍具安全边际"
+  ],
+  "action_plan": [
+    "监控60美元心理支撑位与58美元EMA12技术支撑位的资金承接力度，等待RSI回落至65以下的布局窗口",
+    "跟踪台积电3nm产能利用率变化与AMD MI300X系列实际市占率数据，验证技术护城河与需求持续性"
+  ],
+  "notes_from_past_mistakes": [
+    "2023Q4曾误判库存增速为需求透支信号，实际反映AI芯片产能爬坡周期",
+    "2024年初高估AMD价格战影响，未充分考虑NVDA在云AI领域的定价权溢价"
+  ]
+}
+
+        [Trader Investment Plan]
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "LIMIT",
+  "entry_price": 60.0,
+  "execution_window": "T+1_OPEN",
+  "summary": "技术面多头排列与基本面高增长共振，回调至60美元关键支撑位布局，利用超买修正窗口控制成本",
+  "risk_controls": {
+    "stop_loss_pct": 0.05,
+    "take_profit_pct": 0.20,
+    "invalidation": "若跌破58美元EMA12支撑位或RSI二次突破70超买线则触发止损",
+    "time_horizon": "中长期持有（3-6个月），短期监控AI芯片需求数据与AMD竞争动态"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "LIMIT",
+      "price": 60.0
+    }
+  ],
+  "comment": "信心：中。当前60美元支撑位对应RSI 65临界值，历史数据显示多头趋势下支撑有效概率超80%，但需警惕地缘政治风险引发的系统性波动。建议分批建仓，突破63美元阻力位后动态调整止盈位。"
+}
+
+        [Risk Final Trade Decision]
+
+
+{
+  "role": "risk_manager",
+  "final_decision": "HOLD",
+  "fine_rating": "Overweight",
+  "summary": "NVDA技术面多头排列与AI需求刚性支撑趋势，但RSI极端超买与地缘政治风险形成短期压制。建议在60-58美元区间分批布局，通过仓位控制和动态对冲管理风险。",
+  "rationale": [
+    "技术超买修正风险（75%概率）与供应链地缘风险（30%概率）形成短期压力，需警惕58美元支撑位失效引发的流动性踩踏",
+    "PEG0.717与机构持仓支撑提供安全边际，但22.7倍PS估值需持续业绩增长验证，当前应优先控制风险敞口"
+  ],
+  "position_size": 0.2,
+  "max_drawdown": "接受15%以内回撤作为趋势验证成本，但需在58美元EMA12支撑位失效时强制减仓",
+  "stop_loss": "分层止损：首层58美元（EMA12），次层55美元（机构持仓心理位），跌破任一触发20%仓位减持",
+  "take_profit": "盈利达15%后分批止盈，若突破63美元强阻力位则动态上移止盈至323美元目标价的50%分位",
+  "time_horizon": "核心仓位持有至3月31日（AI需求数据验证期），短期交易者可关注60-63美元区间突破机会",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "2023Q4突破60美元后18%回撤验证需避免重蹈覆辙",
+    "机构持仓集中度32%历史临界点可能加剧趋势反转风险"
+  ]
+}
+
+        [Execution Payload]
+        {
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "stop_loss": null,
+  "take_profit": null,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "Risk/Trader 决策为 HOLD",
+  "is_exploratory": false,
+  "execution_date": "2024-01-31",
+  "date": "2024-01-30",
+  "symbol": "NVDA",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}

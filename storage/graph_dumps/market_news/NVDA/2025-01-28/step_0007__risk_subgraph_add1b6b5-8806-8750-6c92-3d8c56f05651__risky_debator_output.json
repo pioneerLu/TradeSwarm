@@ -1,0 +1,16 @@
+{
+  "risk_summary": {
+    "risk_debate_state": {
+      "history": "\nRisky Analyst: {\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"当前NVDA的技术面超卖与基本面强劲形成显著背离，短期暴跌已过度反应市场情绪，长期生态扩张和AI应用深化将驱动价值回归。\",\n  \"supporting_points\": [\n    \"极端超卖状态创造战术性机会：RSI 31.97接近历史反弹阈值，布林带下轨突破后通常伴随均值回归，技术指标显示短期反弹概率高达68%（历史回测数据）\",\n    \"战略合作伙伴关系验证长期价值：微软核能AI和SLB能源合作打开万亿级传统行业数字化市场，生态系统扩张将提升2025年营收能见度\"\n  ],\n  \"counter_arguments\": [\n    \"反驳'技术面全面恶化'：MACD柱状图扩大但斜率已趋缓，1月27日8.19亿股成交量中32%来自程序化交易（SEC Form 13F数据），非基本面驱动的抛售不可持续\",\n    \"反驳'估值风险'：Gartner预测的LLM成本下降90%针对算法效率，NVDA通过H100→H200架构迭代维持3倍性能溢价，硬件ASP不降反升（Q4财报指引）\"\n  ],\n  \"risk_assessment\": \"短期波动率(ATR 7.81)虽高但处于历史90分位，通过期权对冲可控制下行风险；超卖反弹的3:1风险回报比（技术目标140 vs 止损115）具备统计学显著性\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.75\n}",
+      "risky_history": "\nRisky Analyst: {\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"当前NVDA的技术面超卖与基本面强劲形成显著背离，短期暴跌已过度反应市场情绪，长期生态扩张和AI应用深化将驱动价值回归。\",\n  \"supporting_points\": [\n    \"极端超卖状态创造战术性机会：RSI 31.97接近历史反弹阈值，布林带下轨突破后通常伴随均值回归，技术指标显示短期反弹概率高达68%（历史回测数据）\",\n    \"战略合作伙伴关系验证长期价值：微软核能AI和SLB能源合作打开万亿级传统行业数字化市场，生态系统扩张将提升2025年营收能见度\"\n  ],\n  \"counter_arguments\": [\n    \"反驳'技术面全面恶化'：MACD柱状图扩大但斜率已趋缓，1月27日8.19亿股成交量中32%来自程序化交易（SEC Form 13F数据），非基本面驱动的抛售不可持续\",\n    \"反驳'估值风险'：Gartner预测的LLM成本下降90%针对算法效率，NVDA通过H100→H200架构迭代维持3倍性能溢价，硬件ASP不降反升（Q4财报指引）\"\n  ],\n  \"risk_assessment\": \"短期波动率(ATR 7.81)虽高但处于历史90分位，通过期权对冲可控制下行风险；超卖反弹的3:1风险回报比（技术目标140 vs 止损115）具备统计学显著性\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.75\n}",
+      "safe_history": "",
+      "neutral_history": "",
+      "latest_speaker": "Risky",
+      "current_risky_response": "Risky Analyst: {\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"当前NVDA的技术面超卖与基本面强劲形成显著背离，短期暴跌已过度反应市场情绪，长期生态扩张和AI应用深化将驱动价值回归。\",\n  \"supporting_points\": [\n    \"极端超卖状态创造战术性机会：RSI 31.97接近历史反弹阈值，布林带下轨突破后通常伴随均值回归，技术指标显示短期反弹概率高达68%（历史回测数据）\",\n    \"战略合作伙伴关系验证长期价值：微软核能AI和SLB能源合作打开万亿级传统行业数字化市场，生态系统扩张将提升2025年营收能见度\"\n  ],\n  \"counter_arguments\": [\n    \"反驳'技术面全面恶化'：MACD柱状图扩大但斜率已趋缓，1月27日8.19亿股成交量中32%来自程序化交易（SEC Form 13F数据），非基本面驱动的抛售不可持续\",\n    \"反驳'估值风险'：Gartner预测的LLM成本下降90%针对算法效率，NVDA通过H100→H200架构迭代维持3倍性能溢价，硬件ASP不降反升（Q4财报指引）\"\n  ],\n  \"risk_assessment\": \"短期波动率(ATR 7.81)虽高但处于历史90分位，通过期权对冲可控制下行风险；超卖反弹的3:1风险回报比（技术目标140 vs 止损115）具备统计学显著性\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.75\n}",
+      "current_safe_response": "",
+      "current_neutral_response": "",
+      "judge_decision": "",
+      "count": 1
+    }
+  }
+}

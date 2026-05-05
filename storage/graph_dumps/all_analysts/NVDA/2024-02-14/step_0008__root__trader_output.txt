@@ -1,0 +1,61 @@
+节点: trader
+时间: 2026-04-24 00:00:00
+================================================================================
+
+最后一条消息:
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.75,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "技术面多头排列与基本面盈利爆发共振，AI需求验证和量子计算突破强化长期逻辑，当前估值尚未构成核心风险，顺势加仓把握趋势延续",
+  "risk_controls": {
+    "stop_loss_pct": 70.50,
+    "take_profit_pct": 74.69,
+    "invalidation": "跌破MA5支撑位71.21或出现看跌形态",
+    "time_horizon": "中长期持有，跟踪AI基础设施投资进展与估值合理性"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.75,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "当前持仓已浮盈2.92%，但未达目标仓位。强趋势下采用T+1开盘成交，止损设于MA5下方70.50美元，止盈参考布林带上轨74.69美元。需警惕2023年AI热潮中出现的30%回撤风险，建议分批建仓后逐步上移止损位。"
+}
+
+
+trader_investment_plan:
+================================================================================
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.75,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "技术面多头排列与基本面盈利爆发共振，AI需求验证和量子计算突破强化长期逻辑，当前估值尚未构成核心风险，顺势加仓把握趋势延续",
+  "risk_controls": {
+    "stop_loss_pct": 70.5,
+    "take_profit_pct": 74.69,
+    "invalidation": "跌破MA5支撑位71.21或出现看跌形态",
+    "time_horizon": "中长期持有，跟踪AI基础设施投资进展与估值合理性"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.75,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "当前持仓已浮盈2.92%，但未达目标仓位。强趋势下采用T+1开盘成交，止损设于MA5下方70.50美元，止盈参考布林带上轨74.69美元。需警惕2023年AI热潮中出现的30%回撤风险，建议分批建仓后逐步上移止损位。"
+}

@@ -1,0 +1,75 @@
+节点: trader
+时间: 2026-04-28 00:00:00
+================================================================================
+
+最后一条消息:
+
+
+{
+  "role": "trader",
+  "market_regime": "strong_uptrend",
+  "selected_skill": "strong_uptrend_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "技术面多头排列与MACD金叉确认趋势反转，布林带中轨支撑有效且距上轨有7.9%上涨空间",
+    "基本面ROE(101.5%)和三年营收CAGR(100.6%)维持顶尖水平，AI生态合作强化技术壁垒"
+  ],
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "技术面多头信号明确且基本面高增长支撑，回调窗口已现。顺势加仓并设置布林带中轨止损，监控超买修正与库存风险。",
+  "risk_controls": {
+    "stop_loss_pct": 131.04,
+    "take_profit_pct": 149.76,
+    "invalidation": "若价格跌破131.04美元支撑位或RSI修正超10%触发超买警报",
+    "time_horizon": "1-3个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "当前持仓浮盈1.29%但组合Alpha落后B&H，需通过加仓巩固趋势收益。已预设布林带中轨止损位（131.04美元）以控制回调风险，同时关注149.76美元阻力位突破有效性。新增仓位需配合Lattice/Coherent合作落地进展及库存周转改善信号。"
+}
+
+
+trader_investment_plan:
+================================================================================
+{
+  "role": "trader",
+  "market_regime": "strong_uptrend",
+  "selected_skill": "strong_uptrend_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": [
+    "技术面多头排列与MACD金叉确认趋势反转，布林带中轨支撑有效且距上轨有7.9%上涨空间",
+    "基本面ROE(101.5%)和三年营收CAGR(100.6%)维持顶尖水平，AI生态合作强化技术壁垒"
+  ],
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "技术面多头信号明确且基本面高增长支撑，回调窗口已现。顺势加仓并设置布林带中轨止损，监控超买修正与库存风险。",
+  "risk_controls": {
+    "stop_loss_pct": 131.04,
+    "take_profit_pct": 149.76,
+    "invalidation": "若价格跌破131.04美元支撑位或RSI修正超10%触发超买警报",
+    "time_horizon": "1-3个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "当前持仓浮盈1.29%但组合Alpha落后B&H，需通过加仓巩固趋势收益。已预设布林带中轨止损位（131.04美元）以控制回调风险，同时关注149.76美元阻力位突破有效性。新增仓位需配合Lattice/Coherent合作落地进展及库存周转改善信号。"
+}

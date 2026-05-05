@@ -1,0 +1,101 @@
+Symbol: NVDA
+        Trade Date: 2024-01-12
+        Experiment ID: all_analysts
+        Enabled Analysts: market, news, sentiment, fundamentals
+        Export Mode: backtest
+
+        [Research Investment Plan]
+
+
+{
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "NVDA在AI革命核心资产地位稳固，技术面多头排列与机构增持形成共振，短期超买风险可通过回调布局把握。尽管存在库存增长和竞争压力，但基本面持续性支撑强于估值担忧。",
+  "rationale": [
+    "AI芯片领域垄断优势与Cadence等战略合作伙伴扩展强化技术护城河，2026财年55.6%净利率和100.5%营收三年CAGR验证增长动能未衰竭",
+    "技术面多头排列（MA5/10/20）与OBV历史新高显示资金共识未动摇，超买修正可能提供入场机会而非趋势终结信号"
+  ],
+  "action_plan": [
+    "关注52.70美元（MA5）支撑有效性，突破后加仓确认趋势延续",
+    "跟踪Q2财报毛利率修复情况与库存周转天数变化，警惕边缘计算领域AMD替代效应"
+  ],
+  "notes_from_past_mistakes": [
+    "2023年Q4曾误判库存增长为需求前置，实际反映供应链去库存周期延迟",
+    "2025年中期高估算了通用GPU不可替代性，忽视定制芯片对细分市场的侵蚀"
+  ]
+}
+
+        [Trader Investment Plan]
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "NVDA处于AI核心资产地位，技术面多头排列与机构增持共振，超买修正视为加仓机会。当前基本面支撑强于估值担忧，但需警惕库存与竞争风险。",
+  "risk_controls": {
+    "stop_loss_pct": -0.03,
+    "take_profit_pct": 0.05,
+    "invalidation": "跌破52.70美元支撑位或Q2财报显示毛利率未修复/库存周转恶化",
+    "time_horizon": "1-6个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "信心：中。已突破多条均线且OBV创新高，但RSI超买需防短期回调。执行市价单把握趋势，止损设于MA5支撑位下方3%，止盈参考近期阻力位55.31美元。需跟踪财报指引与边缘计算领域竞争动态。"
+}
+
+        [Risk Final Trade Decision]
+
+
+{
+  "role": "risk_manager",
+  "final_decision": "BUY",
+  "fine_rating": "Underweight",
+  "summary": "NVDA技术面多头排列与机构增持共振，但超买修正、库存风险及竞争加剧需谨慎应对。维持买入方向，通过减仓和动态风控平衡短期波动与长期趋势。",
+  "rationale": [
+    "RSI(80.68)和StochRSI(100)极端超买状态叠加库存/营收比12.5%的警戒水平，显示短期回调与基本面压力并存",
+    "地缘政治风险敞口与内存股票轮动现象形成双重不确定性，需警惕技术支撑失效引发的连锁反应"
+  ],
+  "position_size": 0.2,
+  "max_drawdown": "最大回撤容忍度7%-10%，对应MA5(52.70)至MA10(50.61)支撑区间",
+  "stop_loss": "跌破52.70美元（MA5）触发止损，若MA5支撑失守则转为卖出",
+  "take_profit": "盈利达5%后分批止盈，但需同步MA5/MA10支撑有效性，若突破55.31美元阻力位则延长持有",
+  "time_horizon": "1-6个月（需在3个月内重新评估库存周转天数变化）",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "2024年Q4曾误判库存增长为短期波动，实际反映需求周期拐点",
+    "2025年H1超买修正期间未及时设置动态止盈，导致收益回吐"
+  ]
+}
+
+        [Execution Payload]
+        {
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "stop_loss": null,
+  "take_profit": null,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "已持仓 21.9%，目标 20.0% 无显著增量，HOLD",
+  "is_exploratory": false,
+  "execution_date": "2024-01-16",
+  "date": "2024-01-12",
+  "symbol": "NVDA",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}

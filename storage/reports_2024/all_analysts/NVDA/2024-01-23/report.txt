@@ -1,0 +1,103 @@
+Symbol: NVDA
+        Trade Date: 2024-01-23
+        Experiment ID: all_analysts
+        Enabled Analysts: market, news, sentiment, fundamentals
+        Export Mode: backtest
+
+        [Research Investment Plan]
+
+
+```json
+{
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "NVDA在AI革命核心赛道具备结构性优势，技术面多头排列与机构增持形成共振，短期回调不改长期增长逻辑。尽管存在超买和库存隐忧，但基本面韧性及生态护城河强化支撑估值合理性。",
+  "rationale": [
+    "技术面多头排列（MA5=57.70>MA10=55.76>MA20=52.29）与机构持仓增量（Trust Co.增持至6504万美元）共同验证长期趋势未终结，回调至52.29美元支撑位仍是布局窗口",
+    "AI基础设施需求持续爆发（三年营收CAGR 100.2%）叠加Cadence合作提升设计效率30%，生态协同优势巩固行业地位，PEG 0.705显示估值安全边际"
+  ],
+  "action_plan": [
+    "逢低分批建仓，重点观察MA20（52.29美元）和布林带中轨（52.29美元）支撑有效性",
+    "动态跟踪Meta-Broadcom合作对定制芯片市场的影响及NVDA边缘计算布局进展"
+  ],
+  "notes_from_past_mistakes": [
+    "2023Q4曾因过度乐观库存数据导致误判需求韧性，需密切监控库存/营收比变化",
+    "2025年AI芯片估值泡沫期后出现的30%技术性回调表明超买区域需设置严格止损"
+  ]
+}
+```
+
+        [Trader Investment Plan]
+
+
+{
+  "role": "trader",
+  "action": "HOLD",
+  "target_pct": 0.35,
+  "entry_type": "LIMIT",
+  "entry_price": 52.29,
+  "execution_window": "T+1_OPEN",
+  "summary": "NVDA长期基本面与技术面共振，但短期超买需警惕回调。当前持有仓位已获16.99%浮盈，计划在MA20/布林带中轨52.29美元支撑位分批加仓，同时设置动态止盈止损保护收益。",
+  "risk_controls": {
+    "stop_loss_pct": 0.05,
+    "take_profit_pct": 0.20,
+    "invalidation": "若跌破MA10（55.76美元）或库存/营收比持续恶化（>30%）则触发止损",
+    "time_horizon": "中线持有（3-6个月），短期关注支撑位有效性"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "LIMIT",
+      "price": 52.29
+    }
+  ],
+  "comment": "当前持仓已锁定部分收益，但多头排列和机构增持支撑长期逻辑。设置55.76美元动态止损以保护短期涨幅，同时利用52.29美元支撑位加仓机会。需密切监控Meta-Broadcom合作对定制芯片市场的影响，以及库存周转效率变化。若出现趋势反转信号（如MA5下穿MA10）则立即清仓。"
+}
+
+        [Risk Final Trade Decision]
+
+
+{
+  "role": "risk_manager",
+  "final_decision": "BUY",
+  "fine_rating": "Overweight",
+  "summary": "NVDA长期基本面与技术面共振，机构增持与AI生态优势支撑上涨动能，但短期超买、库存压力及地缘政治风险需警惕。建议在52.29美元支撑位分批建仓并设置动态止损。",
+  "rationale": [
+    "技术面多头排列（MA5>MA10>MA20>MA30）与机构持仓（6504万美元）形成强支撑，但RSI超买（83.95）和布林带接近上轨（59.62）提示回调风险",
+    "库存/营收比突破0.08警戒值（当前0.10）叠加定制芯片市场分散化，可能引发盈利预期修正，需通过仓位控制和止损规则平衡风险"
+  ],
+  "position_size": 0.2,
+  "max_drawdown": "接受15%以内回撤，若跌破MA10（55.76美元）或库存/营收比持续恶化（>0.12）则触发止损",
+  "stop_loss": "动态止损位设于MA10（55.76美元），跌破则减仓50%；若出现MA5下穿MA10趋势反转信号则全额止损",
+  "take_profit": "盈利达20%（目标价71.58美元）且MACD柱状图连续3日收窄时分批止盈，保留30%仓位跟踪长期趋势",
+  "time_horizon": "中线持有（3-6个月），短期密切监控52.29美元支撑位有效性及库存周转效率",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "2023年Q4曾因忽视库存预警信号导致回撤扩大",
+    "2024年初地缘政治事件中过早平仓错失反弹机会"
+  ]
+}
+
+        [Execution Payload]
+        {
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "stop_loss": null,
+  "take_profit": null,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "已持仓 52.2%，目标 20.0% 无显著增量，HOLD",
+  "is_exploratory": false,
+  "execution_date": "2024-01-24",
+  "date": "2024-01-23",
+  "symbol": "NVDA",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}

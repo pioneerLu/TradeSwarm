@@ -1,0 +1,61 @@
+节点: trader
+时间: 2026-04-24 00:00:00
+================================================================================
+
+最后一条消息:
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "LIMIT",
+  "entry_price": 47.29,
+  "execution_window": "T+1_OPEN",
+  "summary": "在47.29美元关键支撑位挂限价单布局，利用技术调整窗口捕捉AI领导者的估值修复机会，机构增持与基本面韧性构成双重安全边际。",
+  "risk_controls": {
+    "stop_loss_pct": 0.46,
+    "take_profit_pct": 50.70,
+    "invalidation": "若47.29支撑失守且RSI跌破40触发超卖信号，或Meta-Broadcom合作导致季度AI业务增速低于20%",
+    "time_horizon": "1-3个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "LIMIT",
+      "price": 47.29
+    }
+  ],
+  "comment": "信心：中。当前技术调整已反映部分风险，但需等待支撑位确认与资金回流信号。LIMIT价格选择近期震荡区间的低点支撑位，预计2-3个交易日内完成技术验证，若支撑有效则开启中期反弹波段。"
+}
+
+
+trader_investment_plan:
+================================================================================
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "LIMIT",
+  "entry_price": 47.29,
+  "execution_window": "T+1_OPEN",
+  "summary": "在47.29美元关键支撑位挂限价单布局，利用技术调整窗口捕捉AI领导者的估值修复机会，机构增持与基本面韧性构成双重安全边际。",
+  "risk_controls": {
+    "stop_loss_pct": 0.46,
+    "take_profit_pct": 50.7,
+    "invalidation": "若47.29支撑失守且RSI跌破40触发超卖信号，或Meta-Broadcom合作导致季度AI业务增速低于20%",
+    "time_horizon": "1-3个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "LIMIT",
+      "price": 47.29
+    }
+  ],
+  "comment": "信心：中。当前技术调整已反映部分风险，但需等待支撑位确认与资金回流信号。LIMIT价格选择近期震荡区间的低点支撑位，预计2-3个交易日内完成技术验证，若支撑有效则开启中期反弹波段。"
+}

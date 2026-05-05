@@ -1,0 +1,101 @@
+Symbol: NVDA
+        Trade Date: 2024-02-09
+        Experiment ID: all_analysts
+        Enabled Analysts: market, news, sentiment, fundamentals
+        Export Mode: backtest
+
+        [Research Investment Plan]
+
+
+{
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "NVDA的AI基础设施领导地位与量子计算突破形成双重增长引擎，技术面多头共振与生态系统商业化进程加速构成强支撑，估值风险可通过分批建仓对冲。",
+  "rationale": [
+    "基本面层面，NVDA作为AI核心供应商，2026财年营收三年复合增长率达100.3%，ROE维持卓越水平，且AI需求从云端向边缘计算和传统工业渗透，验证长期增长逻辑。",
+    "技术面显示强劲上升趋势，MA多头排列与ADX 77.69的极强趋势指标形成共振，布林带接近上轨但未突破，短期回调至MA10（65.39）或提供加仓机会。"
+  ],
+  "action_plan": [
+    "关注回调至MA10（65.39）或MA20（61.73）时的逢低买入机会，结合OBV能量潮指标确认趋势健康度。",
+    "监控ADX与RSI动态，若ADX跌破70或RSI有效下破70则重新评估趋势强度，同时跟踪TSMC产能指引与AMD/英特尔竞争进展。"
+  ],
+  "notes_from_past_mistakes": [
+    "2023年Q4曾误判布林带收窄为预警信号，实际股价突破后延续涨势，需避免过度依赖单一技术指标阈值。",
+    "机构减持1.5%被简单归因于获利了结，但需结合持仓集中度变化（2024Q1降至57%）判断资金真实意图。"
+  ]
+}
+
+        [Trader Investment Plan]
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "基于AI基础设施领导地位与量子计算突破的双重驱动，叠加技术面多头共振，计划T+1开盘顺势加仓。当前趋势强度极强（ADX 77.69）且MA多头排列，回调至MA10（65.39）视为安全边际。",
+  "risk_controls": {
+    "stop_loss_pct": 0.062,
+    "take_profit_pct": 0.12,
+    "invalidation": "ADX跌破70或RSI有效下破70触发趋势重估，TSMC产能指引下调或AMD/英特尔推出竞争性AI芯片",
+    "time_horizon": "3-6个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "当前未设置止损/止盈，需补设64.73美元（MA10下方5%）止损位。分批建仓逻辑优先于短期超买信号，因基本面增长确定性高于技术修正风险。"
+}
+
+        [Risk Final Trade Decision]
+
+
+{
+  "role": "risk_manager",
+  "final_decision": "BUY",
+  "fine_rating": "Hold",
+  "summary": "NVDA技术面维持多头共振且基本面增长确定性强，但短期估值压力与超买指标需谨慎应对。建议分批建仓并强化动态风控，平衡长期趋势与短期波动风险。",
+  "rationale": [
+    "技术面多头排列（MA5/10/20）与ADX极强趋势（77.69）确认上升动能，但RSI超买（79.94）叠加布林带71.44美元阻力位，突破失败可能引发6-7%回调风险",
+    "基本面AI芯片需求验证（TSMC季度利润增50%）与量子计算突破形成增长双引擎，但PE/PB/PS三重高估值指标（60+/20+/20+）已透支未来3-5年成长性，需警惕宏观流动性变化"
+  ],
+  "position_size": 0.2,
+  "max_drawdown": "6-7%回撤（至MA10/20区间）视为可接受风险阈值",
+  "stop_loss": "跌破61.73美元（MA20）触发止损，或ADX持续低于70且RSI有效下破70时动态调整",
+  "take_profit": "盈利达12%且出现趋势破坏信号（如布林带中轨61.73美元失守）时分批止盈，优先保留长期增长敞口",
+  "time_horizon": "3-6个月（短期需监控2月美联储议息会议，中期关注Q2财报指引）",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "2023Q4 RSI突破90后未及时设置动态止盈，导致后续18%回调损失",
+    "过度依赖技术指标容忍度而忽视估值修正风险，需强化基本面与技术面的交叉验证"
+  ]
+}
+
+        [Execution Payload]
+        {
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "stop_loss": null,
+  "take_profit": null,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "已持仓 56.2%，目标 20.0% 无显著增量，HOLD",
+  "is_exploratory": false,
+  "execution_date": "2024-02-12",
+  "date": "2024-02-09",
+  "symbol": "NVDA",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}

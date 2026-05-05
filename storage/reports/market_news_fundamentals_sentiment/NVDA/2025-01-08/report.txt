@@ -1,0 +1,98 @@
+Symbol: NVDA
+        Trade Date: 2025-01-08
+        Experiment ID: market_news_fundamentals_sentiment
+        Enabled Analysts: market, news, fundamentals, sentiment
+        Export Mode: backtest
+
+        [Research Investment Plan]
+
+
+{
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "英伟达在AI革命核心赛道具备结构性优势，技术护城河与生态系统扩张支撑中期趋势，短期回调提供布局窗口。",
+  "rationale": [
+    "基本面维度：ROE超100%、自由现金流968亿美元验证盈利质量，Blackwell架构量产将强化技术代差，CUDA生态形成正向循环",
+    "技术面维度：MACD金叉结构未破坏（1.13>0.12），137美元支撑位与MA20重合提供安全边际，历史V型反转显示该位置强承接能力"
+  ],
+  "action_plan": [
+    "监控137美元支撑有效性及MACD柱状图缩量程度，确认中期趋势是否延续",
+    "跟踪Blackwell架构量产进度与台积电CoWoS产能分配，验证技术迭代对营收增速的支撑"
+  ],
+  "notes_from_past_mistakes": []
+}
+
+        [Trader Investment Plan]
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "技术面显示中期趋势仍积极，布林带中轨与20日均线形成关键支撑；基本面维持高增长与盈利能力，AI生态扩张支撑长期价值；情绪面呈现积极共识但需警惕估值风险。计划在137美元支撑位附近布局。",
+  "risk_controls": {
+    "stop_loss_pct": -0.10,
+    "take_profit_pct": 0.15,
+    "invalidation": "若跌破137美元支撑位或出现重大监管利空新闻",
+    "time_horizon": "2-4周"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "需密切跟踪1月15日季度财报及Blackwell量产进度，若OBV指标转正将强化入场逻辑"
+}
+
+        [Risk Final Trade Decision]
+
+
+{
+  "role": "risk_manager",
+  "final_decision": "BUY",
+  "fine_rating": "Overweight",
+  "summary": "NVDA中期技术趋势与基本面支撑明确，但需平衡高波动性与监管风险。建议在137美元支撑位分批建仓，严格监控技术支撑有效性与监管进展。",
+  "rationale": [
+    "20日均线与布林带中轨重合形成中期支撑，但需连续三日站稳确认有效性",
+    "欧盟反垄断调查与中美科技竞争构成长期监管风险，需对冲Blackwell量产预期的不确定性"
+  ],
+  "position_size": 0.2,
+  "max_drawdown": "单笔交易最大回撤容忍度控制在8%以内",
+  "stop_loss": "若跌破137美元支撑位（布林带中轨）且OBV指标未转正则止损",
+  "take_profit": "突破149.38美元前高并站稳5日均线（141.28）时止盈15%",
+  "time_horizon": "持有至1月15日季度财报前，最长不超过4周",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "2024年Q3因忽视AMD竞品发布导致的短期回调风险",
+    "2024年Q4过度依赖技术支撑位未设置动态止损引发的流动性风险"
+  ]
+}
+
+        [Execution Payload]
+        {
+  "action": "BUY",
+  "target_pct": 0.14999452961612356,
+  "stop_loss": "若跌破137美元支撑位（布林带中轨）且OBV指标未转正则止损",
+  "take_profit": "突破149.38美元前高并站稳5日均线（141.28）时止盈15%",
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "技术面显示中期趋势仍积极，布林带中轨与20日均线形成关键支撑；基本面维持高增长与盈利能力，AI生态扩张支撑长期价值；情绪面呈现积极共识但需警惕估值风险。计划在137美元支撑位附近布局。",
+  "is_exploratory": false,
+  "execution_date": "2025-01-10",
+  "date": "2025-01-08",
+  "symbol": "NVDA",
+  "experiment_id": "market_news_fundamentals_sentiment",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "fundamentals",
+    "sentiment"
+  ]
+}

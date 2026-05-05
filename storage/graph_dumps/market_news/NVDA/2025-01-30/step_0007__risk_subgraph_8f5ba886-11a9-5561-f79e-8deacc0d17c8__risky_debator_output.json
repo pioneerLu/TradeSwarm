@@ -1,0 +1,16 @@
+{
+  "risk_summary": {
+    "risk_debate_state": {
+      "history": "\nRisky Analyst: {\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"当前NVDA处于技术性超卖状态，且长期增长动力强劲，短期反弹概率高。激进策略可捕捉超跌反弹和长期AI增长红利。\",\n  \"supporting_points\": [\n    \"技术指标显示极度超卖（RSI 38.87，CCI -163.99），历史数据显示类似情况后反弹概率超过70%\",\n    \"战略合作扩展AI生态系统（微软核能、SLB能源），长期增长叙事完整，当前下跌是市场情绪过度反应\"\n  ],\n  \"counter_arguments\": [\n    \"反驳'等待底部确认'观点：超卖指标已达历史极端值，完美底部确认将错过30%+反弹空间\",\n    \"反驳'高波动风险'观点：ATR 7.87的高波动性本身包含双向机会，期权市场显示看涨期权隐含波动率溢价\"\n  ],\n  \"risk_assessment\": \"短期波动风险被超卖指标和战略合作缓冲，116美元支撑位下方5%止损空间 vs 上方30%反弹空间，风险收益比优异\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "risky_history": "\nRisky Analyst: {\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"当前NVDA处于技术性超卖状态，且长期增长动力强劲，短期反弹概率高。激进策略可捕捉超跌反弹和长期AI增长红利。\",\n  \"supporting_points\": [\n    \"技术指标显示极度超卖（RSI 38.87，CCI -163.99），历史数据显示类似情况后反弹概率超过70%\",\n    \"战略合作扩展AI生态系统（微软核能、SLB能源），长期增长叙事完整，当前下跌是市场情绪过度反应\"\n  ],\n  \"counter_arguments\": [\n    \"反驳'等待底部确认'观点：超卖指标已达历史极端值，完美底部确认将错过30%+反弹空间\",\n    \"反驳'高波动风险'观点：ATR 7.87的高波动性本身包含双向机会，期权市场显示看涨期权隐含波动率溢价\"\n  ],\n  \"risk_assessment\": \"短期波动风险被超卖指标和战略合作缓冲，116美元支撑位下方5%止损空间 vs 上方30%反弹空间，风险收益比优异\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "safe_history": "",
+      "neutral_history": "",
+      "latest_speaker": "Risky",
+      "current_risky_response": "Risky Analyst: {\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"当前NVDA处于技术性超卖状态，且长期增长动力强劲，短期反弹概率高。激进策略可捕捉超跌反弹和长期AI增长红利。\",\n  \"supporting_points\": [\n    \"技术指标显示极度超卖（RSI 38.87，CCI -163.99），历史数据显示类似情况后反弹概率超过70%\",\n    \"战略合作扩展AI生态系统（微软核能、SLB能源），长期增长叙事完整，当前下跌是市场情绪过度反应\"\n  ],\n  \"counter_arguments\": [\n    \"反驳'等待底部确认'观点：超卖指标已达历史极端值，完美底部确认将错过30%+反弹空间\",\n    \"反驳'高波动风险'观点：ATR 7.87的高波动性本身包含双向机会，期权市场显示看涨期权隐含波动率溢价\"\n  ],\n  \"risk_assessment\": \"短期波动风险被超卖指标和战略合作缓冲，116美元支撑位下方5%止损空间 vs 上方30%反弹空间，风险收益比优异\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "current_safe_response": "",
+      "current_neutral_response": "",
+      "judge_decision": "",
+      "count": 1
+    }
+  }
+}

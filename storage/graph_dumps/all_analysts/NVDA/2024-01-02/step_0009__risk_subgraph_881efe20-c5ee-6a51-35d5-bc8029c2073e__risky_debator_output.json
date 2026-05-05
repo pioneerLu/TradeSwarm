@@ -1,0 +1,16 @@
+{
+  "risk_summary": {
+    "risk_debate_state": {
+      "history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA的技术面出现动能反转信号，基本面维持高成长性且机构持续增持，AI生态主导权带来的长期收益足以覆盖短期波动风险。\",\n  \"supporting_points\": [\n    \"MACD柱状图转正叠加RSI接近超卖区域（42.57），技术性反弹概率显著提升，结合历史数据显示价格测试126美元支撑位后的修复潜力\",\n    \"机构投资者第四季度增持1.2%且分析师平均目标价275.25美元（较当前价格+99%），反映市场对其AI领导地位和长期增长逻辑的深度共识\"\n  ],\n  \"counter_arguments\": [\n    \"空头排列和ADX空头主导仅反映短期趋势，无法否定AI基础设施投资周期持续3年带来的结构性增长动力\",\n    \"内存芯片板块轮动恰说明半导体行业整体景气度提升，NVDA作为AI算力核心仍具跨周期优势，其55.6%净利率和1027亿美元现金流可对冲库存风险\"\n  ],\n  \"risk_assessment\": \"短期波动性（ATR 5.38）和竞争压力已被部分计入股价，当前40.48倍PE对应65.5%的营收增速仍属合理。关键支撑位137.36美元与MA30重合，若能突破140美元心理关口将重获多头主导权。\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.75\n}",
+      "risky_history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA的技术面出现动能反转信号，基本面维持高成长性且机构持续增持，AI生态主导权带来的长期收益足以覆盖短期波动风险。\",\n  \"supporting_points\": [\n    \"MACD柱状图转正叠加RSI接近超卖区域（42.57），技术性反弹概率显著提升，结合历史数据显示价格测试126美元支撑位后的修复潜力\",\n    \"机构投资者第四季度增持1.2%且分析师平均目标价275.25美元（较当前价格+99%），反映市场对其AI领导地位和长期增长逻辑的深度共识\"\n  ],\n  \"counter_arguments\": [\n    \"空头排列和ADX空头主导仅反映短期趋势，无法否定AI基础设施投资周期持续3年带来的结构性增长动力\",\n    \"内存芯片板块轮动恰说明半导体行业整体景气度提升，NVDA作为AI算力核心仍具跨周期优势，其55.6%净利率和1027亿美元现金流可对冲库存风险\"\n  ],\n  \"risk_assessment\": \"短期波动性（ATR 5.38）和竞争压力已被部分计入股价，当前40.48倍PE对应65.5%的营收增速仍属合理。关键支撑位137.36美元与MA30重合，若能突破140美元心理关口将重获多头主导权。\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.75\n}",
+      "safe_history": "",
+      "neutral_history": "",
+      "latest_speaker": "Risky",
+      "current_risky_response": "Risky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA的技术面出现动能反转信号，基本面维持高成长性且机构持续增持，AI生态主导权带来的长期收益足以覆盖短期波动风险。\",\n  \"supporting_points\": [\n    \"MACD柱状图转正叠加RSI接近超卖区域（42.57），技术性反弹概率显著提升，结合历史数据显示价格测试126美元支撑位后的修复潜力\",\n    \"机构投资者第四季度增持1.2%且分析师平均目标价275.25美元（较当前价格+99%），反映市场对其AI领导地位和长期增长逻辑的深度共识\"\n  ],\n  \"counter_arguments\": [\n    \"空头排列和ADX空头主导仅反映短期趋势，无法否定AI基础设施投资周期持续3年带来的结构性增长动力\",\n    \"内存芯片板块轮动恰说明半导体行业整体景气度提升，NVDA作为AI算力核心仍具跨周期优势，其55.6%净利率和1027亿美元现金流可对冲库存风险\"\n  ],\n  \"risk_assessment\": \"短期波动性（ATR 5.38）和竞争压力已被部分计入股价，当前40.48倍PE对应65.5%的营收增速仍属合理。关键支撑位137.36美元与MA30重合，若能突破140美元心理关口将重获多头主导权。\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.75\n}",
+      "current_safe_response": "",
+      "current_neutral_response": "",
+      "judge_decision": "",
+      "count": 1
+    }
+  }
+}

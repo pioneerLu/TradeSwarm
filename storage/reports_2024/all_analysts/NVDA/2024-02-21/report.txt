@@ -1,0 +1,101 @@
+Symbol: NVDA
+        Trade Date: 2024-02-21
+        Experiment ID: all_analysts
+        Enabled Analysts: market, news, sentiment, fundamentals
+        Export Mode: backtest
+
+        [Research Investment Plan]
+
+
+{
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "NVDA在AI革命驱动下展现强劲基本面与技术支撑，短期回调不改长期多头趋势。技术面多层支撑有效，基本面盈利爆发力与生态系统扩展形成竞争壁垒，估值溢价具备增长合理性。",
+  "rationale": [
+    "技术面关键支撑位（67.07/65.37美元）与中长期均线多头排列形成有效防守，MACD线高位运行显示趋势未完全逆转",
+    "基本面ROE超100%与AI数据中心需求渗透传统行业（制造业/能源）的确定性，叠加量子计算技术开源带来的行业溢出效应，形成双重增长引擎"
+  ],
+  "action_plan": [
+    "监控67.07美元支撑位有效性，结合MACD柱状图缩量信号判断回调结束节点",
+    "跟踪微软GPU采购落地进度与CUDA开发者生态份额变化，验证AI基础设施需求可持续性"
+  ],
+  "notes_from_past_mistakes": [
+    "警惕2023年英伟达因AI服务器需求短期透支导致的季度性回调风险",
+    "注意2022年量子计算概念炒作与实际商业化进展的估值错配历史教训"
+  ]
+}
+
+        [Trader Investment Plan]
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "LIMIT",
+  "entry_price": 67.07,
+  "execution_window": "T+1_OPEN",
+  "summary": "NVDA短期回调至关键支撑位，技术面与基本面共振支撑逢低布局。MACD高位缩量调整显示趋势韧性，AI需求与量子计算突破形成双重增长预期。",
+  "risk_controls": {
+    "stop_loss_pct": 65.37,
+    "take_profit_pct": 74.57,
+    "invalidation": "跌破67.07支撑位或MACD柱状图连续3日为负",
+    "time_horizon": "3-6个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "LIMIT",
+      "price": 67.07
+    }
+  ],
+  "comment": "信心：中。当前67.07为20日均线与布林带中轨重合位，结合PEG估值合理性及AI生态扩展确定性，支撑位防守成功概率较高。历史教训已通过设置动态止损位规避需求透支风险。"
+}
+
+        [Risk Final Trade Decision]
+
+
+{
+  "role": "risk_manager",
+  "final_decision": "BUY",
+  "fine_rating": "Overweight",
+  "summary": "NVDA技术面关键支撑位与基本面高成长性形成共振，但需警惕数据时序错乱和估值压力。建议在降低仓位至0.2的同时强化动态风控，平衡AI生态扩展确定性与短期波动风险。",
+  "rationale": [
+    "技术面显示多头结构未破坏（MA20/30多头排列+ADX强趋势59.75），但需验证67.07美元支撑位在当前高波动环境（ATR 2.745）下的有效性",
+    "新闻数据时序错乱（2026年事件被误认为当前趋势）和70%AI项目失败率构成潜在黑天鹅风险，需通过仓位压缩和硬止损控制敞口"
+  ],
+  "position_size": 0.2,
+  "max_drawdown": "最大回撤控制在10%以内（基于ATR波动率调整）",
+  "stop_loss": "跌破67.07美元支撑位立即止损，或MACD柱状图连续3日为负触发趋势失效",
+  "take_profit": "盈利达到30%且股价突破74.57美元阻力位时分批止盈，保留20%仓位跟踪长期趋势",
+  "time_horizon": "3-6个月（视季度财报指引和AI资本开支数据动态调整）",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "2023年AI服务器采购周期阶段性透支导致的估值回调风险需警惕",
+    "2026年数据锚定可能引发的时序逻辑谬误需通过实时数据验证规避"
+  ]
+}
+
+        [Execution Payload]
+        {
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "stop_loss": null,
+  "take_profit": null,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "已持仓 56.0%，目标 20.0% 无显著增量，HOLD",
+  "is_exploratory": false,
+  "execution_date": "2024-02-22",
+  "date": "2024-02-21",
+  "symbol": "NVDA",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}

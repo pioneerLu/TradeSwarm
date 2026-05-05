@@ -1,0 +1,16 @@
+{
+  "risk_summary": {
+    "risk_debate_state": {
+      "history": "\nRisky Analyst: {\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA当前技术面调整已接近关键支撑位，而战略合作带来的长期增长潜力被市场低估，短期波动提供了高赔率的入场机会。\",\n  \"supporting_points\": [\n    \"技术指标显示RSI接近超卖区域(40.71)，布林带下轨(115.31美元)与1月低点(118.38美元)形成强支撑带，当前120.11美元价格已具备高风险回报比\",\n    \"20亿美元光学互连投资和物理AI生态布局将驱动未来2-3个季度的营收重估，新闻面显示机构对AI基础设施的资本开支仍在加速\"\n  ],\n  \"counter_arguments\": [\n    \"反驳'均线空头排列风险'：短期均线系统在宽幅震荡市中信号滞后，1月27日类似技术形态后曾实现18.5%反弹\",\n    \"反驳'OBV资金流出担忧'：2月27日恐慌性抛售(4.43亿股)包含大量程序化交易，战略投资者正借机增持(参考Coherent Corp交易结构)\"\n  ],\n  \"risk_assessment\": \"短期可能测试115美元支撑，但下行空间<5%；而突破130美元阻力将打开至152美元(前高)的26%上涨空间，风险收益比达1:5\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "risky_history": "\nRisky Analyst: {\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA当前技术面调整已接近关键支撑位，而战略合作带来的长期增长潜力被市场低估，短期波动提供了高赔率的入场机会。\",\n  \"supporting_points\": [\n    \"技术指标显示RSI接近超卖区域(40.71)，布林带下轨(115.31美元)与1月低点(118.38美元)形成强支撑带，当前120.11美元价格已具备高风险回报比\",\n    \"20亿美元光学互连投资和物理AI生态布局将驱动未来2-3个季度的营收重估，新闻面显示机构对AI基础设施的资本开支仍在加速\"\n  ],\n  \"counter_arguments\": [\n    \"反驳'均线空头排列风险'：短期均线系统在宽幅震荡市中信号滞后，1月27日类似技术形态后曾实现18.5%反弹\",\n    \"反驳'OBV资金流出担忧'：2月27日恐慌性抛售(4.43亿股)包含大量程序化交易，战略投资者正借机增持(参考Coherent Corp交易结构)\"\n  ],\n  \"risk_assessment\": \"短期可能测试115美元支撑，但下行空间<5%；而突破130美元阻力将打开至152美元(前高)的26%上涨空间，风险收益比达1:5\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "safe_history": "",
+      "neutral_history": "",
+      "latest_speaker": "Risky",
+      "current_risky_response": "Risky Analyst: {\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA当前技术面调整已接近关键支撑位，而战略合作带来的长期增长潜力被市场低估，短期波动提供了高赔率的入场机会。\",\n  \"supporting_points\": [\n    \"技术指标显示RSI接近超卖区域(40.71)，布林带下轨(115.31美元)与1月低点(118.38美元)形成强支撑带，当前120.11美元价格已具备高风险回报比\",\n    \"20亿美元光学互连投资和物理AI生态布局将驱动未来2-3个季度的营收重估，新闻面显示机构对AI基础设施的资本开支仍在加速\"\n  ],\n  \"counter_arguments\": [\n    \"反驳'均线空头排列风险'：短期均线系统在宽幅震荡市中信号滞后，1月27日类似技术形态后曾实现18.5%反弹\",\n    \"反驳'OBV资金流出担忧'：2月27日恐慌性抛售(4.43亿股)包含大量程序化交易，战略投资者正借机增持(参考Coherent Corp交易结构)\"\n  ],\n  \"risk_assessment\": \"短期可能测试115美元支撑，但下行空间<5%；而突破130美元阻力将打开至152美元(前高)的26%上涨空间，风险收益比达1:5\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "current_safe_response": "",
+      "current_neutral_response": "",
+      "judge_decision": "",
+      "count": 1
+    }
+  }
+}

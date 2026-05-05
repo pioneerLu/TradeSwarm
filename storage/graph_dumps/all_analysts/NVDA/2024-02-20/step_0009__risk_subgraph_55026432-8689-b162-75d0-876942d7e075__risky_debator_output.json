@@ -1,0 +1,16 @@
+{
+  "risk_summary": {
+    "risk_debate_state": {
+      "history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面呈现多头主导与强趋势信号，基本面AI生态扩展和量子计算突破提供双重支撑，当前估值模型显示增长预期可覆盖风险。\",\n  \"supporting_points\": [\n    \"技术指标显示ADX维持在64-77区间（强趋势信号），布林带扩张后趋势延续概率达62%，多头排列（MA5/10/20）提供多重支撑位，回调后趋势修复动能充足。\",\n    \"基本面验证AI需求端健康度（微软采购+台积电产能），PEG0.717估值模型具备安全边际，量子计算技术外溢效应强化护城河，ROE超100%显示资本运作效率。\"\n  ],\n  \"counter_arguments\": [\n    \"RSI超买状态被多头排列和ADX强趋势信号对冲，历史数据显示回调后仍能维持上涨动能，短期调整反而是布局机会。\",\n    \"高估值风险被AI基础设施需求验证（TSMC净利润创纪录）和财务健康度（资产负债率23.9%）抵消，现金流与盈利增速支撑持续扩张。\"\n  ],\n  \"risk_assessment\": \"短期波动性（ATR 2.46）和回调风险存在，但技术支撑位密集（MA20-61.73至66.58美元）和AI行业高景气度（微软采购数万台GPU）提供安全边际，同时自由现金流充裕可支撑研发与市场地位巩固。\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "risky_history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面呈现多头主导与强趋势信号，基本面AI生态扩展和量子计算突破提供双重支撑，当前估值模型显示增长预期可覆盖风险。\",\n  \"supporting_points\": [\n    \"技术指标显示ADX维持在64-77区间（强趋势信号），布林带扩张后趋势延续概率达62%，多头排列（MA5/10/20）提供多重支撑位，回调后趋势修复动能充足。\",\n    \"基本面验证AI需求端健康度（微软采购+台积电产能），PEG0.717估值模型具备安全边际，量子计算技术外溢效应强化护城河，ROE超100%显示资本运作效率。\"\n  ],\n  \"counter_arguments\": [\n    \"RSI超买状态被多头排列和ADX强趋势信号对冲，历史数据显示回调后仍能维持上涨动能，短期调整反而是布局机会。\",\n    \"高估值风险被AI基础设施需求验证（TSMC净利润创纪录）和财务健康度（资产负债率23.9%）抵消，现金流与盈利增速支撑持续扩张。\"\n  ],\n  \"risk_assessment\": \"短期波动性（ATR 2.46）和回调风险存在，但技术支撑位密集（MA20-61.73至66.58美元）和AI行业高景气度（微软采购数万台GPU）提供安全边际，同时自由现金流充裕可支撑研发与市场地位巩固。\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "safe_history": "",
+      "neutral_history": "",
+      "latest_speaker": "Risky",
+      "current_risky_response": "Risky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面呈现多头主导与强趋势信号，基本面AI生态扩展和量子计算突破提供双重支撑，当前估值模型显示增长预期可覆盖风险。\",\n  \"supporting_points\": [\n    \"技术指标显示ADX维持在64-77区间（强趋势信号），布林带扩张后趋势延续概率达62%，多头排列（MA5/10/20）提供多重支撑位，回调后趋势修复动能充足。\",\n    \"基本面验证AI需求端健康度（微软采购+台积电产能），PEG0.717估值模型具备安全边际，量子计算技术外溢效应强化护城河，ROE超100%显示资本运作效率。\"\n  ],\n  \"counter_arguments\": [\n    \"RSI超买状态被多头排列和ADX强趋势信号对冲，历史数据显示回调后仍能维持上涨动能，短期调整反而是布局机会。\",\n    \"高估值风险被AI基础设施需求验证（TSMC净利润创纪录）和财务健康度（资产负债率23.9%）抵消，现金流与盈利增速支撑持续扩张。\"\n  ],\n  \"risk_assessment\": \"短期波动性（ATR 2.46）和回调风险存在，但技术支撑位密集（MA20-61.73至66.58美元）和AI行业高景气度（微软采购数万台GPU）提供安全边际，同时自由现金流充裕可支撑研发与市场地位巩固。\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "current_safe_response": "",
+      "current_neutral_response": "",
+      "judge_decision": "",
+      "count": 1
+    }
+  }
+}

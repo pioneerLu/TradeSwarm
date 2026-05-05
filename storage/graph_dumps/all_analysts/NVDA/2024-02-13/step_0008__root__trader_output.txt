@@ -1,0 +1,61 @@
+节点: trader
+时间: 2026-04-24 00:00:00
+================================================================================
+
+最后一条消息:
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.7,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "NVDA处于AI驱动的强趋势中，技术面多头排列与ADX极强信号确认趋势延续，基本面高成长性与财务韧性支撑长期逻辑。机构减持属战术调整而非趋势反转，维持强势买入。",
+  "risk_controls": {
+    "stop_loss_pct": 6.6,
+    "take_profit_pct": 2.1,
+    "invalidation": "跌破MA10（67.48）或出现价格新高但RSI未创新高的顶背离",
+    "time_horizon": "3-6个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.7,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "当前持仓已浮盈2.92%，加仓后总仓位占比目标70%需分批执行。止损设于MA10支撑失效点，止盈锁定布林带上轨突破收益。需密切跟踪库存周转与应收账款增速是否匹配65%营收增长预期。"
+}
+
+
+trader_investment_plan:
+================================================================================
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.7,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "execution_window": "T+1_OPEN",
+  "summary": "NVDA处于AI驱动的强趋势中，技术面多头排列与ADX极强信号确认趋势延续，基本面高成长性与财务韧性支撑长期逻辑。机构减持属战术调整而非趋势反转，维持强势买入。",
+  "risk_controls": {
+    "stop_loss_pct": 6.6,
+    "take_profit_pct": 2.1,
+    "invalidation": "跌破MA10（67.48）或出现价格新高但RSI未创新高的顶背离",
+    "time_horizon": "3-6个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.7,
+      "price_type": "MARKET",
+      "price": null
+    }
+  ],
+  "comment": "当前持仓已浮盈2.92%，加仓后总仓位占比目标70%需分批执行。止损设于MA10支撑失效点，止盈锁定布林带上轨突破收益。需密切跟踪库存周转与应收账款增速是否匹配65%营收增长预期。"
+}

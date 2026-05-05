@@ -1,0 +1,16 @@
+{
+  "risk_summary": {
+    "risk_debate_state": {
+      "history": "\nRisky Analyst: {\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面已出现多重反弹信号，且公司在AI生态系统的战略布局持续强化，短期波动不足为惧，应积极增加风险敞口以捕捉潜在的大幅反弹机会。\",\n  \"supporting_points\": [\n    \"技术指标全面改善：MACD柱状图转正、RSI从超卖回升、5日均线上穿10日均线形成金叉，价格突破布林带中轨，显示短期反弹动能强劲\",\n    \"战略合作持续扩展AI生态系统：与Lattice Semiconductor和Coherent Corp的合作强化物理AI和光学互连领域布局，20亿美元投资协议彰显长期信心，基本面支撑强劲\"\n  ],\n  \"counter_arguments\": [\n    \"保守派过度关注短期波动性(ATR 8.08)，但忽略技术面已形成明确底部结构(116.66美元低点)和14.4%的反弹幅度，市场情绪正在快速修复\",\n    \"中性立场低估战略合作价值：与能源巨头和光学技术公司的深度合作将打开万亿级物理AI市场，当前股价尚未充分反映这些长期增长点\"\n  ],\n  \"risk_assessment\": \"尽管存在供应链瓶颈和竞争压力，但NVDA技术领导地位不可撼动，且短期超卖后的反弹空间(至152.11美元阻力位仍有14%涨幅)足以覆盖波动风险\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "risky_history": "\nRisky Analyst: {\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面已出现多重反弹信号，且公司在AI生态系统的战略布局持续强化，短期波动不足为惧，应积极增加风险敞口以捕捉潜在的大幅反弹机会。\",\n  \"supporting_points\": [\n    \"技术指标全面改善：MACD柱状图转正、RSI从超卖回升、5日均线上穿10日均线形成金叉，价格突破布林带中轨，显示短期反弹动能强劲\",\n    \"战略合作持续扩展AI生态系统：与Lattice Semiconductor和Coherent Corp的合作强化物理AI和光学互连领域布局，20亿美元投资协议彰显长期信心，基本面支撑强劲\"\n  ],\n  \"counter_arguments\": [\n    \"保守派过度关注短期波动性(ATR 8.08)，但忽略技术面已形成明确底部结构(116.66美元低点)和14.4%的反弹幅度，市场情绪正在快速修复\",\n    \"中性立场低估战略合作价值：与能源巨头和光学技术公司的深度合作将打开万亿级物理AI市场，当前股价尚未充分反映这些长期增长点\"\n  ],\n  \"risk_assessment\": \"尽管存在供应链瓶颈和竞争压力，但NVDA技术领导地位不可撼动，且短期超卖后的反弹空间(至152.11美元阻力位仍有14%涨幅)足以覆盖波动风险\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "safe_history": "",
+      "neutral_history": "",
+      "latest_speaker": "Risky",
+      "current_risky_response": "Risky Analyst: {\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"NVDA技术面已出现多重反弹信号，且公司在AI生态系统的战略布局持续强化，短期波动不足为惧，应积极增加风险敞口以捕捉潜在的大幅反弹机会。\",\n  \"supporting_points\": [\n    \"技术指标全面改善：MACD柱状图转正、RSI从超卖回升、5日均线上穿10日均线形成金叉，价格突破布林带中轨，显示短期反弹动能强劲\",\n    \"战略合作持续扩展AI生态系统：与Lattice Semiconductor和Coherent Corp的合作强化物理AI和光学互连领域布局，20亿美元投资协议彰显长期信心，基本面支撑强劲\"\n  ],\n  \"counter_arguments\": [\n    \"保守派过度关注短期波动性(ATR 8.08)，但忽略技术面已形成明确底部结构(116.66美元低点)和14.4%的反弹幅度，市场情绪正在快速修复\",\n    \"中性立场低估战略合作价值：与能源巨头和光学技术公司的深度合作将打开万亿级物理AI市场，当前股价尚未充分反映这些长期增长点\"\n  ],\n  \"risk_assessment\": \"尽管存在供应链瓶颈和竞争压力，但NVDA技术领导地位不可撼动，且短期超卖后的反弹空间(至152.11美元阻力位仍有14%涨幅)足以覆盖波动风险\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "current_safe_response": "",
+      "current_neutral_response": "",
+      "judge_decision": "",
+      "count": 1
+    }
+  }
+}

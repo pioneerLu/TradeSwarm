@@ -1,0 +1,56 @@
+节点: trader
+时间: 2026-04-28 00:00:00
+================================================================================
+
+最后一条消息:
+{
+  "role": "trader",
+  "market_regime": "downtrend",
+  "selected_skill": "downtrend_skill",
+  "regime_confidence": 0.85,
+  "regime_evidence": ["价格大幅低于所有主要移动平均线（MA5/10/20/30），形成空头排列", "MACD深度负值且柱状图扩大，显示看跌动量增强", "OBV持续为负表明资金流出，ADX显示-DI显著高于+DI确认下跌趋势", "股价从近期高点下跌15.4%，跌破关键支撑位126.79美元"],
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "entry_type": null,
+  "entry_price": null,
+  "execution_window": null,
+  "summary": "尽管长期基本面支撑存在，但当前技术面仍处于强烈下跌趋势中，建议等待更明确的反转信号再入场。",
+  "risk_controls": {
+    "stop_loss_pct": null,
+    "take_profit_pct": null,
+    "invalidation": "若价格有效突破127.63美元（MA5）并伴随成交量放大，可考虑小仓试探",
+    "time_horizon": "短期观望，中期关注基本面进展"
+  },
+  "order_plan": [],
+  "comment": "信心：中。虽然研究建议逢低布局，但当前技术趋势尚未反转，且波动性较高，建议保持谨慎。"
+}
+
+
+trader_investment_plan:
+================================================================================
+{
+  "role": "trader",
+  "market_regime": "downtrend",
+  "selected_skill": "downtrend_skill",
+  "regime_confidence": 0.85,
+  "regime_evidence": [
+    "价格大幅低于所有主要移动平均线（MA5/10/20/30），形成空头排列",
+    "MACD深度负值且柱状图扩大，显示看跌动量增强",
+    "OBV持续为负表明资金流出，ADX显示-DI显著高于+DI确认下跌趋势",
+    "股价从近期高点下跌15.4%，跌破关键支撑位126.79美元"
+  ],
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "entry_type": null,
+  "entry_price": null,
+  "execution_window": null,
+  "summary": "尽管长期基本面支撑存在，但当前技术面仍处于强烈下跌趋势中，建议等待更明确的反转信号再入场。",
+  "risk_controls": {
+    "stop_loss_pct": null,
+    "take_profit_pct": null,
+    "invalidation": "若价格有效突破127.63美元（MA5）并伴随成交量放大，可考虑小仓试探",
+    "time_horizon": "短期观望，中期关注基本面进展"
+  },
+  "order_plan": [],
+  "comment": "信心：中。虽然研究建议逢低布局，但当前技术趋势尚未反转，且波动性较高，建议保持谨慎。"
+}

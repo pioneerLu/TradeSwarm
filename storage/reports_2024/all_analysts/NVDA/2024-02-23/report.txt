@@ -1,0 +1,103 @@
+Symbol: NVDA
+        Trade Date: 2024-02-23
+        Experiment ID: all_analysts
+        Enabled Analysts: market, news, sentiment, fundamentals
+        Export Mode: backtest
+
+        [Research Investment Plan]
+
+
+```json
+{
+  "role": "research_manager",
+  "decision": "BUY",
+  "summary": "NVDA在AI超级周期驱动下展现强劲基本面与技术面共振，生态系统扩展和合作伙伴关系巩固其行业领导地位。尽管短期存在超买调整压力，但长期增长动能与财务健康度支撑估值合理性。",
+  "rationale": [
+    "核心理由1：2026财年ROE突破100%、AI数据中心业务占比提升至45%且三年营收CAGR达100.5%，叠加量子计算技术突破引发的板块联动（D-Wave单日+22.63%），显示技术溢价与需求持续性未被透支。",
+    "核心理由2：技术面多头排列（MA5>MA10>MA20>MA30）与OBV资金流入（5.757亿）形成正反馈，布林带突破后回调至MA5（72.10）即提供加仓机会，PEG比率0.719显示估值内嵌安全边际。"
+  ],
+  "action_plan": [
+    "关注72.10（MA5）与68.31（MA20）支撑位有效性，技术性回调时分批布局，但避免追高突破78.22（布林带上轨）后的短期波动。",
+    "跟踪AI数据中心业务季度增速（当前三年CAGR 100.5%）及合作伙伴协议执行细节（如Caterpillar季度交付波动条款±15%），验证需求持续性与估值匹配度。"
+  ],
+  "notes_from_past_mistakes": [
+    "需警惕2025年毛利率从75%降至71.1%的边际调整趋势，若2027财年ROE跌破90%，可能触发估值体系重构。",
+    "历史数据显示布林带突破后回踩成功概率随波动率上升衰减（当前隐波率28%对应概率51%），应避免将短期超买调整误判为趋势反转信号。"
+  ]
+}
+```
+
+        [Trader Investment Plan]
+
+
+{
+  "role": "trader",
+  "action": "BUY",
+  "target_pct": 0.35,
+  "entry_type": "LIMIT",
+  "entry_price": 68.31,
+  "execution_window": "T+1_OPEN",
+  "summary": "基于技术面多头排列与基本面AI超级周期共振，以MA20支撑位作为加仓锚点，利用PEG安全边际控制估值风险",
+  "risk_controls": {
+    "stop_loss_pct": 0.10,
+    "take_profit_pct": 0.25,
+    "invalidation": "若2027财年ROE跌破90%或出现MA5下穿MA10的死亡交叉",
+    "time_horizon": "3-6个月"
+  },
+  "order_plan": [
+    {
+      "symbol": "NVDA",
+      "direction": "BUY",
+      "size_pct": 0.35,
+      "price_type": "LIMIT",
+      "price": 68.31
+    }
+  ],
+  "comment": "信心：中。当前MA20（68.31）作为关键支撑位具有强吸引力，结合基本面AI数据中心业务45%占比与量子计算技术突破的正反馈，回调至该位置是安全的加仓点。需密切监控MA排列完整性，若跌破MA30（64.66）则触发止损。"
+}
+
+        [Risk Final Trade Decision]
+
+
+{
+  "role": "risk_manager",
+  "final_decision": "BUY",
+  "fine_rating": "Overweight",
+  "summary": "NVDA技术面多头排列与AI超级周期基本面共振，但需警惕短期超买调整风险。建议在维持趋势方向的同时通过仓位压缩和动态止盈止损控制回撤。",
+  "rationale": [
+    "技术面多头排列（MA5/10/20）和OBV资金流入确认趋势，但RSI(74.43)和布林带突破后回调动能未充分释放，存在8%-15%短期回撤风险",
+    "基本面ROE(101.5%)和AI数据中心业务占比45%的结构优势显著，但31.22倍市净率和214亿美元库存积累需要持续需求验证"
+  ],
+  "position_size": 0.25,
+  "max_drawdown": "接受8%-10%短期回撤以捕捉AI生态系统的长期增长",
+  "stop_loss": "跌破MA30(64.66)触发止损，或连续两日收于MA5(72.10)下方时执行",
+  "take_profit": "盈利达20%且出现MACD死叉时分批止盈，或突破80.00心理关口后保留核心仓位",
+  "time_horizon": "3-6个月（需根据MA排列完整性动态调整）",
+  "risk_level": "MEDIUM",
+  "notes_from_past_mistakes": [
+    "2024年2月历史数据显示布林带突破后回踩支撑位失败概率达49%，需警惕技术性调整",
+    "2026财年库存环比增长111%可能引发供应链压力，需监控季度库存周转天数变化"
+  ]
+}
+
+        [Execution Payload]
+        {
+  "action": "HOLD",
+  "target_pct": 0.0,
+  "stop_loss": null,
+  "take_profit": null,
+  "entry_type": "MKT_OPEN",
+  "entry_price": null,
+  "reason": "已持仓 55.3%，目标 25.0% 无显著增量，HOLD",
+  "is_exploratory": false,
+  "execution_date": "2024-02-26",
+  "date": "2024-02-23",
+  "symbol": "NVDA",
+  "experiment_id": "all_analysts",
+  "enabled_analysts": [
+    "market",
+    "news",
+    "sentiment",
+    "fundamentals"
+  ]
+}

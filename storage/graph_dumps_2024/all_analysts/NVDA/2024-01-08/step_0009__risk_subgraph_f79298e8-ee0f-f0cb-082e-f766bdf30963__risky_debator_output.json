@@ -1,0 +1,16 @@
+{
+  "risk_summary": {
+    "risk_debate_state": {
+      "history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"英伟达在AI芯片领域的结构性主导地位与财务韧性构成核心支撑，短期震荡不改长期增长逻辑。技术面关键支撑位稳固且资金流持续为正，分析师目标价上调与机构增持强化基本面共识。\",\n  \"supporting_points\": [\n    \"ROE超100%、净利率55.6%的顶级盈利能力及966亿美元自由现金流，为风险敞口提供充足安全边际\",\n    \"布林带中轨与MA20形成双重支撑（48.00-48.50），突破50美元阻力位后潜在上涨空间达30%以上\"\n  ],\n  \"counter_arguments\": [\n    \"地缘政治风险已被市场部分定价，标普500六周内维持稳定显示系统性风险可控\",\n    \"内存芯片轮动反映AI产业链整体景气度，NVDA作为核心受益者无需因细分领域轮动过度减仓\"\n  ],\n  \"risk_assessment\": \"短期波动风险（±15%）被PEG<1的估值安全垫和MA20支撑位对冲，机构增持与分析师上调目标价（平均$275.25）表明市场已内化长期增长预期\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "risky_history": "\nRisky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"英伟达在AI芯片领域的结构性主导地位与财务韧性构成核心支撑，短期震荡不改长期增长逻辑。技术面关键支撑位稳固且资金流持续为正，分析师目标价上调与机构增持强化基本面共识。\",\n  \"supporting_points\": [\n    \"ROE超100%、净利率55.6%的顶级盈利能力及966亿美元自由现金流，为风险敞口提供充足安全边际\",\n    \"布林带中轨与MA20形成双重支撑（48.00-48.50），突破50美元阻力位后潜在上涨空间达30%以上\"\n  ],\n  \"counter_arguments\": [\n    \"地缘政治风险已被市场部分定价，标普500六周内维持稳定显示系统性风险可控\",\n    \"内存芯片轮动反映AI产业链整体景气度，NVDA作为核心受益者无需因细分领域轮动过度减仓\"\n  ],\n  \"risk_assessment\": \"短期波动风险（±15%）被PEG<1的估值安全垫和MA20支撑位对冲，机构增持与分析师上调目标价（平均$275.25）表明市场已内化长期增长预期\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "safe_history": "",
+      "neutral_history": "",
+      "latest_speaker": "Risky",
+      "current_risky_response": "Risky Analyst: \n\n{\n  \"role\": \"risky_debator\",\n  \"stance\": \"aggressive\",\n  \"summary\": \"英伟达在AI芯片领域的结构性主导地位与财务韧性构成核心支撑，短期震荡不改长期增长逻辑。技术面关键支撑位稳固且资金流持续为正，分析师目标价上调与机构增持强化基本面共识。\",\n  \"supporting_points\": [\n    \"ROE超100%、净利率55.6%的顶级盈利能力及966亿美元自由现金流，为风险敞口提供充足安全边际\",\n    \"布林带中轨与MA20形成双重支撑（48.00-48.50），突破50美元阻力位后潜在上涨空间达30%以上\"\n  ],\n  \"counter_arguments\": [\n    \"地缘政治风险已被市场部分定价，标普500六周内维持稳定显示系统性风险可控\",\n    \"内存芯片轮动反映AI产业链整体景气度，NVDA作为核心受益者无需因细分领域轮动过度减仓\"\n  ],\n  \"risk_assessment\": \"短期波动风险（±15%）被PEG<1的估值安全垫和MA20支撑位对冲，机构增持与分析师上调目标价（平均$275.25）表明市场已内化长期增长预期\",\n  \"proposed_action\": \"INCREASE_RISK\",\n  \"confidence\": 0.85\n}",
+      "current_safe_response": "",
+      "current_neutral_response": "",
+      "judge_decision": "",
+      "count": 1
+    }
+  }
+}
