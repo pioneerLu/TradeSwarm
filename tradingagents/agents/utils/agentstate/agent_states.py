@@ -212,6 +212,7 @@ class AgentState(MessagesState):
     
     # ========== Trader 执行计划 ==========
     trader_investment_plan: Annotated[Optional[str], "Trader 生成的结构化执行计划（JSON 字符串）"]
+    strategy_skill_context: Annotated[Optional[Dict[str, Any]], "Trader 自反思动态 skill router 上下文"]
 
     # ========== 仓位信息 ==========
     current_position: Annotated[Optional[Dict[str, Any]], "当前持仓信息 {symbol: {shares, entry_price, entry_date, current_price, pnl, pnl_pct}}"]

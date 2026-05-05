@@ -199,6 +199,15 @@ class TradeSwarmSignalAlgorithm(QCAlgorithm):
         self._write_daily_snapshot(today)
 
     def _execute_signal(self, today, signal):
+        # Optional guard: cancel existing open orders before placing new ones.
+        # Prevents stale LIMIT orders from piling up across days.
+        if bool(signal.get("cancel_pending_orders")):
+            try:
+                self.Transactions.CancelOpenOrders(self.symbol)
+                self.debug(f"[{today}] CancelOpenOrders before executing new signal")
+            except Exception as e:
+                self.debug(f"[{today}] CancelOpenOrders failed: {e}")
+
         action = (signal.get("action") or "HOLD").upper()
         if action == "HOLD":
             return
@@ -272,15 +281,42 @@ class TradeSwarmSignalAlgorithm(QCAlgorithm):
 
     def _collect_pending_orders(self):
         pending = []
+        def _first_attr(obj, names, default=None):
+            for name in names:
+                if hasattr(obj, name):
+                    value = getattr(obj, name)
+                    if value is not None:
+                        return value
+            return default
+
         try:
             for ticket in self.transactions.get_open_orders():
+                order_type = _first_attr(ticket, ["order_type", "Type"])
+                direction = _first_attr(ticket, ["direction", "Direction"])
+                quantity = _first_attr(ticket, ["quantity", "Quantity"], 0)
+                order_id = _first_attr(ticket, ["order_id", "OrderId", "id", "Id"])
+
+                limit_price = _first_attr(ticket, ["limit_price", "LimitPrice"])
+                stop_price = _first_attr(ticket, ["stop_price", "StopPrice"])
+                # OrderTicket 形态可用 get(OrderField.*) 读取挂单价；Order 形态走属性读取
+                if limit_price is None and hasattr(ticket, "get"):
+                    try:
+                        limit_price = ticket.get(OrderField.LIMIT_PRICE)
+                    except Exception:
+                        limit_price = None
+                if stop_price is None and hasattr(ticket, "get"):
+                    try:
+                        stop_price = ticket.get(OrderField.STOP_PRICE)
+                    except Exception:
+                        stop_price = None
+
                 pending.append({
-                    "order_id": ticket.order_id,
-                    "type": str(ticket.order_type),
-                    "direction": str(ticket.direction),
-                    "quantity": float(ticket.quantity),
-                    "limit_price": float(ticket.get(OrderField.LIMIT_PRICE)) if ticket.order_type == OrderType.LIMIT else None,
-                    "stop_price": float(ticket.get(OrderField.STOP_PRICE)) if ticket.order_type == OrderType.STOP_MARKET else None,
+                    "order_id": int(order_id) if order_id is not None else None,
+                    "type": str(order_type) if order_type is not None else "UNKNOWN",
+                    "direction": str(direction) if direction is not None else "UNKNOWN",
+                    "quantity": float(quantity),
+                    "limit_price": float(limit_price) if limit_price is not None else None,
+                    "stop_price": float(stop_price) if stop_price is not None else None,
                 })
         except Exception:
             pass

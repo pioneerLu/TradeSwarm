@@ -21,6 +21,27 @@ def main() -> None:
     parser.add_argument("--experiment-id", type=str, default=None)
     parser.add_argument("--report-output-root", type=str, default=str(Path("storage") / "reports"))
     parser.add_argument("--graph-dump", type=str, default=str(Path("storage") / "graph_dumps"))
+    parser.add_argument("--llm-profile", type=str, default=None, help="Select llm.silicon profile from config.yaml")
+    parser.add_argument("--llm-model", type=str, default=None, help="Override model_name (e.g. THUDM/glm-4-9b-chat)")
+    parser.add_argument("--llm-temperature", type=float, default=None, help="Override temperature (float)")
+    parser.add_argument("--strategy-skills-mode", choices=("reflect", "all", "off"), default=None)
+    parser.add_argument("--strategy-skills-fallback-mode", choices=("all", "off"), default=None)
+    parser.add_argument(
+        "--force-strategy-skill",
+        choices=(
+            "strong_uptrend_skill",
+            "range_bound_skill",
+            "downtrend_skill",
+            "high_vol_uncertain_skill",
+        ),
+        default=None,
+    )
+    parser.add_argument(
+        "--current-position-pct",
+        type=float,
+        default=0.0,
+        help="Analysis mode: inject current position weight in [0,1]. Default 0.0.",
+    )
     args = parser.parse_args()
 
     dates_override = None
@@ -40,6 +61,13 @@ def main() -> None:
         enabled_analysts=[x.strip() for x in args.enabled_analysts.split(",") if x.strip()],
         experiment_id=args.experiment_id,
         report_output_root=args.report_output_root,
+        llm_profile=args.llm_profile,
+        llm_model=args.llm_model,
+        llm_temperature=args.llm_temperature,
+        current_position_pct=args.current_position_pct,
+        strategy_skills_mode=args.strategy_skills_mode,
+        strategy_skills_fallback_mode=args.strategy_skills_fallback_mode,
+        force_strategy_skill=args.force_strategy_skill,
     )
 
 

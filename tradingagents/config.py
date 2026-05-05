@@ -35,6 +35,12 @@ logger = logging.getLogger(__name__)
 _PROJECT_ROOT: Path = Path(__file__).resolve().parent.parent
 _DEFAULT_CONFIG_PATH: Path = _PROJECT_ROOT / "config" / "config.yaml"
 _DEFAULT_ENV_PATH: Path = _PROJECT_ROOT / ".env"
+_VALID_STRATEGY_SKILLS = {
+    "strong_uptrend_skill",
+    "range_bound_skill",
+    "downtrend_skill",
+    "high_vol_uncertain_skill",
+}
 
 
 # ---------------------------------------------------------------------------
@@ -177,7 +183,178 @@ def get_config(config_path: Optional[str | Path] = None) -> Dict[str, Any]:
     return config
 
 
-def get_llm(config_path: Optional[str | Path] = None):
+def get_strategy_skills_config(
+    *,
+    config_path: Optional[str | Path] = None,
+    mode_override: Optional[str] = None,
+    fallback_mode_override: Optional[str] = None,
+    force_skill_override: Optional[str] = None,
+) -> Dict[str, Any]:
+    """Resolve prompt strategy skill routing config.
+
+    Supported modes:
+    - reflect: Trader first reflects on regime/skill, then injects one selected skill.
+    - all: inject all skill playbooks.
+    - off: inject no skill playbook.
+    """
+    cfg_file = Path(config_path).resolve() if config_path else _DEFAULT_CONFIG_PATH
+    config: Dict[str, Any] = {}
+    if cfg_file.exists():
+        with open(cfg_file, "r", encoding="utf-8") as f:
+            config = yaml.safe_load(f) or {}
+    skills_cfg = config.get("strategy_skills", {}) if isinstance(config, dict) else {}
+    skills_cfg = skills_cfg if isinstance(skills_cfg, dict) else {}
+
+    mode = (
+        mode_override
+        or os.getenv("TRADESWARM_STRATEGY_SKILLS_MODE")
+        or skills_cfg.get("mode")
+        or "reflect"
+    )
+    fallback_mode = (
+        fallback_mode_override
+        or os.getenv("TRADESWARM_STRATEGY_SKILLS_FALLBACK_MODE")
+        or skills_cfg.get("fallback_mode")
+        or "off"
+    )
+    force_skill = (
+        force_skill_override
+        or os.getenv("TRADESWARM_FORCE_STRATEGY_SKILL")
+        or skills_cfg.get("force_skill")
+        or None
+    )
+
+    mode = str(mode).strip().lower()
+    fallback_mode = str(fallback_mode).strip().lower()
+    force_skill = str(force_skill).strip().lower() if force_skill is not None else None
+    if force_skill in {"", "none", "null", "off"}:
+        force_skill = None
+    if mode not in {"reflect", "all", "off"}:
+        raise ValueError("strategy_skills.mode must be one of: reflect, all, off")
+    if fallback_mode not in {"all", "off"}:
+        raise ValueError("strategy_skills.fallback_mode must be one of: all, off")
+    if force_skill is not None and force_skill not in _VALID_STRATEGY_SKILLS:
+        raise ValueError(
+            "strategy_skills.force_skill must be one of: "
+            + ", ".join(sorted(_VALID_STRATEGY_SKILLS))
+        )
+
+    return {"mode": mode, "fallback_mode": fallback_mode, "force_skill": force_skill}
+
+
+def resolve_llm_config(
+    *,
+    config_path: Optional[str | Path] = None,
+    profile: Optional[str] = None,
+    model_override: Optional[str] = None,
+    temperature_override: Optional[float] = None,
+) -> Dict[str, Any]:
+    """
+    解析最终生效的 LLM 配置（SiliconFlow OpenAI-compatible）。
+
+    支持 llm.silicon.profiles/default_profile，并允许 CLI/ENV 覆盖。
+
+    优先级：
+    1) model_override（CLI --llm-model）
+    2) profile（CLI --llm-profile）
+    3) 环境变量 SILICON_MODEL
+    4) llm.silicon.default_profile
+    5) 旧字段 llm.silicon.model_name
+    6) 默认 Qwen/Qwen3-32B
+    """
+    cfg_file = Path(config_path).resolve() if config_path else _DEFAULT_CONFIG_PATH
+    if not cfg_file.exists():
+        raise FileNotFoundError(f"配置文件不存在: {cfg_file}")
+
+    repo_dotenv = cfg_file.parent.parent / ".env"
+    if repo_dotenv.is_file():
+        load_dotenv(repo_dotenv, override=True)
+
+    with open(cfg_file, "r", encoding="utf-8") as f:
+        config = yaml.safe_load(f) or {}
+
+    llm_config = config.get("llm", {}) if isinstance(config, dict) else {}
+    silicon_cfg = (llm_config.get("silicon", {}) or {}) if isinstance(llm_config, dict) else {}
+
+    profiles = silicon_cfg.get("profiles") if isinstance(silicon_cfg, dict) else None
+    profiles = profiles if isinstance(profiles, dict) else {}
+    default_profile = (silicon_cfg.get("default_profile") if isinstance(silicon_cfg, dict) else None) or None
+
+    requested_profile = (profile or "").strip() or None
+    env_model = (os.getenv("SILICON_MODEL") or "").strip() or None
+
+    model_name: str = ""
+    temperature: Optional[float] = None
+    used_profile: Optional[str] = None
+
+    if model_override and str(model_override).strip():
+        model_name = str(model_override).strip()
+    else:
+        if requested_profile:
+            prof_cfg = profiles.get(requested_profile)
+            prof_model = (prof_cfg.get("model_name") if isinstance(prof_cfg, dict) else None) or ""
+            if not str(prof_model).strip():
+                available = sorted([k for k, v in profiles.items() if isinstance(v, dict) and str(v.get("model_name") or "").strip()])
+                raise ValueError(
+                    f"未知或无效的 LLM profile: {requested_profile}. "
+                    f"请在 config.yaml 的 llm.silicon.profiles 中配置该 profile。"
+                    + (f" 可用 profiles: {available}" if available else " 当前未配置任何有效 profiles。")
+                )
+
+        prof_key = requested_profile or (str(default_profile).strip() if default_profile else None)
+        prof_cfg = profiles.get(prof_key) if prof_key else None
+        if isinstance(prof_cfg, dict) and str(prof_cfg.get("model_name") or "").strip():
+            model_name = str(prof_cfg.get("model_name")).strip()
+            used_profile = prof_key
+            try:
+                temperature = float(prof_cfg.get("temperature")) if prof_cfg.get("temperature") is not None else None
+            except Exception:
+                temperature = None
+        elif env_model:
+            model_name = env_model
+        else:
+            model_name = str(silicon_cfg.get("model_name") or "").strip() or "Qwen/Qwen3-32B"
+
+    if temperature_override is not None:
+        try:
+            temperature = float(temperature_override)
+        except Exception:
+            temperature = None
+
+    if temperature is None:
+        temperature = silicon_cfg.get("temperature", llm_config.get("temperature", 0.1))
+        try:
+            temperature = float(temperature)
+        except Exception:
+            temperature = 0.1
+
+    silicon_triple = env_silicon_keys_and_base(silicon_cfg.get("base_url"))
+    if not silicon_triple:
+        raise ValueError(
+            "未找到 Silicon 凭证：请在 .env 中配置 Silicon_API_KEY"
+            "（及可选 base_url_silicon）；"
+            '支持单 key、逗号分隔或 JSON 列表如 ["sk-a","sk-b"]'
+        )
+    api_keys, base_url = silicon_triple
+
+    return {
+        "provider": "siliconflow",
+        # Only record a profile when we actually resolved settings from it.
+        "profile": used_profile,
+        "model_name": model_name,
+        "temperature": float(temperature),
+        "base_url": base_url,
+        "api_keys": api_keys,
+    }
+
+
+def get_llm(
+    config_path: Optional[str | Path] = None,
+    *,
+    profile: Optional[str] = None,
+    model_override: Optional[str] = None,
+    temperature_override: Optional[float] = None,
+):
     """Create a ``ChatOpenAI`` instance from the project config (Silicon Flow).
 
     Supports multi-key failover when multiple keys are supplied in
@@ -197,34 +374,16 @@ def get_llm(config_path: Optional[str | Path] = None):
     import httpx
 
     cfg_file = Path(config_path).resolve() if config_path else _DEFAULT_CONFIG_PATH
-    if not cfg_file.exists():
-        raise FileNotFoundError(f"配置文件不存在: {cfg_file}")
-
-    repo_dotenv = cfg_file.parent.parent / ".env"
-    if repo_dotenv.is_file():
-        load_dotenv(repo_dotenv, override=True)
-
-    with open(cfg_file, "r", encoding="utf-8") as f:
-        config = yaml.safe_load(f)
-
-    llm_config = config.get("llm", {})
-    silicon_cfg = llm_config.get("silicon", {}) or {}
-    silicon_triple = env_silicon_keys_and_base(silicon_cfg.get("base_url"))
-
-    if not silicon_triple:
-        raise ValueError(
-            "未找到 Silicon 凭证：请在 .env 中配置 Silicon_API_KEY"
-            "（及可选 base_url_silicon）；"
-            '支持单 key、逗号分隔或 JSON 列表如 ["sk-a","sk-b"]'
-        )
-
-    api_keys, base_url = silicon_triple
-    model_name = (
-        os.getenv("SILICON_MODEL")
-        or silicon_cfg.get("model_name")
-        or "Qwen/Qwen3-32B"
+    resolved = resolve_llm_config(
+        config_path=cfg_file,
+        profile=profile,
+        model_override=model_override,
+        temperature_override=temperature_override,
     )
-    temperature = silicon_cfg.get("temperature", llm_config.get("temperature", 0.1))
+    api_keys = resolved["api_keys"]
+    base_url = resolved["base_url"]
+    model_name = resolved["model_name"]
+    temperature = resolved["temperature"]
 
     use_proxy = _llm_proxy_enabled()
     if use_proxy:
@@ -258,6 +417,29 @@ def get_llm(config_path: Optional[str | Path] = None):
         llm = primary.with_fallbacks(fallbacks)
     logger.info("[LLM] Silicon 检测到 %d 个 API key，已启用故障转移", len(api_keys))
     return llm
+
+
+def get_llm_metadata(
+    *,
+    config_path: Optional[str | Path] = None,
+    profile: Optional[str] = None,
+    model_override: Optional[str] = None,
+    temperature_override: Optional[float] = None,
+) -> Dict[str, Any]:
+    """返回最终生效的 LLM 配置（不创建网络连接），用于写入结果文件便于复现。"""
+    resolved = resolve_llm_config(
+        config_path=config_path,
+        profile=profile,
+        model_override=model_override,
+        temperature_override=temperature_override,
+    )
+    return {
+        "provider": resolved.get("provider"),
+        "profile": resolved.get("profile"),
+        "model_name": resolved.get("model_name"),
+        "temperature": resolved.get("temperature"),
+        "base_url": resolved.get("base_url"),
+    }
 
 
 def get_graph_debate_rounds(

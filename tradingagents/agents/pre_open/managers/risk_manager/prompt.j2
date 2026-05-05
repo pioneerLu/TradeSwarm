@@ -27,9 +27,38 @@ Trader 当前计划：
 3. 如果 Trader 方向明确且未发现重大失控风险，应尽量保持方向一致，通过仓位和风控参数表达谨慎程度。
 4. 输出清晰的 `final_decision`、`fine_rating`、仓位建议和风控参数。
 
+执行约束（务必遵守）：
+1. 你必须检查 Trader 的 `market_regime` / `selected_skill` 是否与 analyst 输入、当前仓位和组合状态一致；如果不一致，可以修正为更合适的 regime/skill，并在 `rationale` 中说明。
+2. 你必须使用同一套 skill 规则复核 Trader 的选择，并按被确认的 skill 调整仓位、止损、止盈和再评估条件。
+
+{% if strategy_skill_context %}
+Trader 第一段自反思上下文：
+- mode: {{ strategy_skill_context.skill_router_mode }}
+- effective_mode: {{ strategy_skill_context.skill_router_effective_mode }}
+- reflection_market_regime: {{ strategy_skill_context.reflection_market_regime }}
+- reflection_selected_skill: {{ strategy_skill_context.reflection_selected_skill }}
+- reflection_confidence: {{ strategy_skill_context.reflection_confidence }}
+- reflection_evidence: {{ strategy_skill_context.reflection_evidence }}
+{% endif %}
+
+{% if strategy_skill_rules_text %}
+本次注入给 Trader 的 strategy skill 规则如下，请用同一套规则复核：
+
+{{ strategy_skill_rules_text }}
+{% else %}
+本次 Trader 未注入外部 strategy skill。你仍必须独立复核其 `market_regime` / `selected_skill` 是否与证据一致。
+{% endif %}
+
+3. **止盈规则要结构化**：不要只写“觉得涨多了”。请用可执行条件描述，例如“盈利达到 X% 且出现趋势破坏信号（如跌破短期均线/关键支撑）才止盈；否则继续持有或分批止盈”。
+4. **与 Trader 一致优先**：Trader 给出 BUY 且风险不高时，优先通过 `position_size` 限制风险，而不是简单改成 HOLD 或 SELL。
+
 现在请严格返回一个合法 JSON，对象结构必须如下，不要输出 JSON 之外的任何文字：
 {
   "role": "risk_manager",
+  "market_regime": "strong_uptrend 或 range_bound 或 downtrend 或 high_vol_uncertain",
+  "selected_skill": "strong_uptrend_skill 或 range_bound_skill 或 downtrend_skill 或 high_vol_uncertain_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": ["证据 1", "证据 2"],
   "final_decision": "BUY 或 SELL 或 HOLD",
   "fine_rating": "Buy 或 Overweight 或 Hold 或 Underweight 或 Sell",
   "summary": "2-3 句中文执行摘要",

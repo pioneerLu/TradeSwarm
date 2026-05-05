@@ -28,6 +28,21 @@ def main() -> None:
     parser.add_argument("--graph-dump", type=str, default=None)
     parser.add_argument("--max-research-debate-rounds", type=int, default=None)
     parser.add_argument("--max-risk-debate-rounds", type=int, default=None)
+    parser.add_argument("--llm-profile", type=str, default=None)
+    parser.add_argument("--llm-model", type=str, default=None)
+    parser.add_argument("--llm-temperature", type=float, default=None)
+    parser.add_argument("--strategy-skills-mode", choices=("reflect", "all", "off"), default=None)
+    parser.add_argument("--strategy-skills-fallback-mode", choices=("all", "off"), default=None)
+    parser.add_argument(
+        "--force-strategy-skill",
+        choices=(
+            "strong_uptrend_skill",
+            "range_bound_skill",
+            "downtrend_skill",
+            "high_vol_uncertain_skill",
+        ),
+        default=None,
+    )
     parser.add_argument("-v", "--verbose", action="store_true")
     args = parser.parse_args()
 

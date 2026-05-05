@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import argparse
 import runpy
@@ -32,6 +32,22 @@ def main() -> None:
     parser.add_argument("--max-risk-debate-rounds", type=int, default=None)
     parser.add_argument("--simulate-portfolio", action="store_true")
     parser.add_argument("--initial-cash", type=float, default=100_000.0)
+    parser.add_argument("--llm-profile", type=str, default=None)
+    parser.add_argument("--llm-model", type=str, default=None)
+    parser.add_argument("--llm-temperature", type=float, default=None)
+    parser.add_argument("--strategy-skills-mode", choices=("reflect", "all", "off"), default=None)
+    parser.add_argument("--strategy-skills-fallback-mode", choices=("all", "off"), default=None)
+    parser.add_argument(
+        "--force-strategy-skill",
+        choices=(
+            "strong_uptrend_skill",
+            "range_bound_skill",
+            "downtrend_skill",
+            "high_vol_uncertain_skill",
+        ),
+        default=None,
+    )
+    parser.add_argument("--current-position-pct", type=float, default=0.0)
     parser.add_argument("--verbose", action="store_true")
     parser.add_argument("--use-db-reports-only", action="store_true", default=True)
     parser.add_argument("--no-db-reports-only", action="store_false", dest="use_db_reports_only")

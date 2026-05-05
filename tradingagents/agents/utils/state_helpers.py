@@ -97,6 +97,7 @@ def format_position_info(current_position: Optional[Dict[str, Any]]) -> str:
     """Format current_position dict into a human-readable text block."""
     if not current_position:
         return "\nCurrent position: none\n"
+    weight = current_position.get("weight")
     shares = current_position.get("shares") or 0.0
     entry_price = current_position.get("entry_price") or 0.0
     entry_date = current_position.get("entry_date") or ""
@@ -107,8 +108,17 @@ def format_position_info(current_position: Optional[Dict[str, Any]]) -> str:
     sl_str = f"${sl_raw:.2f}" if sl_raw is not None else "Not set"
     tp_raw = current_position.get("take_profit_price")
     tp_str = f"${tp_raw:.2f}" if tp_raw is not None else "Not set"
+    weight_line = ""
+    if weight is not None:
+        try:
+            w = float(weight)
+            if 0.0 <= w <= 1.0:
+                weight_line = f"- Position weight: {w * 100.0:.1f}%\n"
+        except Exception:
+            weight_line = ""
     return (
         f"\nCurrent position:\n"
+        f"{weight_line}"
         f"- Shares: {shares:.0f}\n"
         f"- Entry price: ${entry_price:.2f}\n"
         f"- Entry date: {entry_date}\n"
@@ -128,12 +138,28 @@ def format_portfolio_info(portfolio_state: Optional[Dict[str, Any]]) -> str:
     cash = portfolio_state.get("cash") or 0.0
     positions_value = portfolio_state.get("positions_value") or 0.0
     total_return = portfolio_state.get("total_return") or 0.0
+    bh_cum = portfolio_state.get("benchmark_buy_hold_cum_return")
+    alpha = portfolio_state.get("alpha_vs_buy_hold")
+    bh_line = ""
+    alpha_line = ""
+    try:
+        if bh_cum is not None:
+            bh_line = f"- Buy & Hold (cum): {float(bh_cum) * 100.0:.2f}%\n"
+    except Exception:
+        bh_line = ""
+    try:
+        if alpha is not None:
+            alpha_line = f"- Alpha vs B&H (cum): {float(alpha) * 100.0:.2f}%\n"
+    except Exception:
+        alpha_line = ""
     return (
         f"\nPortfolio state:\n"
         f"- Total value: ${total_value:,.2f}\n"
         f"- Cash: ${cash:,.2f}\n"
         f"- Positions value: ${positions_value:,.2f}\n"
         f"- Total return: {total_return:.2f}%\n"
+        f"{bh_line}"
+        f"{alpha_line}"
     )
 
 

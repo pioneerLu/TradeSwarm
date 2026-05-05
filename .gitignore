@@ -125,9 +125,14 @@ dmypy.json
 # IDE and editor files
 .vscode/
 .idea/
+.cursor/
 *.swp
 *.swo
 *~
+
+# Only keep the root project README on GitHub
+*.md
+!README.md
 
 # macOS system files
 .DS_Store
@@ -149,6 +154,7 @@ data/*.pkl
 data/*.parquet
 cache/
 data_cache/
+chroma_db/
 logs/
 *.log
 
@@ -201,6 +207,9 @@ api_failures_report.txt
 # Research output and reports
 research_output/
 reports/
+appendices/
+exp_res/
+local_outputs/
 *.pdf
 *.xlsx
 
@@ -209,6 +218,12 @@ reports/
 !demo_data.db
 *.sqlite
 *.sqlite3
+
+# Runtime generated experiment artifacts
+storage/
+graph_outputs/
+test_results/
+backtest_results_v0/
 
 # Time series data files
 *.hdf5

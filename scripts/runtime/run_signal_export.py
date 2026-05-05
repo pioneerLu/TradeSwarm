@@ -24,14 +24,44 @@ from pathlib import Path
 from textwrap import dedent
 from typing import Any, Dict, List, Optional
 
+from jinja2 import Environment, FileSystemLoader, select_autoescape
+
 REPO_ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(REPO_ROOT))
 
 from tradingagents.agents.utils.agentstate.agent_states import AgentState  # noqa: E402
 from tradingagents.agents.utils.hybrid_memory import create_hybrid_trading_memory  # noqa: E402
 from tradingagents.core.data_adapter import DataAdapter  # noqa: E402
+from tradingagents.config import get_llm_metadata, get_strategy_skills_config  # noqa: E402
 
 DEFAULT_ENABLED_ANALYSTS = ("market", "news", "sentiment", "fundamentals")
+
+
+def _apply_strategy_skills_env(
+    strategy_skills_mode: Optional[str],
+    strategy_skills_fallback_mode: Optional[str],
+    force_strategy_skill: Optional[str] = None,
+) -> Dict[str, Optional[str]]:
+    previous = {
+        "TRADESWARM_STRATEGY_SKILLS_MODE": os.environ.get("TRADESWARM_STRATEGY_SKILLS_MODE"),
+        "TRADESWARM_STRATEGY_SKILLS_FALLBACK_MODE": os.environ.get("TRADESWARM_STRATEGY_SKILLS_FALLBACK_MODE"),
+        "TRADESWARM_FORCE_STRATEGY_SKILL": os.environ.get("TRADESWARM_FORCE_STRATEGY_SKILL"),
+    }
+    if strategy_skills_mode is not None:
+        os.environ["TRADESWARM_STRATEGY_SKILLS_MODE"] = strategy_skills_mode
+    if strategy_skills_fallback_mode is not None:
+        os.environ["TRADESWARM_STRATEGY_SKILLS_FALLBACK_MODE"] = strategy_skills_fallback_mode
+    if force_strategy_skill is not None:
+        os.environ["TRADESWARM_FORCE_STRATEGY_SKILL"] = force_strategy_skill
+    return previous
+
+
+def _restore_strategy_skills_env(previous: Dict[str, Optional[str]]) -> None:
+    for key, value in previous.items():
+        if value is None:
+            os.environ.pop(key, None)
+        else:
+            os.environ[key] = value
 
 
 def _get_runtime_dependencies() -> Dict[str, Any]:
@@ -122,6 +152,108 @@ def _extract_report_sections(final_state: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
+def _json_pretty(value: Any) -> str:
+    return json.dumps(value or {}, ensure_ascii=False, indent=2, default=str)
+
+
+def _compact_llm_summary(llm_metadata: Optional[Dict[str, Any]]) -> str:
+    if not llm_metadata:
+        return "-"
+    profile = llm_metadata.get("profile") or llm_metadata.get("used_profile") or "-"
+    model = llm_metadata.get("model_name") or llm_metadata.get("model") or "-"
+    temperature = llm_metadata.get("temperature")
+    return f"{profile} / {model} / temp={temperature}"
+
+
+def _build_report_html_context(payload: Dict[str, Any]) -> Dict[str, Any]:
+    skill_ctx = payload.get("strategy_skill_context")
+    skill_ctx = skill_ctx if isinstance(skill_ctx, dict) else {}
+    execution_payload = payload.get("execution_payload")
+    execution_payload = execution_payload if isinstance(execution_payload, dict) else {}
+
+    regime_badges = []
+    for key in (
+        "market_regime",
+        "selected_skill",
+        "regime_confidence",
+        "skill_router_mode",
+        "forced_selected_skill",
+        "reflection_market_regime",
+        "reflection_selected_skill",
+        "reflection_confidence",
+    ):
+        value = execution_payload.get(key)
+        if value is None:
+            value = skill_ctx.get(key)
+        if value is not None and value != "":
+            regime_badges.append(f"{key}: {value}")
+
+    return {
+        **payload,
+        "llm_summary": _compact_llm_summary(payload.get("llm")),
+        "skill_summary": (
+            f"{skill_ctx.get('skill_router_mode') or '-'}"
+            f" / {skill_ctx.get('forced_selected_skill') or skill_ctx.get('reflection_selected_skill') or '-'}"
+        ),
+        "input_position_json": _json_pretty(payload.get("input_position")),
+        "execution_payload_json": _json_pretty(payload.get("execution_payload")),
+        "research_investment_plan": payload.get("research_investment_plan") or "-",
+        "trader_investment_plan": payload.get("trader_investment_plan") or "-",
+        "risk_final_trade_decision": payload.get("risk_final_trade_decision") or "-",
+        "regime_badges": regime_badges,
+    }
+
+
+def _write_report_html_and_pdf(base_dir: Path, payload: Dict[str, Any]) -> None:
+    template_dir = Path(__file__).parent / "templates"
+    env = Environment(
+        loader=FileSystemLoader(str(template_dir)),
+        autoescape=select_autoescape(("html", "xml")),
+    )
+    html = env.get_template("report.html.j2").render(**_build_report_html_context(payload))
+
+    html_path = base_dir / "report.html"
+    html_path.write_text(html, encoding="utf-8")
+
+    try:
+        from weasyprint import HTML  # type: ignore
+    except Exception:
+        HTML = None  # type: ignore[assignment]
+
+    try:
+        if HTML is not None:
+            HTML(filename=str(html_path)).write_pdf(str(base_dir / "report.pdf"))
+            return
+    except Exception as e:
+        print(f"  [WARN] weasyprint 导出 PDF 失败: {e}")
+
+    # Fallback: use Playwright (Chromium) to print PDF on Windows without native Cairo deps.
+    try:
+        from playwright.sync_api import sync_playwright  # type: ignore
+    except Exception:
+        print(
+            "  [WARN] report.html 已生成；如需 PDF：\n"
+            "         方案A(推荐): pip install \"[pdf_playwright]\" 并执行: python -m playwright install chromium\n"
+            "         方案B: 按 WeasyPrint 文档安装 cairo/pango 等系统依赖后重跑"
+        )
+        return
+
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch()
+            page = browser.new_page()
+            page.goto(html_path.as_uri(), wait_until="networkidle")
+            page.pdf(
+                path=str(base_dir / "report.pdf"),
+                format="A4",
+                print_background=True,
+                margin={"top": "18mm", "bottom": "18mm", "left": "16mm", "right": "16mm"},
+            )
+            browser.close()
+    except Exception as e:
+        print(f"  [WARN] playwright 导出 PDF 失败: {e}")
+
+
 def _write_report_artifacts(
     report_output_root: str,
     experiment_id: str,
@@ -131,6 +263,8 @@ def _write_report_artifacts(
     final_state: Dict[str, Any],
     export_mode: str,
     execution_payload: Optional[Dict[str, Any]] = None,
+    llm_metadata: Optional[Dict[str, Any]] = None,
+    input_position: Optional[Dict[str, Any]] = None,
 ) -> None:
     base_dir = Path(report_output_root) / experiment_id / symbol / trade_date
     base_dir.mkdir(parents=True, exist_ok=True)
@@ -141,6 +275,9 @@ def _write_report_artifacts(
         "experiment_id": experiment_id,
         "enabled_analysts": enabled_analysts,
         "export_mode": export_mode,
+        "llm": llm_metadata,
+        "input_position": input_position,
+        "strategy_skill_context": final_state.get("strategy_skill_context"),
         **_extract_report_sections(final_state),
         "execution_payload": execution_payload,
     }
@@ -172,6 +309,8 @@ def _write_report_artifacts(
 
     with open(base_dir / "report.txt", "w", encoding="utf-8") as f:
         f.write(text + "\n")
+
+    _write_report_html_and_pdf(base_dir, payload)
 
 
 def get_trading_dates(start_date: str, end_date: str, data_adapter: DataAdapter) -> List[str]:
@@ -249,6 +388,8 @@ def extract_rating_record(
     if isinstance(risk, dict):
         fd = (risk.get("final_trade_decision") or "").strip()
     kj = extract_json_from_text(fd) if fd else None
+    skill_ctx = final_state.get("strategy_skill_context")
+    skill_ctx = skill_ctx if isinstance(skill_ctx, dict) else {}
 
     return {
         "date": trade_date,
@@ -258,6 +399,16 @@ def extract_rating_record(
         "fine_rating": (kj or {}).get("fine_rating") if kj else None,
         "final_decision": (kj or {}).get("final_decision") if kj else None,
         "risk_level": (kj or {}).get("risk_level") if kj else None,
+        "market_regime": (kj or {}).get("market_regime") if kj else None,
+        "selected_skill": (kj or {}).get("selected_skill") if kj else None,
+        "regime_confidence": (kj or {}).get("regime_confidence") if kj else None,
+        "regime_evidence": (kj or {}).get("regime_evidence") if kj else [],
+        "skill_router_mode": skill_ctx.get("skill_router_mode"),
+        "forced_selected_skill": skill_ctx.get("forced_selected_skill"),
+        "reflection_market_regime": skill_ctx.get("reflection_market_regime"),
+        "reflection_selected_skill": skill_ctx.get("reflection_selected_skill"),
+        "reflection_confidence": skill_ctx.get("reflection_confidence"),
+        "reflection_evidence": skill_ctx.get("reflection_evidence") or [],
     }
 
 
@@ -416,11 +567,20 @@ def run_signal_export(
     max_research_debate_rounds: Optional[int] = None,
     max_risk_debate_rounds: Optional[int] = None,
     prompt_log_path: Optional[str] = None,
+    llm_profile: Optional[str] = None,
+    llm_model: Optional[str] = None,
+    llm_temperature: Optional[float] = None,
+    current_position_pct: float = 0.0,
+    strategy_skills_mode: Optional[str] = None,
+    strategy_skills_fallback_mode: Optional[str] = None,
+    force_strategy_skill: Optional[str] = None,
 ) -> Dict[str, Any]:
     """Export ratings or executable backtest signals from prepared analyst data."""
 
     if export_mode not in ("backtest", "rating"):
         raise ValueError("export_mode must be either backtest or rating")
+
+    _apply_strategy_skills_env(strategy_skills_mode, strategy_skills_fallback_mode, force_strategy_skill)
 
     print(f"\n{'='*80}")
     if export_mode == "rating":
@@ -468,7 +628,29 @@ def run_signal_export(
     stream_graph_updates_with_dump = runtime["stream_graph_updates_with_dump"]
 
     _cfg = str(REPO_ROOT / "config" / "config.yaml")
-    llm = load_llm_from_config(_cfg)
+    llm = load_llm_from_config(
+        _cfg,
+        llm_profile=llm_profile,
+        llm_model=llm_model,
+        llm_temperature=llm_temperature,
+    )
+    llm_meta = get_llm_metadata(
+        config_path=_cfg,
+        profile=llm_profile,
+        model_override=llm_model,
+        temperature_override=llm_temperature,
+    )
+    strategy_skills_meta = get_strategy_skills_config(
+        config_path=_cfg,
+        mode_override=strategy_skills_mode,
+        fallback_mode_override=strategy_skills_fallback_mode,
+        force_skill_override=force_strategy_skill,
+    )
+    print(
+        "Strategy skills: "
+        f"mode={strategy_skills_meta['mode']} fallback={strategy_skills_meta['fallback_mode']} "
+        f"force={strategy_skills_meta.get('force_skill') or '-'}"
+    )
     stream_cfg: Optional[Dict[str, Any]] = None
     analyst_context_trace_path: Optional[str] = None
     if prompt_log_path:
@@ -579,7 +761,30 @@ def run_signal_export(
                 cp, ps = sim.to_agent_fields(trade_date, mark_price)
                 is_holding = sim.is_holding(mark_price)
             elif export_mode == "rating":
-                cp, ps = None, None
+                # Analysis mode: allow user to inject a current position weight.
+                try:
+                    pct = float(current_position_pct)
+                except Exception:
+                    pct = 0.0
+                pct = max(0.0, min(1.0, pct))
+                if pct > 0:
+                    ps = {
+                        "total_value": float(initial_cash),
+                        "cash": float(initial_cash) * (1.0 - pct),
+                        "positions_value": float(initial_cash) * pct,
+                        "total_return": 0.0,
+                    }
+                    cp = {
+                        "shares": 1.0,  # placeholder: prompt should prefer weight in analysis mode
+                        "entry_price": 0.0,
+                        "entry_date": "",
+                        "current_price": float(mark_price) if mark_price is not None else 0.0,
+                        "pnl": 0.0,
+                        "pnl_pct": 0.0,
+                        "weight": pct,
+                    }
+                else:
+                    cp, ps = None, None
 
             initial_state: AgentState = {
                 "company_of_interest": symbol,
@@ -634,6 +839,8 @@ def run_signal_export(
                         final_state=final_state,
                         export_mode=export_mode,
                         execution_payload=rec,
+                        llm_metadata=llm_meta,
+                        input_position={"current_position_pct": float(current_position_pct), "source": "cli"},
                     )
                 rd = rec.get("research_decision") or "?"
                 fd = rec.get("final_decision") or "?"
@@ -658,6 +865,7 @@ def run_signal_export(
                     final_state=final_state,
                     export_mode=export_mode,
                     execution_payload=signal,
+                    llm_metadata=llm_meta,
                 )
 
             if sim is not None:
@@ -732,6 +940,9 @@ def run_signal_export(
             "end_date": meta_end,
             "experiment_id": experiment_id,
             "enabled_analysts": enabled_analysts,
+            "llm": llm_meta,
+            "strategy_skills": strategy_skills_meta,
+            "input_position": {"current_position_pct": float(current_position_pct), "source": "cli"},
             "by_date": all_signals,
         }
         out_file = _resolve_output_file(output_dir, experiment_id, symbol, "ratings.json")
@@ -749,6 +960,8 @@ def run_signal_export(
             "end_date": meta_end,
             "experiment_id": experiment_id,
             "enabled_analysts": enabled_analysts,
+            "llm": llm_meta,
+            "strategy_skills": strategy_skills_meta,
             "signals": all_signals,
             "by_execution_date": by_execution_date,
         }
@@ -836,6 +1049,38 @@ def main() -> None:
         help="Append LLM prompts/responses to this file; also writes analyst_context_trace.jsonl "
         "next to it (each get_prompt_context_from_summaries call: full enabled_analysts_text + active_analyst_blocks).",
     )
+    parser.add_argument("--llm-profile", type=str, default=None, help="Select llm.silicon profile from config.yaml")
+    parser.add_argument("--llm-model", type=str, default=None, help="Override model_name (e.g. THUDM/glm-4-9b-chat)")
+    parser.add_argument("--llm-temperature", type=float, default=None, help="Override temperature (float)")
+    parser.add_argument(
+        "--strategy-skills-mode",
+        choices=("reflect", "all", "off"),
+        default=None,
+        help="Override strategy_skills.mode from config.yaml",
+    )
+    parser.add_argument(
+        "--strategy-skills-fallback-mode",
+        choices=("all", "off"),
+        default=None,
+        help="Fallback when reflect mode cannot parse a valid skill",
+    )
+    parser.add_argument(
+        "--force-strategy-skill",
+        choices=(
+            "strong_uptrend_skill",
+            "range_bound_skill",
+            "downtrend_skill",
+            "high_vol_uncertain_skill",
+        ),
+        default=None,
+        help="Override the reflected selected skill while keeping reflection metadata.",
+    )
+    parser.add_argument(
+        "--current-position-pct",
+        type=float,
+        default=0.0,
+        help="Analysis mode only (export-mode=rating): inject current position weight in [0,1]. Default 0.0.",
+    )
     args = parser.parse_args()
 
     dates_override = None
@@ -864,6 +1109,13 @@ def main() -> None:
         max_research_debate_rounds=args.max_research_debate_rounds,
         max_risk_debate_rounds=args.max_risk_debate_rounds,
         prompt_log_path=args.prompt_log,
+        llm_profile=args.llm_profile,
+        llm_model=args.llm_model,
+        llm_temperature=args.llm_temperature,
+        current_position_pct=args.current_position_pct,
+        strategy_skills_mode=args.strategy_skills_mode,
+        strategy_skills_fallback_mode=args.strategy_skills_fallback_mode,
+        force_strategy_skill=args.force_strategy_skill,
     )
 
 

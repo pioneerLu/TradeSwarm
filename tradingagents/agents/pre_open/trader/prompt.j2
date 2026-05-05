@@ -14,10 +14,43 @@
 2. 结合历史经验和本次启用 analyst 的综合输入，判断应该顺势、逆势还是暂缓。
 3. 生成结构化交易指令，供下游风险管理继续审查。
 
+动态 Skill Router（务必先选择一个，再生成交易计划）：
+1. 你必须先根据 analyst 输入、当前仓位、组合状态、Alpha vs B&H、风险线索判断 `market_regime`：
+   - `strong_uptrend`：价格创新高/均线多头/上升通道/研究共识偏多/回撤浅。
+   - `range_bound`：价格在支撑阻力区间内反复，趋势不明确，适合低吸高抛。
+   - `downtrend`：跌破关键均线/低点下移/负面共识增强/反弹失败。
+   - `high_vol_uncertain`：财报、宏观、监管、跳空、大幅波动或信息分歧导致不确定性显著上升。
+2. 你必须只选择一个 `selected_skill`，并让 action、target_pct、entry_type 与该 skill 一致。
+
+{% if strategy_skill_context %}
+Trader 第一段自反思结果：
+- mode: {{ strategy_skill_context.skill_router_mode }}
+- effective_mode: {{ strategy_skill_context.skill_router_effective_mode }}
+- reflection_market_regime: {{ strategy_skill_context.reflection_market_regime }}
+- reflection_selected_skill: {{ strategy_skill_context.reflection_selected_skill }}
+- reflection_confidence: {{ strategy_skill_context.reflection_confidence }}
+- reflection_evidence: {{ strategy_skill_context.reflection_evidence }}
+{% endif %}
+
+{% if strategy_skill_rules_text %}
+本次注入的 strategy skill 详细规则如下：
+
+{{ strategy_skill_rules_text }}
+{% else %}
+本次未注入外部 strategy skill。你仍必须基于自身判断输出 `market_regime` 和 `selected_skill`，并让 action、target_pct、entry_type 与你的判断一致。
+{% endif %}
+
+3. **target_pct 与信心绑定**：summary/comment 中必须明确“信心：低/中/高”，且与 `target_pct` 匹配。
+4. **避免频繁反手与过早清仓**：除非有明确“交易失效条件”触发，否则不要因为短期回撤就直接 SELL MKT 清仓。
+
 请严格返回一个合法 JSON，对象结构必须如下，不要输出 JSON 之外的任何文字：
 {% raw %}
 {
   "role": "trader",
+  "market_regime": "strong_uptrend 或 range_bound 或 downtrend 或 high_vol_uncertain",
+  "selected_skill": "strong_uptrend_skill 或 range_bound_skill 或 downtrend_skill 或 high_vol_uncertain_skill",
+  "regime_confidence": 0.75,
+  "regime_evidence": ["证据 1", "证据 2"],
   "action": "BUY 或 SELL 或 HOLD",
   "target_pct": 0.35,
   "entry_type": "MKT_OPEN 或 LIMIT 或 STOP",

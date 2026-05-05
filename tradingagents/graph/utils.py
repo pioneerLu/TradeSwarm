@@ -14,9 +14,19 @@ from tradingagents.config import (
 )
 
 
-def load_llm_from_config(config_path: str = "config/config.yaml"):
-    """Backward-compatible wrapper — delegates to ``tradingagents.config.get_llm``."""
-    return get_llm(config_path)
+def load_llm_from_config(
+    config_path: str = "config/config.yaml",
+    llm_profile: str | None = None,
+    llm_model: str | None = None,
+    llm_temperature: float | None = None,
+):
+    """Wrapper — delegates to ``tradingagents.config.get_llm`` with optional overrides."""
+    return get_llm(
+        config_path,
+        profile=llm_profile,
+        model_override=llm_model,
+        temperature_override=llm_temperature,
+    )
 
 
 def load_graph_debate_rounds(config_path=None):

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 from pathlib import Path
 from typing import Dict, Any, Optional
-from jinja2 import Template, Environment, FileSystemLoader, select_autoescape
+from jinja2 import Template, Environment, FileSystemLoader
 
 
 # 模板目录路径
@@ -20,6 +20,41 @@ TEMPLATE_DIRS = {
     "trader": TEMPLATE_BASE_DIR / "trader",
     "managers": TEMPLATE_BASE_DIR / "managers",
 }
+
+
+def _render_template_file(template_path: Path, context: Dict[str, Any]) -> str:
+    """Render a pre_open template and allow includes from the same template tree."""
+    env = Environment(
+        loader=FileSystemLoader(str(TEMPLATE_BASE_DIR)),
+        autoescape=False,
+        trim_blocks=False,
+        lstrip_blocks=False,
+    )
+    template_name = template_path.relative_to(TEMPLATE_BASE_DIR).as_posix()
+    template = env.get_template(template_name)
+    return template.render(**context)
+
+
+def render_pre_open_template(relative_template_path: str, context: Optional[Dict[str, Any]] = None) -> str:
+    """Render a template by path relative to the pre_open template root."""
+    context = context or {}
+    template_path = TEMPLATE_BASE_DIR / relative_template_path
+    return _render_template_file(template_path, context)
+
+
+def _get_template_path(agent_type: str, agent_name: str) -> Path:
+    template_dir = TEMPLATE_DIRS.get(agent_type)
+    if template_dir is None:
+        raise ValueError(
+            f"未知的 agent_type: {agent_type}。"
+            f"可选值: {list(TEMPLATE_DIRS.keys())}"
+        )
+
+    if agent_type == "managers":
+        return template_dir / agent_name / "prompt.j2"
+    if agent_type == "trader":
+        return template_dir / "prompt.j2"
+    return template_dir / agent_name / "prompt.j2"
 
 
 def load_prompt_template(
@@ -54,33 +89,12 @@ def load_prompt_template(
     if context is None:
         context = {}
     
-    # 确定模板文件路径
-    template_dir = TEMPLATE_DIRS.get(agent_type)
-    if template_dir is None:
-        raise ValueError(
-            f"未知的 agent_type: {agent_type}。"
-            f"可选值: {list(TEMPLATE_DIRS.keys())}"
-        )
-    
-    # 构建模板文件路径
-    # 对于 managers，模板文件在子目录中（如 research_manager/prompt.j2）
-    # 对于 trader，模板文件直接在 trader 目录下（trader/prompt.j2）
-    if agent_type == "managers":
-        template_path = template_dir / agent_name / "prompt.j2"
-    elif agent_type == "trader":
-        # trader 的模板文件直接在 trader 目录下，不需要 agent_name 子目录
-        template_path = template_dir / "prompt.j2"
-    else:
-        template_path = template_dir / agent_name / "prompt.j2"
+    template_path = _get_template_path(agent_type, agent_name)
     
     # 尝试加载模板文件
     if template_path.exists():
         try:
-            with open(template_path, "r", encoding="utf-8") as f:
-                template_content = f.read()
-            
-            template = Template(template_content)
-            return template.render(**context)
+            return _render_template_file(template_path, context)
         except Exception as e:
             print(f"[WARN] 加载模板文件失败: {template_path}, 错误: {e}")
             print(f"[WARN] 使用 fallback prompt")
@@ -117,11 +131,4 @@ def get_template_path(agent_type: str, agent_name: str) -> Path:
     Returns:
         模板文件的 Path 对象
     """
-    template_dir = TEMPLATE_DIRS.get(agent_type)
-    if template_dir is None:
-        raise ValueError(f"未知的 agent_type: {agent_type}")
-    
-    if agent_type == "managers":
-        return template_dir / agent_name / "prompt.j2"
-    else:
-        return template_dir / agent_name / "prompt.j2"
+    return _get_template_path(agent_type, agent_name)

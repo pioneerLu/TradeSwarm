@@ -25,7 +25,7 @@ class DataAdapter:
             if start_date is None:
                 from datetime import datetime, timedelta
                 date_obj = datetime.strptime(date, "%Y-%m-%d")
-                start_date_obj = date_obj - timedelta(days=365)
+                start_date_obj = date_obj - timedelta(days=90)
                 start_date = start_date_obj.strftime("%Y-%m-%d")
             
             df = load_stock_data(symbol, start_date, date, use_cache=self.use_cache)

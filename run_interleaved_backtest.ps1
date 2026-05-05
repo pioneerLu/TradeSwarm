@@ -4,7 +4,7 @@
 # Configurable parameters (edit below):
 $Symbol       = "NVDA"
 $StartDate    = "2025-01-02"
-$EndDate      = "2025-01-10"
+$EndDate      = "2025-02-28"
 $InitialCash  = 100000
 $DbPath       = "storage\db\memory.db"
 $Analysts     = "market,news,sentiment,fundamentals"
@@ -25,14 +25,19 @@ $env:ALL_PROXY   = ""
 $env:all_proxy   = ""
 $env:PYTHONUNBUFFERED = "1"
 
-# Activate conda environment
-$condaExe = "D:\Software\Anaconda\Scripts\conda.exe"
-if (Test-Path $condaExe) {
-    & $condaExe activate langchain 2>$null
-    $env:PATH = "D:\Software\Anaconda\envs\langchain;D:\Software\Anaconda\envs\langchain\Scripts;" + $env:PATH
+# Activate conda environment via shell hook (not `conda activate`)
+$condaBase = "D:\Software\Anaconda"
+$condaEnv  = "$condaBase\envs\langchain"
+if (Test-Path "$condaBase\shell\condabin\conda-hook.ps1") {
+    . "$condaBase\shell\condabin\conda-hook.ps1"
+    conda activate langchain 2>$null
+} else {
+    $env:PATH = "$condaEnv;$condaEnv\Scripts;$condaEnv\Library\bin;$condaBase;$condaBase\Scripts;" + $env:PATH
+    $env:CONDA_DEFAULT_ENV = "langchain"
+    $env:CONDA_PREFIX = $condaEnv
 }
 
-$pythonExe = "D:\Software\Anaconda\envs\langchain\python.exe"
+$pythonExe = "$condaEnv\python.exe"
 if (-not (Test-Path $pythonExe)) {
     $pythonExe = "python"
 }

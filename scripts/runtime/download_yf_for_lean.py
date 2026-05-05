@@ -11,6 +11,19 @@ import pandas as pd
 import yfinance as yf
 
 
+def _as_1d_series(df: pd.DataFrame, col: str) -> pd.Series:
+    """
+    yfinance 在某些版本/参数下会返回 MultiIndex 列或导致 df[col] 为 DataFrame（shape: Nx1）。
+    这里统一压平成 1D Series，避免构造 DataFrame 时触发 “Data must be 1-dimensional”。
+    """
+    s = df[col]
+    if isinstance(s, pd.DataFrame):
+        if s.shape[1] == 1:
+            return s.iloc[:, 0]
+        return s.iloc[:, 0]
+    return s
+
+
 def main() -> None:
     p = argparse.ArgumentParser(description="下载 Yahoo Finance 日线到 Lean custom data")
     p.add_argument("--symbol", default="NVDA")
@@ -32,6 +45,13 @@ def main() -> None:
         progress=False,
         threads=False,
     )
+    # 若为 MultiIndex（常见于 yfinance 返回带 ticker level 的列），裁剪到单 ticker。
+    if df is not None and not df.empty and isinstance(df.columns, pd.MultiIndex):
+        try:
+            if args.symbol in df.columns.get_level_values(-1):
+                df = df.xs(args.symbol, axis=1, level=-1, drop_level=True)
+        except Exception:
+            pass
     if df is None or df.empty:
         # 备选源：Stooq（免费日线 CSV）
         stooq_symbol = f"{args.symbol.lower()}.us"
@@ -56,11 +76,11 @@ def main() -> None:
     out = pd.DataFrame(
         {
             "date": pd.to_datetime(df.index).strftime("%Y-%m-%d"),
-            "open": df["Open"].astype(float).round(6),
-            "high": df["High"].astype(float).round(6),
-            "low": df["Low"].astype(float).round(6),
-            "close": df["Close"].astype(float).round(6),
-            "volume": df["Volume"].fillna(0).astype(float).round(0).astype(int),
+            "open": _as_1d_series(df, "Open").astype(float).round(6),
+            "high": _as_1d_series(df, "High").astype(float).round(6),
+            "low": _as_1d_series(df, "Low").astype(float).round(6),
+            "close": _as_1d_series(df, "Close").astype(float).round(6),
+            "volume": _as_1d_series(df, "Volume").fillna(0).astype(float).round(0).astype(int),
         }
     )
     out = out.sort_values("date").drop_duplicates(subset=["date"]).reset_index(drop=True)

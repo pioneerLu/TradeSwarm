@@ -59,6 +59,12 @@ def create_risk_manager(llm: BaseChatModel, memory: Any) -> Callable[[AgentState
                 **summary_context,
                 "past_memory_str": past_memory_str,
                 "trader_plan": trader_plan,
+                "strategy_skill_context": state.get("strategy_skill_context"),
+                "strategy_skill_rules_text": (
+                    state.get("strategy_skill_context", {}).get("strategy_skill_rules_text", "")
+                    if isinstance(state.get("strategy_skill_context"), dict)
+                    else ""
+                ),
                 "history": history,
                 "position_info": position_info,
                 "portfolio_info": portfolio_info,
