@@ -1,3 +1,0 @@
-date,equity,cumulative_return,daily_return,close_price,signal_action,execution_date,shares,target_pct,entry_type,limit_price,cancel_pending_orders,pending_orders_count,pending_order_limits,filled_today_count,last_fill_offset_days
-2024-01-02,100000.0,0.0,0.0,48.167999,HOLD,,,,MKT_OPEN,,,0,[],0,
-2024-01-03,100000.0,0.0,0.0,47.569,HOLD,,0.0,,MKT_OPEN,,,0,[],0,

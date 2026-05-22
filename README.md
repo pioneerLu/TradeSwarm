@@ -17,6 +17,8 @@ TradeSwarm 是一个基于 LangGraph 的多智能体投研与回测系统。
 
 **工作交接**：环境与架构要点、交错回测数据流、已知坑见 [docs/HANDOVER.md](docs/HANDOVER.md)。
 
+**Git 仓库范围**：仅包含代码、配置模板与 pipeline 脚本；`storage/` 下的数据库、报告、信号、回测与 `graph_dumps` 等**均在本地生成，不会提交到 GitHub**。clone 后需自行跑 data prep 生成数据。
+
 ## 快速开始
 
 ```powershell
@@ -26,8 +28,8 @@ pip install -r requirements.txt
 请先确保以下内容已经准备好：
 
 - `config/config.yaml`（从 `config/config.yaml.example` 复制并填入实际值）
-- 仓库根目录下的 `.env`（配置 `Silicon_API_KEY` 等敏感信息）
-- 本地数据库文件
+- 仓库根目录下的 `.env`（从 `.env.example` 复制，配置 `Silicon_API_KEY` 等敏感信息）
+- 本地 `storage/` 目录（首次运行 data prep / 回测后自动填充；默认 DB 路径 `storage/db/memory.db`）
 - QuantConnect / Lean 本地环境（如需回测）
 
 说明：
@@ -60,8 +62,8 @@ TradeSwarm/
 ├── datasources/                # 数据源适配器
 ├── db_viewer/                  # Flask DB 查看器
 ├── quantconnect/               # QuantConnect 算法
-├── storage/                    # 运行时数据资产
-│   ├── db/
+├── storage/                    # 本地运行时目录（gitignored，仅保留 .gitkeep 占位）
+│   ├── db/                     # memory.db、Chroma 等
 │   ├── market_data/
 │   ├── reports/
 │   ├── signals/
@@ -341,7 +343,7 @@ python scripts\runtime\run_interleaved_backtest.py --symbol NVDA --start 2025-01
 - 汇总 JSON 顶层会写入 `data_coverage` 与 `snapshot_coverage` 字段，便于判断结果可信度
 
 ```powershell
-python scripts\runtime\run_interleaved_backtest.py --symbol NVDA --start 2024-01-01 --end 2024-03-01 --db storage\db\memory.db --initial-cash 100000 --report-output-root storage\reports_2024 --graph-dump storage\graph_dumps -v
+python scripts\runtime\run_interleaved_backtest.py --symbol NVDA --start 2024-01-01 --end 2024-01-07 --db storage\db\memory.db --initial-cash 100000 --report-output-root storage\reports_2024 --graph-dump storage\graph_dumps -v
 ```
 
 #### 3.4 基准策略对比回测（BH / MA / MACD）

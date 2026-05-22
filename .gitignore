@@ -130,9 +130,10 @@ dmypy.json
 *.swo
 *~
 
-# Only keep the root project README on GitHub
+# Markdown: root README + docs (pipeline / handover)
 *.md
 !README.md
+!docs/**/*.md
 
 # macOS system files
 .DS_Store
@@ -223,9 +224,10 @@ graph_outputs/
 test_results/
 backtest_results_v0/
 
-# Project storage data is versioned on this branch.
-!storage/
-!storage/**
+# Local runtime data & results (not versioned; directory layout via .gitkeep only)
+storage/**
+!storage/**/
+!storage/**/.gitkeep
 
 # Time series data files
 *.hdf5

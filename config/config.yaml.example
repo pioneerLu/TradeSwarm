@@ -1,0 +1,61 @@
+# TradeSwarm 配置模板
+# 复制为 config.yaml 后填入实际值；敏感信息建议放在 .env 中。
+
+memory:
+  # hybrid: Chroma 向量召回（按 symbol 过滤）优先，空则 cycle_reflections
+  # sql_only: 仅 SQLite 最近 weekly 反思
+  # chroma_only: 仅向量库，无命中则返回空
+  mode: hybrid
+
+graph:
+  max_research_debate_rounds: 2   # 每轮 = bull + bear；结束条件为发言次数 >= 该值 * 2
+  max_risk_debate_rounds: 2       # 每轮 = risky + neutral + safe；结束条件为次数 >= 该值 * 3
+
+strategy_skills:
+  mode: reflect        # reflect | all | off
+  fallback_mode: off   # all | off；Trader 自反思输出无效时使用
+  force_skill: null    # 可选：strong_uptrend_skill | range_bound_skill | downtrend_skill | high_vol_uncertain_skill
+
+llm:
+  api_key: ""
+  base_url: "https://api.siliconflow.cn/v1"
+  model_name: "qwen-plus"
+  temperature: 0.1
+
+  silicon:
+    api_key: ${Silicon_API_KEY}
+    base_url: ${base_url_silicon}
+    # default_profile/profiles 用于“可复现”的模型切换实验
+    default_profile: "qwen3_32b"
+    profiles:
+      qwen3_32b:
+        model_name: "Qwen/Qwen3-32B"
+        temperature: 0.1
+      deepseek_v3:
+        model_name: "deepseek-ai/DeepSeek-V3"
+        temperature: 0.1
+      glm_4_9b:
+        # 以 SiliconFlow 控制台实际模型 ID 为准；若名称不同，只需改这里。
+        model_name: "THUDM/glm-4-9b-chat"
+        temperature: 0.1
+    # 兼容旧字段：当 profiles 未配置时回退到 model_name/temperature
+    model_name: "Qwen/Qwen3-32B"
+    temperature: 0.1
+
+data_sources:
+  tushare_token: ${TUSHARE_TOKEN}
+  currency_api_key: ${CURRENCY_API_KEY}
+  polaris_token: ${POLARIS_TOKEN}
+
+storage:
+  sqlite_path: "memory.db"
+  chroma_persist_directory: "chroma_db"
+  chroma_collection: "tradeswarm_memory"
+  # embedding_backend: silicon | bge_local
+  # - silicon: use embeddings API (needs Silicon_API_KEY + base_url_silicon)
+  # - bge_local: use local SentenceTransformer BGE model
+  embedding_backend: "bge_local"
+  # Put the model under repo root, e.g. models/bge-small-zh-v1.5/
+  embedding_model_path: "models/bge-small-zh-v1.5"
+  # Optional: when embedding_model_path is empty, load from HF repo id
+  embedding_model_name: "BAAI/bge-small-zh-v1.5"
