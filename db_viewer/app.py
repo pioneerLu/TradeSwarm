@@ -33,7 +33,12 @@ def resolve_db_path(cli_db: str | None = None) -> Path:
 DB_PATH = resolve_db_path()
 
 # 允许按 id 删除行的表（本地工具，仍做白名单）
-ALLOWED_DELETE_BY_ID_TABLES = frozenset({"analyst_reports", "analyst_summaries"})
+ALLOWED_DELETE_BY_ID_TABLES = frozenset({
+    "analyst_reports",
+    "analyst_summaries",
+    "daily_trading_summaries",
+    "cycle_reflections",
+})
 
 app = Flask(__name__)
 
@@ -338,6 +343,50 @@ def api_delete_summary():
     return jsonify({"ok": True, "deleted": deleted})
 
 
+@app.route("/api/delete_trading_summary", methods=["POST"])
+def api_delete_trading_summary():
+    """按 symbol + date 删除 daily_trading_summaries"""
+    data = request.get_json() or {}
+    symbol = (data.get("symbol") or "NVDA").strip().upper()
+    date = data.get("date")
+    if not date:
+        return jsonify({"error": "缺少 date"}), 400
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute(
+        "DELETE FROM daily_trading_summaries WHERE symbol=? AND date=?",
+        (symbol, date),
+    )
+    deleted = cur.rowcount
+    conn.commit()
+    conn.close()
+    if deleted == 0:
+        return jsonify({"ok": False, "deleted": 0, "error": "未找到该 trading summary"}), 404
+    return jsonify({"ok": True, "deleted": deleted})
+
+
+@app.route("/api/delete_cycle_reflection", methods=["POST"])
+def api_delete_cycle_reflection():
+    """按 id 删除 cycle_reflections"""
+    data = request.get_json() or {}
+    rid = data.get("id")
+    if rid is None:
+        return jsonify({"error": "缺少 id"}), 400
+    try:
+        rid_int = int(rid)
+    except (TypeError, ValueError):
+        return jsonify({"error": "id 须为整数"}), 400
+    conn = get_conn()
+    cur = conn.cursor()
+    cur.execute("DELETE FROM cycle_reflections WHERE id=?", (rid_int,))
+    deleted = cur.rowcount
+    conn.commit()
+    conn.close()
+    if deleted == 0:
+        return jsonify({"ok": False, "deleted": 0, "error": "未找到该 cycle reflection"}), 404
+    return jsonify({"ok": True, "deleted": deleted})
+
+
 @app.route("/api/delete_row", methods=["POST"])
 def api_delete_row():
     """按主键 id 删除白名单表中的单行"""
@@ -570,6 +619,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           <select id="selTradingDate"><option value="">选择日期</option></select>
         </div>
         <div class="btn-row">
+          <button type="button" class="btn btn-danger" id="btnDeleteTradingSummary">删除当前 Trading Summary</button>
           <span class="meta" id="tradingMeta"></span>
         </div>
         <div class="split">
@@ -612,6 +662,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         <div style="height:0.75rem"></div>
         <div class="card" style="margin-bottom:0">
           <h3 style="margin-bottom:0.75rem">详情（reflection_content）</h3>
+          <div class="btn-row">
+            <button type="button" class="btn btn-danger" id="btnDeleteCycleReflection" disabled>删除当前反思</button>
+            <span class="meta" id="reflDetailMeta"></span>
+          </div>
           <div id="reflDetail" class="report-content">(从列表点选一条)</div>
         </div>
       </div>
@@ -634,6 +688,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
     let currentReportId = null;
     let currentSummaryId = null;
     let currentTradingSummaryId = null;
+    let currentCycleReflectionId = null;
 
     document.querySelectorAll('.tab').forEach(t => {
       t.onclick = () => {
@@ -823,6 +878,7 @@ HTML_TEMPLATE = """<!DOCTYPE html>
           return `<div style="padding:0.5rem 0;border-bottom:1px solid #30363d">
             <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap">
               <button class="btn btn-mini" data-refl-id="${row.id}">查看</button>
+              <button class="btn btn-danger btn-mini" data-refl-del-id="${row.id}">删除</button>
               <div style="font-weight:600">${title}</div>
             </div>
             <div class="meta">${ki}</div>
@@ -831,6 +887,9 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         listEl.querySelectorAll('[data-refl-id]').forEach(btn => {
           btn.onclick = () => loadReflectionDetail(btn.getAttribute('data-refl-id'));
         });
+        listEl.querySelectorAll('[data-refl-del-id]').forEach(btn => {
+          btn.onclick = () => deleteCycleReflection(btn.getAttribute('data-refl-del-id'), true);
+        });
       } catch (e) {
         listEl.textContent = '加载失败: ' + e.message;
       }
@@ -838,11 +897,22 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
     async function loadReflectionDetail(id) {
       const el = document.getElementById('reflDetail');
+      const meta = document.getElementById('reflDetailMeta');
+      const delBtn = document.getElementById('btnDeleteCycleReflection');
+      currentCycleReflectionId = id;
+      delBtn.disabled = false;
       el.textContent = '加载中...';
+      meta.textContent = 'id=' + id;
       try {
         const r = await fetch(API + '/api/cycle_reflection?id=' + encodeURIComponent(id));
         const j = await r.json();
-        if (!r.ok || j.error) { el.textContent = j.error || '加载失败'; return; }
+        if (!r.ok || j.error) {
+          el.textContent = j.error || '加载失败';
+          currentCycleReflectionId = null;
+          delBtn.disabled = true;
+          meta.textContent = '';
+          return;
+        }
         if (j.reflection_content_parsed) {
           el.textContent = JSON.stringify(j.reflection_content_parsed, null, 2);
         } else {
@@ -850,8 +920,62 @@ HTML_TEMPLATE = """<!DOCTYPE html>
         }
       } catch (e) {
         el.textContent = '加载失败: ' + e.message;
+        currentCycleReflectionId = null;
+        delBtn.disabled = true;
+        meta.textContent = '';
       }
     }
+
+    async function deleteCycleReflection(id, fromList) {
+      if (!id) return;
+      if (!confirm('确定删除 id=' + id + ' 的周期反思？不可恢复。')) return;
+      try {
+        const r = await fetch(API + '/api/delete_cycle_reflection', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ id: parseInt(id, 10) })
+        });
+        const j = await r.json();
+        if (!r.ok) { alert(j.error || '删除失败'); return; }
+        alert('已删除 ' + (j.deleted || 0) + ' 条');
+        if (String(currentCycleReflectionId) === String(id)) {
+          currentCycleReflectionId = null;
+          document.getElementById('btnDeleteCycleReflection').disabled = true;
+          document.getElementById('reflDetailMeta').textContent = '';
+          document.getElementById('reflDetail').textContent = fromList ? '(已删除)' : '(已删除，请重新选择)';
+        }
+        loadReflections();
+        loadOverview();
+      } catch (e) { alert('删除失败: ' + e.message); }
+    }
+
+    document.getElementById('btnDeleteTradingSummary').onclick = async () => {
+      const symbol = document.getElementById('selTradingSymbol').value;
+      const date = document.getElementById('selTradingDate').value;
+      if (!date) { alert('请先选择日期'); return; }
+      if (!confirm('确定删除「' + symbol + ' / ' + date + '」这条 Trading Summary？不可恢复。')) return;
+      try {
+        const r = await fetch(API + '/api/delete_trading_summary', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ symbol, date })
+        });
+        const j = await r.json();
+        if (!r.ok) { alert(j.error || '删除失败'); return; }
+        alert('已删除 ' + (j.deleted || 0) + ' 条');
+        document.getElementById('tradingKv').innerHTML = '';
+        document.getElementById('tradingJson').textContent = '已删除，请重新选择或刷新日期列表';
+        document.getElementById('tradingMeta').textContent = '';
+        currentTradingSummaryId = null;
+        loadTradingSummaryDates();
+        loadOverview();
+      } catch (e) { alert('删除失败: ' + e.message); }
+    };
+
+    document.getElementById('btnDeleteCycleReflection').onclick = async () => {
+      if (!currentCycleReflectionId) { alert('请先从列表选择一条反思'); return; }
+      await deleteCycleReflection(currentCycleReflectionId, false);
+    };
 
     document.getElementById('btnDeleteSummary').onclick = async () => {
       const symbol = document.getElementById('selSummarySymbol').value;
@@ -907,7 +1031,10 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       sel.onchange = loadTableData;
     }
 
-    const ALLOW_DELETE_TABLES = ['analyst_reports', 'analyst_summaries'];
+    const ALLOW_DELETE_TABLES = [
+      'analyst_reports', 'analyst_summaries',
+      'daily_trading_summaries', 'cycle_reflections'
+    ];
 
     async function deleteTableRow(table, id) {
       if (!confirm('确定删除 id=' + id + ' ？不可恢复。')) return;

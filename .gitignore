@@ -133,6 +133,7 @@ dmypy.json
 # Markdown: root README + docs (pipeline / handover)
 *.md
 !README.md
+!exp.md
 !docs/**/*.md
 
 # macOS system files
@@ -237,7 +238,9 @@ storage/**
 *.ohlcv
 *.tick
 quote_data/
+# Ignore downloaded market caches except storage layout marker
 market_data/
+!storage/market_data/.gitkeep
 
 # Lean CLI workspace (lean init 输出，含下载数据)
 lean_workspace/

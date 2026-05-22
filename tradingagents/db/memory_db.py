@@ -441,6 +441,26 @@ class MemoryDBHelper:
             logger.error("[ERROR] 查询 daily trading summaries 失败: %s", e)
             return []
 
+    def delete_daily_trading_summary(self, date: str, symbol: str) -> int:
+        """按 (date, symbol) 删除 daily_trading_summaries，返回删除行数。"""
+        try:
+            conn = self._get_connection()
+            cur = conn.cursor()
+            cur.execute(
+                "DELETE FROM daily_trading_summaries WHERE date=? AND symbol=?",
+                (date, symbol),
+            )
+            deleted = cur.rowcount
+            conn.commit()
+            cur.close()
+            if deleted:
+                logger.info("[OK] 删除 daily trading summary: %s - %s", date, symbol)
+            return deleted
+        except Exception as e:
+            logger.error("[ERROR] 删除 daily trading summary 失败: %s", e)
+            self._rollback_current_thread()
+            return 0
+
     # ==================================================================
     # cycle_reflections
     # ==================================================================
@@ -519,6 +539,23 @@ class MemoryDBHelper:
         except Exception as e:
             logger.error("[ERROR] 查询 cycle reflection 失败: %s", e)
             return None
+
+    def delete_cycle_reflection(self, reflection_id: int) -> int:
+        """按主键 id 删除 cycle_reflections，返回删除行数。"""
+        try:
+            conn = self._get_connection()
+            cur = conn.cursor()
+            cur.execute("DELETE FROM cycle_reflections WHERE id=?", (reflection_id,))
+            deleted = cur.rowcount
+            conn.commit()
+            cur.close()
+            if deleted:
+                logger.info("[OK] 删除 cycle reflection id=%s", reflection_id)
+            return deleted
+        except Exception as e:
+            logger.error("[ERROR] 删除 cycle reflection 失败: %s", e)
+            self._rollback_current_thread()
+            return 0
 
     # ==================================================================
     # portfolio_snapshots
