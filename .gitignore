@@ -215,8 +215,9 @@ local_outputs/
 *.pdf
 *.xlsx
 
-# Database files
+# Database files (project ships storage/db/memory.db for dev bootstrap)
 *.db
+!storage/db/memory.db
 *.sqlite
 *.sqlite3
 
@@ -225,9 +226,11 @@ graph_outputs/
 test_results/
 backtest_results_v0/
 
-# Local runtime data & results (not versioned; directory layout via .gitkeep only)
+# Local runtime data & results (memory.db is versioned; rest via .gitkeep only)
 storage/**
 !storage/**/
+!storage/db/
+!storage/db/memory.db
 !storage/**/.gitkeep
 
 # Time series data files
