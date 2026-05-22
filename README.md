@@ -1,6 +1,6 @@
 # TradeSwarm
 
-基于 LangGraph 的多智能体投研与回测系统。四条 pipeline **手动串联**（不自动编排）：
+基于 LangGraph 的多智能体投研与回测系统。四条 pipeline 串联：
 
 | Pipeline | 入口 | 作用 |
 |----------|------|------|
@@ -11,7 +11,7 @@
 
 `enabled_analysts`：`market` → `market,news` → `market,news,sentiment,fundamentals`。
 
-开发者文档：[docs/HANDOVER.md](docs/HANDOVER.md) · 实验计划：[docs/EXPERIMENT_MATRIX.md](docs/EXPERIMENT_MATRIX.md)
+实验矩阵见 [exp.md](exp.md)。`storage/db/memory.db` 随仓库提交，其余 `storage/` 产物本地生成。
 
 ---
 
@@ -31,12 +31,12 @@ python db_viewer\app.py --db storage\db\memory.db   # http://127.0.0.1:5555
 ## 目录结构
 
 ```text
-apps/              # 唯一推荐 CLI 入口
+apps/              # CLI 入口
 tradingagents/     # 图、Agent、config、db
 scripts/runtime/   # 回测、信号导出、交错回测
 scripts/experimental/
 datasources/  quantconnect/  db_viewer/  config/
-storage/           # 本地运行时（gitignored）
+storage/           # 报告/回测等本地产物（gitignored）；db/memory.db 随仓库提交
 ```
 
 ---
